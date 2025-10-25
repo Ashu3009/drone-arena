@@ -1,0 +1,25 @@
+**Create file: `DroneArena/.gitignore`**
+```
+# Node modules
+backend/node_modules/
+backend/.env
+
+# Python
+ml-analysis/__pycache__/
+ml-analysis/*.pyc
+ml-analysis/venv/
+ml-analysis/.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
