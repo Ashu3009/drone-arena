@@ -14,6 +14,8 @@ const leaderboardRoutes = require('./routes/leaderboardRoutes');
 
 const droneLogRoutes = require('./routes/droneLogRoutes');
 
+// Import MQTT service to initialize connection
+require('./services/mqttService');  // ✅ ADD THIS LINE
 // Load environment variables
 dotenv.config();
 

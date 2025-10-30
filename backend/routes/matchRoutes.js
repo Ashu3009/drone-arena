@@ -8,7 +8,8 @@ const {
   startRound,
   updateScore,
   endRound,
-  completeMatch
+  completeMatch,
+  registerDrones  // ✅ YE NAYA ADD KARO
 } = require('../controllers/matchController');
 
 router.route('/')
@@ -20,5 +21,8 @@ router.put('/:matchId/start-round', startRound);
 router.put('/:matchId/update-score', updateScore);
 router.put('/:matchId/end-round', endRound);
 router.put('/:matchId/complete', completeMatch);
+
+// ✅ YE NAYA ROUTE ADD KARO
+router.post('/:matchId/register-drones', registerDrones);
 
 module.exports = router;

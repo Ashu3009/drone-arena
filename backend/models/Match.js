@@ -8,6 +8,29 @@ const roundSchema = new mongoose.Schema({
     min: 1,
     max: 3
   },
+  
+  // ✅ YE NAYA ADD KARO - Registered drones for this round
+  registeredDrones: [{
+    droneNumber: { 
+      type: Number, 
+      required: true,
+      min: 1,
+      max: 16
+    }, // Physical drone (1-16)
+    
+    droneId: { 
+      type: String, 
+      required: true,
+      enum: ['R1', 'R2', 'R3', 'R4', 'B1', 'B2', 'B3', 'B4']
+    }, // In-match ID
+    
+    team: { 
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: 'Team',
+      required: true
+    }
+  }],
+  
   teamAScore: {
     type: Number,
     default: 0
@@ -29,6 +52,7 @@ const roundSchema = new mongoose.Schema({
   }
 });
 
+// Baaki sab same rahega
 const matchSchema = new mongoose.Schema({
   tournament: {
     type: mongoose.Schema.Types.ObjectId,

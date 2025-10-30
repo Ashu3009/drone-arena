@@ -535,6 +535,257 @@ const completeMatch = async (req, res) => {
   }
 };
 
+// @desc    Register drones for a round
+// @route   POST /api/matches/:matchId/register-drones
+const registerDrones = async (req, res) => {
+  try {
+    const { matchId } = req.params;
+    const { roundNumber, drones } = req.body;
+
+    // Validation
+    if (!roundNumber || !drones || !Array.isArray(drones)) {
+      return res.status(400).json({ 
+        message: 'Round number and drones array are required' 
+      });
+    }
+
+    // Validate drones array length (should be 8: 4 for each team)
+    if (drones.length !== 8) {
+      return res.status(400).json({ 
+        message: 'Exactly 8 drones required (4 per team)' 
+      });
+    }
+
+    // Find match
+    const match = await Match.findById(matchId);
+    if (!match) {
+      return res.status(404).json({ message: 'Match not found' });
+    }
+
+    // Check if match is not completed
+    if (match.status === 'completed') {
+      return res.status(400).json({ 
+        message: 'Cannot register drones for completed match' 
+      });
+    }
+
+    // Find or create round
+    let round = match.rounds.find(r => r.roundNumber === roundNumber);
+    
+    if (!round) {
+      // Create new round
+      match.rounds.push({
+        roundNumber,
+        status: 'pending',
+        registeredDrones: drones,
+        teamAScore: 0,
+        teamBScore: 0
+      });
+    } else {
+      // Update existing round
+      if (round.status === 'completed') {
+        return res.status(400).json({ 
+          message: 'Cannot register drones for completed round' 
+        });
+      }
+      round.registeredDrones = drones;
+    }
+
+    await match.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Drones registered successfully',
+      match
+    });
+
+  } catch (error) {
+    console.error('Error registering drones:', error);
+    res.status(500).json({ 
+      message: 'Error registering drones', 
+      error: error.message 
+    });
+  }
+};
+
+
+const getMatchReport = async (req, res) => {
+  try {
+    const { matchId } = req.params;
+
+    // Find match with all populated data
+    const match = await Match.findById(matchId)
+      .populate('tournament', 'name description startDate endDate')
+      .populate('teamA', 'name color members')
+      .populate('teamB', 'name color members')
+      .populate('winner', 'name color')
+      .populate({
+        path: 'rounds.registeredDrones.team',
+        select: 'name color'
+      });
+
+    if (!match) {
+      return res.status(404).json({ 
+        success: false,
+        message: 'Match not found' 
+      });
+    }
+
+    // Calculate detailed statistics
+    const report = {
+      matchId: match._id,
+      tournament: match.tournament,
+      matchStatus: match.status,
+      scheduledTime: match.scheduledTime,
+      
+      // Teams Info
+      teams: {
+        teamA: {
+          _id: match.teamA._id,
+          name: match.teamA.name,
+          color: match.teamA.color,
+          finalScore: match.finalScoreA,
+          totalMembers: match.teamA.members.length
+        },
+        teamB: {
+          _id: match.teamB._id,
+          name: match.teamB.name,
+          color: match.teamB.color,
+          finalScore: match.finalScoreB,
+          totalMembers: match.teamB.members.length
+        }
+      },
+
+      // Winner Info
+      winner: match.winner ? {
+        _id: match.winner._id,
+        name: match.winner.name,
+        color: match.winner.color
+      } : null,
+
+      // Rounds Details
+      rounds: match.rounds.map(round => {
+        const teamADrones = round.registeredDrones.filter(
+          d => d.team._id.toString() === match.teamA._id.toString()
+        );
+        const teamBDrones = round.registeredDrones.filter(
+          d => d.team._id.toString() === match.teamB._id.toString()
+        );
+
+        return {
+          roundNumber: round.roundNumber,
+          status: round.status,
+          startTime: round.startTime,
+          endTime: round.endTime,
+          duration: round.startTime && round.endTime 
+            ? Math.round((new Date(round.endTime) - new Date(round.startTime)) / 1000) + ' seconds'
+            : 'N/A',
+          
+          scores: {
+            teamA: round.teamAScore,
+            teamB: round.teamBScore,
+            winner: round.teamAScore > round.teamBScore 
+              ? match.teamA.name 
+              : round.teamBScore > round.teamAScore 
+                ? match.teamB.name 
+                : 'Draw'
+          },
+
+          drones: {
+            teamA: teamADrones.map(d => ({
+              droneNumber: d.droneNumber,
+              droneId: d.droneId,
+              team: d.team.name
+            })),
+            teamB: teamBDrones.map(d => ({
+              droneNumber: d.droneNumber,
+              droneId: d.droneId,
+              team: d.team.name
+            }))
+          },
+
+          totalDrones: round.registeredDrones.length
+        };
+      }),
+
+      // Overall Statistics
+      statistics: {
+        totalRounds: match.rounds.length,
+        completedRounds: match.rounds.filter(r => r.status === 'completed').length,
+        currentRound: match.currentRound,
+        
+        totalDronesUsed: [
+          ...new Set(
+            match.rounds.flatMap(r => 
+              r.registeredDrones.map(d => d.droneNumber)
+            )
+          )
+        ].length,
+
+        roundsWonByTeamA: match.rounds.filter(
+          r => r.teamAScore > r.teamBScore
+        ).length,
+        
+        roundsWonByTeamB: match.rounds.filter(
+          r => r.teamBScore > r.teamAScore
+        ).length,
+
+        totalPointsScored: match.finalScoreA + match.finalScoreB
+      },
+
+      // Drone Usage Summary
+      droneUsageSummary: generateDroneUsageSummary(match),
+
+      createdAt: match.createdAt,
+      updatedAt: match.updatedAt
+    };
+
+    res.status(200).json({
+      success: true,
+      report
+    });
+
+  } catch (error) {
+    console.error('Error generating match report:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Error generating match report', 
+      error: error.message 
+    });
+  }
+};
+
+// Helper function for drone usage summary
+const generateDroneUsageSummary = (match) => {
+  const droneUsage = {};
+
+  match.rounds.forEach(round => {
+    round.registeredDrones.forEach(drone => {
+      if (!droneUsage[drone.droneNumber]) {
+        droneUsage[drone.droneNumber] = {
+          droneNumber: drone.droneNumber,
+          timesUsed: 0,
+          rounds: [],
+          teams: new Set()
+        };
+      }
+      
+      droneUsage[drone.droneNumber].timesUsed++;
+      droneUsage[drone.droneNumber].rounds.push(round.roundNumber);
+      droneUsage[drone.droneNumber].teams.add(drone.team.name);
+    });
+  });
+
+  return Object.values(droneUsage).map(drone => ({
+    droneNumber: drone.droneNumber,
+    timesUsed: drone.timesUsed,
+    roundsUsedIn: drone.rounds,
+    teamsUsedBy: Array.from(drone.teams)
+  }));
+};
+
+
+
 module.exports = {
   getAllMatches,
   getMatchById,
@@ -542,5 +793,7 @@ module.exports = {
   startRound,
   updateScore,
   endRound,
-  completeMatch
+  completeMatch,
+  registerDrones,
+  getMatchReport
 };
