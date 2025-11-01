@@ -13,12 +13,29 @@ const receiveTelemetry = async (req, res) => {
     });
 
     await telemetry.save();
-    
+
     // Log for debugging
     console.log(`📡 Telemetry received: ${droneId} [${telemetry.source}]`);
-    
-    res.status(200).json({ 
-      success: true, 
+
+    // ✅ Emit Socket.io event for real-time telemetry
+    if (global.io && matchId) {
+      global.io.to(`match-${matchId}`).emit('telemetry', {
+        droneId,
+        matchId,
+        roundNumber,
+        x: req.body.x,
+        y: req.body.y,
+        z: req.body.z,
+        pitch: req.body.pitch,
+        roll: req.body.roll,
+        yaw: req.body.yaw,
+        battery: req.body.battery,
+        timestamp: telemetry.timestamp
+      });
+    }
+
+    res.status(200).json({
+      success: true,
       message: 'Telemetry received',
       droneId,
       source: telemetry.source

@@ -190,9 +190,22 @@ const startRound = async (req, res) => {
     match.status = 'in_progress';
     
     await match.save();
-    
+
     console.log(`✅ Round ${nextRound.roundNumber} started`);
-    
+
+    // ✅ Emit Socket.io event for real-time updates
+    if (global.io) {
+      global.io.to(`match-${matchId}`).emit('round-started', {
+        matchId: matchId,
+        roundNumber: nextRound.roundNumber,
+        startTime: nextRound.startTime,
+        teamA: match.teamA.name,
+        teamB: match.teamB.name,
+        currentRound: match.currentRound
+      });
+      console.log(`📡 Socket event emitted: round-started (Round ${nextRound.roundNumber})`);
+    }
+
     res.json({
       success: true,
       message: `Round ${nextRound.roundNumber} started`,
@@ -256,7 +269,21 @@ const updateScore = async (req, res) => {
     
     await match.save();
     await match.populate('teamA teamB');
-    
+
+    // ✅ Emit Socket.io event for live score updates
+    if (global.io) {
+      global.io.to(`match-${matchId}`).emit('score-updated', {
+        matchId: matchId,
+        roundNumber: match.currentRound,
+        teamAScore: currentRound.teamAScore,
+        teamBScore: currentRound.teamBScore,
+        finalScoreA: match.finalScoreA,
+        finalScoreB: match.finalScoreB,
+        updatedTeam: team
+      });
+      console.log(`📡 Socket event emitted: score-updated (Team ${team})`);
+    }
+
     res.json({
       success: true,
       data: match
@@ -434,15 +461,30 @@ const endRound = async (req, res) => {
     }
     
     await match.save();
-    
+
     console.log(`✅ Round ${roundNumber} completed!`);
     console.log(`   - Team A Score: ${activeRound.teamAScore}`);
     console.log(`   - Team B Score: ${activeRound.teamBScore}`);
     console.log('=====================================\n');
-    
+
     await match.populate('teamA', 'name color');
     await match.populate('teamB', 'name color');
-    
+
+    // ✅ Emit Socket.io event for round completion
+    if (global.io) {
+      global.io.to(`match-${matchId}`).emit('round-ended', {
+        matchId: matchId,
+        roundNumber: roundNumber,
+        teamAScore: activeRound.teamAScore,
+        teamBScore: activeRound.teamBScore,
+        finalScoreA: match.finalScoreA,
+        finalScoreB: match.finalScoreB,
+        duration: Math.round((activeRound.endTime - activeRound.startTime) / 1000),
+        mlAnalysis: activeRound.mlAnalysis || null
+      });
+      console.log(`📡 Socket event emitted: round-ended (Round ${roundNumber})`);
+    }
+
     res.status(200).json({
       success: true,
       message: `Round ${roundNumber} ended successfully`,
@@ -509,10 +551,26 @@ const completeMatch = async (req, res) => {
     match.completedAt = new Date();
     
     await match.save();
-    
+
     console.log('🏆 Match completed!');
     console.log(`   Winner: ${winner ? (winner.toString() === match.teamA._id.toString() ? 'Team A' : 'Team B') : 'Draw'}`);
-    
+
+    // ✅ Emit Socket.io event for match completion
+    if (global.io) {
+      global.io.emit('match-completed', {
+        matchId: match._id,
+        status: 'completed',
+        winner: winner,
+        winnerName: winner ? (winner.toString() === match.teamA._id.toString() ? match.teamA.name : match.teamB.name) : 'Draw',
+        finalScoreA: match.finalScoreA,
+        finalScoreB: match.finalScoreB,
+        teamA: match.teamA.name,
+        teamB: match.teamB.name,
+        completedAt: match.completedAt
+      });
+      console.log(`📡 Socket event emitted: match-completed`);
+    }
+
     res.json({
       success: true,
       message: 'Match completed',
@@ -608,182 +666,207 @@ const registerDrones = async (req, res) => {
   }
 };
 
-
-const getMatchReport = async (req, res) => {
+// @desc    Set current match (only one match can be current at a time)
+// @route   PUT /api/matches/:matchId/set-current
+const setCurrentMatch = async (req, res) => {
   try {
     const { matchId } = req.params;
 
-    // Find match with all populated data
-    const match = await Match.findById(matchId)
-      .populate('tournament', 'name description startDate endDate')
-      .populate('teamA', 'name color members')
-      .populate('teamB', 'name color members')
-      .populate('winner', 'name color')
-      .populate({
-        path: 'rounds.registeredDrones.team',
-        select: 'name color'
-      });
+    // First, unset any existing current match
+    await Match.updateMany({}, { isCurrentMatch: false });
+
+    // Set this match as current
+    const match = await Match.findByIdAndUpdate(
+      matchId,
+      { isCurrentMatch: true },
+      { new: true }
+    )
+      .populate('tournament', 'name')
+      .populate('teamA', 'name color')
+      .populate('teamB', 'name color');
 
     if (!match) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        message: 'Match not found' 
+        message: 'Match not found'
       });
     }
 
-    // Calculate detailed statistics
-    const report = {
-      matchId: match._id,
-      tournament: match.tournament,
-      matchStatus: match.status,
-      scheduledTime: match.scheduledTime,
-      
-      // Teams Info
-      teams: {
-        teamA: {
-          _id: match.teamA._id,
-          name: match.teamA.name,
-          color: match.teamA.color,
-          finalScore: match.finalScoreA,
-          totalMembers: match.teamA.members.length
-        },
-        teamB: {
-          _id: match.teamB._id,
-          name: match.teamB.name,
-          color: match.teamB.color,
-          finalScore: match.finalScoreB,
-          totalMembers: match.teamB.members.length
-        }
-      },
+    console.log(`✅ Current match set: ${match._id}`);
 
-      // Winner Info
-      winner: match.winner ? {
-        _id: match.winner._id,
-        name: match.winner.name,
-        color: match.winner.color
-      } : null,
+    // Emit Socket.io event
+    if (global.io) {
+      global.io.emit('current-match-updated', {
+        matchId: match._id,
+        tournament: match.tournament.name,
+        teamA: match.teamA.name,
+        teamB: match.teamB.name,
+        status: match.status
+      });
+      console.log(`📡 Socket event emitted: current-match-updated`);
+    }
 
-      // Rounds Details
-      rounds: match.rounds.map(round => {
-        const teamADrones = round.registeredDrones.filter(
-          d => d.team._id.toString() === match.teamA._id.toString()
-        );
-        const teamBDrones = round.registeredDrones.filter(
-          d => d.team._id.toString() === match.teamB._id.toString()
-        );
-
-        return {
-          roundNumber: round.roundNumber,
-          status: round.status,
-          startTime: round.startTime,
-          endTime: round.endTime,
-          duration: round.startTime && round.endTime 
-            ? Math.round((new Date(round.endTime) - new Date(round.startTime)) / 1000) + ' seconds'
-            : 'N/A',
-          
-          scores: {
-            teamA: round.teamAScore,
-            teamB: round.teamBScore,
-            winner: round.teamAScore > round.teamBScore 
-              ? match.teamA.name 
-              : round.teamBScore > round.teamAScore 
-                ? match.teamB.name 
-                : 'Draw'
-          },
-
-          drones: {
-            teamA: teamADrones.map(d => ({
-              droneNumber: d.droneNumber,
-              droneId: d.droneId,
-              team: d.team.name
-            })),
-            teamB: teamBDrones.map(d => ({
-              droneNumber: d.droneNumber,
-              droneId: d.droneId,
-              team: d.team.name
-            }))
-          },
-
-          totalDrones: round.registeredDrones.length
-        };
-      }),
-
-      // Overall Statistics
-      statistics: {
-        totalRounds: match.rounds.length,
-        completedRounds: match.rounds.filter(r => r.status === 'completed').length,
-        currentRound: match.currentRound,
-        
-        totalDronesUsed: [
-          ...new Set(
-            match.rounds.flatMap(r => 
-              r.registeredDrones.map(d => d.droneNumber)
-            )
-          )
-        ].length,
-
-        roundsWonByTeamA: match.rounds.filter(
-          r => r.teamAScore > r.teamBScore
-        ).length,
-        
-        roundsWonByTeamB: match.rounds.filter(
-          r => r.teamBScore > r.teamAScore
-        ).length,
-
-        totalPointsScored: match.finalScoreA + match.finalScoreB
-      },
-
-      // Drone Usage Summary
-      droneUsageSummary: generateDroneUsageSummary(match),
-
-      createdAt: match.createdAt,
-      updatedAt: match.updatedAt
-    };
-
-    res.status(200).json({
+    res.json({
       success: true,
-      report
+      message: 'Current match set successfully',
+      data: match
     });
 
   } catch (error) {
-    console.error('Error generating match report:', error);
-    res.status(500).json({ 
+    console.error('Error in setCurrentMatch:', error);
+    res.status(500).json({
       success: false,
-      message: 'Error generating match report', 
-      error: error.message 
+      message: error.message
     });
   }
 };
 
-// Helper function for drone usage summary
-const generateDroneUsageSummary = (match) => {
-  const droneUsage = {};
+// @desc    Get current match
+// @route   GET /api/matches/current
+const getCurrentMatch = async (req, res) => {
+  try {
+    const match = await Match.findOne({ isCurrentMatch: true })
+      .populate('tournament', 'name')
+      .populate('teamA', 'name color droneIds')
+      .populate('teamB', 'name color droneIds')
+      .populate('winner', 'name');
 
-  match.rounds.forEach(round => {
-    round.registeredDrones.forEach(drone => {
-      if (!droneUsage[drone.droneNumber]) {
-        droneUsage[drone.droneNumber] = {
-          droneNumber: drone.droneNumber,
-          timesUsed: 0,
-          rounds: [],
-          teams: new Set()
-        };
-      }
-      
-      droneUsage[drone.droneNumber].timesUsed++;
-      droneUsage[drone.droneNumber].rounds.push(round.roundNumber);
-      droneUsage[drone.droneNumber].teams.add(drone.team.name);
+    if (!match) {
+      return res.status(404).json({
+        success: false,
+        message: 'No current match set'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: match
     });
-  });
 
-  return Object.values(droneUsage).map(drone => ({
-    droneNumber: drone.droneNumber,
-    timesUsed: drone.timesUsed,
-    roundsUsedIn: drone.rounds,
-    teamsUsedBy: Array.from(drone.teams)
-  }));
+  } catch (error) {
+    console.error('Error in getCurrentMatch:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
 };
 
+// @desc    Start all drones for current round (batch command)
+// @route   POST /api/matches/:matchId/start-all-drones
+const startAllDrones = async (req, res) => {
+  try {
+    const { matchId } = req.params;
+
+    const match = await Match.findById(matchId)
+      .populate('teamA', 'name')
+      .populate('teamB', 'name');
+
+    if (!match) {
+      return res.status(404).json({
+        success: false,
+        message: 'Match not found'
+      });
+    }
+
+    // Check if there's an active round
+    const activeRound = match.rounds.find(r => r.status === 'in_progress');
+
+    if (!activeRound) {
+      return res.status(400).json({
+        success: false,
+        message: 'No active round. Please start a round first.'
+      });
+    }
+
+    // Get registered drones for this round
+    const drones = activeRound.registeredDrones;
+
+    if (!drones || drones.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No drones registered for this round'
+      });
+    }
+
+    // Import MQTT service
+    const { configureMatchDrones } = require('../services/mqttService');
+
+    // Send START command to all drones
+    await configureMatchDrones(
+      matchId,
+      activeRound.roundNumber,
+      drones,
+      match.teamA._id,
+      match.teamB._id
+    );
+
+    console.log(`✅ Batch START sent to ${drones.length} drones`);
+
+    res.json({
+      success: true,
+      message: `START command sent to ${drones.length} drones`,
+      drones: drones.map(d => d.droneId)
+    });
+
+  } catch (error) {
+    console.error('Error in startAllDrones:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+// @desc    Stop all drones (batch command)
+// @route   POST /api/matches/:matchId/stop-all-drones
+const stopAllDrones = async (req, res) => {
+  try {
+    const { stopAllDrones } = require('../services/mqttService');
+
+    // Send STOP command to all drones via MQTT broadcast
+    stopAllDrones();
+
+    console.log(`✅ Batch STOP sent to all drones`);
+
+    res.json({
+      success: true,
+      message: 'STOP command sent to all drones'
+    });
+
+  } catch (error) {
+    console.error('Error in stopAllDrones:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+// @desc    Reset all drones (batch command)
+// @route   POST /api/matches/:matchId/reset-all-drones
+const resetAllDrones = async (req, res) => {
+  try {
+    const { resetAllDrones } = require('../services/mqttService');
+
+    // Send RESET command to all drones via MQTT broadcast
+    resetAllDrones();
+
+    console.log(`✅ Batch RESET sent to all drones`);
+
+    res.json({
+      success: true,
+      message: 'RESET command sent to all drones'
+    });
+
+  } catch (error) {
+    console.error('Error in resetAllDrones:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
 
 
 module.exports = {
@@ -795,5 +878,9 @@ module.exports = {
   endRound,
   completeMatch,
   registerDrones,
-  getMatchReport
+  setCurrentMatch,
+  getCurrentMatch,
+  startAllDrones,
+  stopAllDrones,
+  resetAllDrones
 };

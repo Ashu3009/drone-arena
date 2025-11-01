@@ -9,16 +9,16 @@ const {
   deleteTournament,
   registerTeamToTournament
 } = require('../controllers/tournamentController');
+const { protect } = require('../middleware/auth');
 
-router.route('/')
-  .get(getAllTournaments)
-  .post(createTournament);
+// Public routes
+router.get('/', getAllTournaments);
+router.get('/:id', getTournamentById);
 
-router.route('/:id')
-  .get(getTournamentById)
-  .put(updateTournament)
-  .delete(deleteTournament);
-
-router.post('/:id/register', registerTeamToTournament);
+// Protected routes (admin only)
+router.post('/', protect, createTournament);
+router.put('/:id', protect, updateTournament);
+router.delete('/:id', protect, deleteTournament);
+router.post('/:id/register', protect, registerTeamToTournament);
 
 module.exports = router;

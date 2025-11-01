@@ -8,14 +8,15 @@ const {
   updateTeam,
   deleteTeam
 } = require('../controllers/teamController');
+const { protect } = require('../middleware/auth');
 
-router.route('/')
-  .get(getAllTeams)
-  .post(createTeam);
+// Public routes
+router.get('/', getAllTeams);
+router.get('/:id', getTeamById);
 
-router.route('/:id')
-  .get(getTeamById)
-  .put(updateTeam)
-  .delete(deleteTeam);
+// Protected routes (admin only)
+router.post('/', protect, createTeam);
+router.put('/:id', protect, updateTeam);
+router.delete('/:id', protect, deleteTeam);
 
 module.exports = router;

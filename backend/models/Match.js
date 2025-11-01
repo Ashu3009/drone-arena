@@ -96,6 +96,10 @@ const matchSchema = new mongoose.Schema({
   scheduledTime: {
     type: Date,
     default: Date.now
+  },
+  isCurrentMatch: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true

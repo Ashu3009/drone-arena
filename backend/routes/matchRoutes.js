@@ -9,20 +9,32 @@ const {
   updateScore,
   endRound,
   completeMatch,
-  registerDrones  // ✅ YE NAYA ADD KARO
+  registerDrones,
+  setCurrentMatch,
+  getCurrentMatch,
+  startAllDrones,
+  stopAllDrones,
+  resetAllDrones
 } = require('../controllers/matchController');
+const { protect } = require('../middleware/auth');
 
-router.route('/')
-  .get(getAllMatches)
-  .post(createMatch);
-
+// Public routes
+router.get('/', getAllMatches);
+router.get('/current', getCurrentMatch);
 router.get('/:matchId', getMatchById);
-router.put('/:matchId/start-round', startRound);
-router.put('/:matchId/update-score', updateScore);
-router.put('/:matchId/end-round', endRound);
-router.put('/:matchId/complete', completeMatch);
 
-// ✅ YE NAYA ROUTE ADD KARO
-router.post('/:matchId/register-drones', registerDrones);
+// Protected routes (admin only)
+router.post('/', protect, createMatch);
+router.put('/:matchId/start-round', protect, startRound);
+router.put('/:matchId/update-score', protect, updateScore);
+router.put('/:matchId/end-round', protect, endRound);
+router.put('/:matchId/complete', protect, completeMatch);
+router.post('/:matchId/register-drones', protect, registerDrones);
+router.put('/:matchId/set-current', protect, setCurrentMatch);
+
+// Batch drone commands (admin only)
+router.post('/:matchId/start-all-drones', protect, startAllDrones);
+router.post('/:matchId/stop-all-drones', protect, stopAllDrones);
+router.post('/:matchId/reset-all-drones', protect, resetAllDrones);
 
 module.exports = router;
