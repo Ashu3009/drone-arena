@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl:*)",
+      "Bash(npm install:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nBackend Complete: Socket.io + Current Match + Admin Auth + Batch Commands\n\nPhase 1: Socket.io Real-time Events\n- Added Socket.io initialization in server.js\n- 5 real-time events: round-started, score-updated, round-ended, match-completed, telemetry\n- Real-time updates for match status and drone telemetry\n\nPhase 2: Current Match API\n- Added isCurrentMatch field to Match model\n- POST /api/matches/:id/set-current - Set current match\n- GET /api/matches/current - Get current match\n- Socket.io event: current-match-updated\n\nPhase 3: Admin Authentication System\n- Created Admin model with bcrypt password hashing\n- JWT-based authentication (jsonwebtoken)\n- Auth middleware for route protection\n- Auth endpoints: login, logout, create-admin, me\n- Protected 14 admin routes (create/update/delete operations)\n\nPhase 4: Batch Drone Commands\n- POST /api/matches/:id/start-all-drones - Start all 8 drones at once\n- POST /api/matches/:id/stop-all-drones - Stop all drones\n- POST /api/matches/:id/reset-all-drones - Reset all drones\n- Uses existing MQTT service for batch operations\n\nFiles Added:\n- backend/models/Admin.js\n- backend/controllers/authController.js\n- backend/middleware/auth.js\n- backend/routes/authRoutes.js\n\nFiles Modified:\n- backend/server.js (Socket.io + auth routes)\n- backend/models/Match.js (isCurrentMatch field)\n- backend/controllers/matchController.js (Socket events + current match + batch commands)\n- backend/controllers/telemetryController.js (Socket event)\n- backend/routes/matchRoutes.js (protected routes + batch commands)\n- backend/routes/tournamentRoutes.js (protected routes)\n- backend/routes/teamRoutes.js (protected routes)\n- backend/package.json (jsonwebtoken, bcryptjs)\n\n🤖 Generated with Claude Code\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push:*)",
+      "Bash(npm start)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

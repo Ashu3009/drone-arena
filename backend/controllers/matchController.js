@@ -138,6 +138,33 @@ const createMatch = async (req, res) => {
   }
 };
 
+// @desc    Delete a match
+// @route   DELETE /api/matches/:matchId
+const deleteMatch = async (req, res) => {
+  try {
+    const match = await Match.findById(req.params.matchId);
+
+    if (!match) {
+      return res.status(404).json({
+        success: false,
+        message: 'Match not found'
+      });
+    }
+
+    await Match.findByIdAndDelete(req.params.matchId);
+
+    res.json({
+      success: true,
+      message: 'Match deleted successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 // @desc    Start a round
 // @route   PUT /api/matches/:matchId/start-round
 const startRound = async (req, res) => {
@@ -873,6 +900,7 @@ module.exports = {
   getAllMatches,
   getMatchById,
   createMatch,
+  deleteMatch,
   startRound,
   updateScore,
   endRound,

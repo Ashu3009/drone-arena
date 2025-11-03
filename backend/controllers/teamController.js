@@ -49,16 +49,16 @@ exports.getTeamById = async (req, res) => {
 // @route   POST /api/teams
 exports.createTeam = async (req, res) => {
   try {
-    const { name, color, contactEmail, droneIds } = req.body;
-    
+    const { name, color, captainName, members, droneIds } = req.body;
+
     // Validation
-    if (!name || !color || !contactEmail) {
+    if (!name) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide name, color, and contact email'
+        message: 'Please provide team name'
       });
     }
-    
+
     // Check if team name already exists
     const existingTeam = await Team.findOne({ name });
     if (existingTeam) {
@@ -67,11 +67,12 @@ exports.createTeam = async (req, res) => {
         message: 'Team name already exists'
       });
     }
-    
+
     const team = await Team.create({
       name,
-      color,
-      contactEmail,
+      color: color || '#3B82F6',
+      captain: captainName,
+      members,
       droneIds: droneIds || []
     });
     

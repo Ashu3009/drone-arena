@@ -9,23 +9,15 @@ const roundSchema = new mongoose.Schema({
     max: 3
   },
   
-  // ✅ YE NAYA ADD KARO - Registered drones for this round
+  // Registered drones for this round
   registeredDrones: [{
-    droneNumber: { 
-      type: Number, 
+    droneId: {
+      type: String,
       required: true,
-      min: 1,
-      max: 16
-    }, // Physical drone (1-16)
-    
-    droneId: { 
-      type: String, 
-      required: true,
-      enum: ['R1', 'R2', 'R3', 'R4', 'B1', 'B2', 'B3', 'B4']
-    }, // In-match ID
-    
-    team: { 
-      type: mongoose.Schema.Types.ObjectId, 
+      enum: ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8']
+    },
+    team: {
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'Team',
       required: true
     }
@@ -49,6 +41,18 @@ const roundSchema = new mongoose.Schema({
   },
   endTime: {
     type: Date
+  },
+  pausedAt: {
+    type: Date
+  },
+  elapsedTime: {
+    type: Number, // in seconds
+    default: 0
+  },
+  timerStatus: {
+    type: String,
+    enum: ['not_started', 'running', 'paused', 'ended'],
+    default: 'not_started'
   }
 });
 
