@@ -387,32 +387,104 @@ const MatchManager = () => {
                   </div>
                 </div>
 
-                <div style={styles.roundInfo}>
-                  <span>Round: {currentRound} / 3</span>
-                  {activeRound && <span style={styles.activeRound}>ROUND IN PROGRESS</span>}
+                {/* Rounds Section */}
+                <div style={styles.roundsContainer}>
+                  <h4 style={styles.roundsTitle}>Rounds</h4>
+
+                  {match.rounds && match.rounds.map((round) => (
+                    <div key={round.roundNumber} style={{
+                      ...styles.roundCard,
+                      border: round.status === 'in_progress' ? '2px solid #4CAF50' : '1px solid #444'
+                    }}>
+                      {/* Round Header */}
+                      <div style={styles.roundHeader}>
+                        <h5 style={styles.roundTitle}>Round {round.roundNumber}</h5>
+                        <span style={{
+                          ...styles.roundStatusBadge,
+                          backgroundColor:
+                            round.status === 'completed' ? '#2196F3' :
+                            round.status === 'in_progress' ? '#4CAF50' : '#666'
+                        }}>
+                          {round.status.toUpperCase().replace('_', ' ')}
+                        </span>
+                      </div>
+
+                      {/* Round Scores */}
+                      {(round.status === 'in_progress' || round.status === 'completed') && (
+                        <div style={styles.roundScores}>
+                          <div style={styles.roundScore}>
+                            <span style={styles.scoreLabel}>{match.teamA?.name}</span>
+                            <span style={styles.scoreValue}>{round.teamAScore || 0}</span>
+                          </div>
+                          <div style={styles.roundScore}>
+                            <span style={styles.scoreLabel}>{match.teamB?.name}</span>
+                            <span style={styles.scoreValue}>{round.teamBScore || 0}</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Registered Drones Display */}
+                      {round.registeredDrones && round.registeredDrones.length > 0 && (
+                        <div style={styles.registeredDrones}>
+                          <span style={styles.dronesLabel}>Registered Drones:</span>
+                          <div style={styles.dronesList}>
+                            {round.registeredDrones.map((drone, idx) => (
+                              <span key={idx} style={{
+                                ...styles.droneChip,
+                                backgroundColor: drone.droneId.startsWith('R') ? '#ff4444' : '#4444ff'
+                              }}>
+                                {drone.droneId}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Timer Display (when round is active) */}
+                      {round.status === 'in_progress' && round.timerStatus && (
+                        <TimerDisplay
+                          round={round}
+                          matchId={match._id}
+                          onPause={handlePauseTimer}
+                          onResume={handleResumeTimer}
+                          onReset={handleResetTimer}
+                        />
+                      )}
+
+                      {/* Drone Selector (before starting round) */}
+                      {round.status === 'pending' && (!round.registeredDrones || round.registeredDrones.length === 0) && (
+                        <DroneSelector
+                          matchId={match._id}
+                          roundNumber={round.roundNumber}
+                          teamA={match.teamA}
+                          teamB={match.teamB}
+                          onRegister={(roundNumber, drones) => handleRegisterDrones(match._id, roundNumber, drones)}
+                        />
+                      )}
+
+                      {/* Round Controls */}
+                      {round.status === 'pending' && round.registeredDrones && round.registeredDrones.length > 0 && (
+                        <button
+                          onClick={() => handleStartRound(match._id, round.roundNumber)}
+                          style={{...styles.controlButton, backgroundColor: '#4CAF50', width: '100%', marginTop: '10px'}}
+                          disabled={loading}
+                        >
+                          Start Round {round.roundNumber}
+                        </button>
+                      )}
+
+                      {round.status === 'in_progress' && (
+                        <button
+                          onClick={() => handleEndRound(match._id, round.roundNumber)}
+                          style={{...styles.controlButton, backgroundColor: '#ff9800', width: '100%', marginTop: '10px'}}
+                          disabled={loading}
+                        >
+                          End Round {round.roundNumber}
+                        </button>
+                      )}
+                    </div>
+                  ))}
                 </div>
-
-                {/* Timer Display (when round is active) */}
-                {activeRound && activeRound.timerStatus && (
-                  <TimerDisplay
-                    round={activeRound}
-                    matchId={match._id}
-                    onPause={handlePauseTimer}
-                    onResume={handleResumeTimer}
-                    onReset={handleResetTimer}
-                  />
-                )}
-
-                {/* Drone Selector (before starting a round) */}
-                {!activeRound && match.status !== 'completed' && match.currentRound < 3 && (
-                  <DroneSelector
-                    matchId={match._id}
-                    roundNumber={currentRound}
-                    teamA={match.teamA}
-                    teamB={match.teamB}
-                    onRegister={(roundNumber, drones) => handleRegisterDrones(match._id, roundNumber, drones)}
-                  />
-                )}
 
                 {/* Match Controls */}
                 <div style={styles.controls}>
@@ -426,26 +498,8 @@ const MatchManager = () => {
                     </button>
                   )}
 
-                  {match.status === 'pending' && (
-                    <button
-                      onClick={() => handleStartRound(match._id, currentRound)}
-                      style={{...styles.controlButton, backgroundColor: '#4CAF50'}}
-                      disabled={loading}
-                    >
-                      Start Round {currentRound}
-                    </button>
-                  )}
-
                   {activeRound && (
                     <>
-                      <button
-                        onClick={() => handleEndRound(match._id, currentRound)}
-                        style={{...styles.controlButton, backgroundColor: '#ff9800'}}
-                        disabled={loading}
-                      >
-                        End Round {currentRound}
-                      </button>
-
                       {/* Batch Drone Commands */}
                       <div style={styles.batchCommands}>
                         <span style={styles.batchLabel}>Batch Commands:</span>
@@ -727,6 +781,89 @@ const styles = {
     fontSize: '12px',
     fontWeight: 'bold',
     cursor: 'pointer'
+  },
+  // New round styles
+  roundsContainer: {
+    marginTop: '20px',
+    marginBottom: '20px'
+  },
+  roundsTitle: {
+    margin: '0 0 16px 0',
+    fontSize: '18px',
+    color: '#fff',
+    fontWeight: 'bold'
+  },
+  roundCard: {
+    backgroundColor: '#2a2a2a',
+    borderRadius: '8px',
+    padding: '20px',
+    marginBottom: '16px'
+  },
+  roundHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '16px'
+  },
+  roundTitle: {
+    margin: 0,
+    fontSize: '16px',
+    color: '#fff'
+  },
+  roundStatusBadge: {
+    padding: '4px 12px',
+    borderRadius: '12px',
+    fontSize: '11px',
+    fontWeight: 'bold',
+    color: 'white'
+  },
+  roundScores: {
+    display: 'flex',
+    gap: '16px',
+    marginBottom: '16px'
+  },
+  roundScore: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: '12px',
+    backgroundColor: '#1e1e1e',
+    borderRadius: '6px'
+  },
+  scoreLabel: {
+    fontSize: '12px',
+    color: '#888',
+    marginBottom: '6px'
+  },
+  scoreValue: {
+    fontSize: '24px',
+    fontWeight: 'bold',
+    color: '#4CAF50'
+  },
+  registeredDrones: {
+    marginBottom: '16px',
+    padding: '12px',
+    backgroundColor: '#1e1e1e',
+    borderRadius: '6px'
+  },
+  dronesLabel: {
+    fontSize: '12px',
+    color: '#aaa',
+    marginBottom: '8px',
+    display: 'block'
+  },
+  dronesList: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '6px'
+  },
+  droneChip: {
+    padding: '4px 10px',
+    borderRadius: '12px',
+    fontSize: '11px',
+    fontWeight: 'bold',
+    color: 'white'
   }
 };
 
