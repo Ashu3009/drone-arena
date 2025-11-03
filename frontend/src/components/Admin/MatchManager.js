@@ -12,8 +12,14 @@ import {
   completeMatch,
   startAllDrones,
   stopAllDrones,
-  resetAllDrones
+  resetAllDrones,
+  pauseTimer,
+  resumeTimer,
+  resetTimer,
+  registerDronesForRound
 } from '../../services/api';
+import DroneSelector from './DroneSelector';
+import TimerDisplay from './TimerDisplay';
 
 const MatchManager = () => {
   const [matches, setMatches] = useState([]);
@@ -197,6 +203,74 @@ const MatchManager = () => {
     }
   };
 
+  // Timer control handlers
+  const handlePauseTimer = async (matchId, roundNumber) => {
+    setLoading(true);
+    try {
+      const response = await pauseTimer(matchId, roundNumber);
+      if (response.success) {
+        alert('Timer paused!');
+        loadData();
+      }
+    } catch (error) {
+      console.error('Error pausing timer:', error);
+      alert(error.response?.data?.message || 'Failed to pause timer');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResumeTimer = async (matchId, roundNumber) => {
+    setLoading(true);
+    try {
+      const response = await resumeTimer(matchId, roundNumber);
+      if (response.success) {
+        alert('Timer resumed!');
+        loadData();
+      }
+    } catch (error) {
+      console.error('Error resuming timer:', error);
+      alert(error.response?.data?.message || 'Failed to resume timer');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetTimer = async (matchId, roundNumber) => {
+    if (!window.confirm('Reset timer to 0? This will restart the timer.')) return;
+
+    setLoading(true);
+    try {
+      const response = await resetTimer(matchId, roundNumber);
+      if (response.success) {
+        alert('Timer reset!');
+        loadData();
+      }
+    } catch (error) {
+      console.error('Error resetting timer:', error);
+      alert(error.response?.data?.message || 'Failed to reset timer');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Drone registration handler
+  const handleRegisterDrones = async (matchId, roundNumber, drones) => {
+    setLoading(true);
+    try {
+      const response = await registerDronesForRound(matchId, roundNumber, drones);
+      if (response.success) {
+        alert(`Drones registered for Round ${roundNumber}!`);
+        loadData();
+      }
+    } catch (error) {
+      console.error('Error registering drones:', error);
+      alert(error.response?.data?.message || 'Failed to register drones');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div style={styles.container}>
       <div style={styles.header}>
@@ -317,6 +391,28 @@ const MatchManager = () => {
                   <span>Round: {currentRound} / 3</span>
                   {activeRound && <span style={styles.activeRound}>ROUND IN PROGRESS</span>}
                 </div>
+
+                {/* Timer Display (when round is active) */}
+                {activeRound && activeRound.timerStatus && (
+                  <TimerDisplay
+                    round={activeRound}
+                    matchId={match._id}
+                    onPause={handlePauseTimer}
+                    onResume={handleResumeTimer}
+                    onReset={handleResetTimer}
+                  />
+                )}
+
+                {/* Drone Selector (before starting a round) */}
+                {!activeRound && match.status !== 'completed' && match.currentRound < 3 && (
+                  <DroneSelector
+                    matchId={match._id}
+                    roundNumber={currentRound}
+                    teamA={match.teamA}
+                    teamB={match.teamB}
+                    onRegister={(roundNumber, drones) => handleRegisterDrones(match._id, roundNumber, drones)}
+                  />
+                )}
 
                 {/* Match Controls */}
                 <div style={styles.controls}>

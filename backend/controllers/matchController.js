@@ -142,6 +142,8 @@ const createMatch = async (req, res) => {
 // @route   DELETE /api/matches/:matchId
 const deleteMatch = async (req, res) => {
   try {
+    const DroneReport = require('../models/DroneReport'); // ✅ Import model
+
     const match = await Match.findById(req.params.matchId);
 
     if (!match) {
@@ -151,11 +153,15 @@ const deleteMatch = async (req, res) => {
       });
     }
 
+    // ✅ Delete all drone reports for this match
+    await DroneReport.deleteMany({ match: req.params.matchId });
+    console.log(`🗑️  Deleted all reports for match ${req.params.matchId}`);
+
     await Match.findByIdAndDelete(req.params.matchId);
 
     res.json({
       success: true,
-      message: 'Match deleted successfully'
+      message: 'Match and all reports deleted successfully'
     });
   } catch (error) {
     res.status(500).json({
@@ -213,9 +219,10 @@ const startRound = async (req, res) => {
     // Start the round
     nextRound.status = 'in_progress';
     nextRound.startTime = new Date();
+    nextRound.timerStatus = 'running'; // ✅ Initialize timer
     match.currentRound = nextRound.roundNumber;
     match.status = 'in_progress';
-    
+
     await match.save();
 
     console.log(`✅ Round ${nextRound.roundNumber} started`);
@@ -320,6 +327,83 @@ const updateScore = async (req, res) => {
       success: false,
       message: error.message
     });
+  }
+};
+
+// @desc    Pause round timer
+// @route   PUT /api/matches/:matchId/rounds/:roundNumber/pause
+const pauseTimer = async (req, res) => {
+  try {
+    const { matchId, roundNumber } = req.params;
+    const match = await Match.findById(matchId);
+    if (!match) return res.status(404).json({ success: false, message: 'Match not found' });
+
+    const round = match.rounds.find(r => r.roundNumber === parseInt(roundNumber));
+    if (!round) return res.status(404).json({ success: false, message: 'Round not found' });
+    if (round.timerStatus !== 'running') return res.status(400).json({ success: false, message: 'Timer is not running' });
+
+    const now = new Date();
+    round.elapsedTime = Math.floor((now - round.startTime) / 1000);
+    round.pausedAt = now;
+    round.timerStatus = 'paused';
+    await match.save();
+
+    console.log(`⏸️  Timer paused for Round ${roundNumber}`);
+
+    res.json({ success: true, data: match });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Resume round timer
+// @route   PUT /api/matches/:matchId/rounds/:roundNumber/resume
+const resumeTimer = async (req, res) => {
+  try {
+    const { matchId, roundNumber } = req.params;
+    const match = await Match.findById(matchId);
+    if (!match) return res.status(404).json({ success: false, message: 'Match not found' });
+
+    const round = match.rounds.find(r => r.roundNumber === parseInt(roundNumber));
+    if (!round) return res.status(404).json({ success: false, message: 'Round not found' });
+    if (round.timerStatus !== 'paused') return res.status(400).json({ success: false, message: 'Timer is not paused' });
+
+    const pauseDuration = new Date() - round.pausedAt;
+    round.startTime = new Date(round.startTime.getTime() + pauseDuration);
+    round.pausedAt = null;
+    round.timerStatus = 'running';
+    await match.save();
+
+    console.log(`▶️  Timer resumed for Round ${roundNumber}`);
+
+    res.json({ success: true, data: match });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Reset round timer
+// @route   PUT /api/matches/:matchId/rounds/:roundNumber/reset
+const resetTimer = async (req, res) => {
+  try {
+    const { matchId, roundNumber } = req.params;
+    const match = await Match.findById(matchId);
+    if (!match) return res.status(404).json({ success: false, message: 'Match not found' });
+
+    const round = match.rounds.find(r => r.roundNumber === parseInt(roundNumber));
+    if (!round) return res.status(404).json({ success: false, message: 'Round not found' });
+
+    round.startTime = new Date();
+    round.elapsedTime = 0;
+    round.pausedAt = null;
+    round.timerStatus = 'running';
+    await match.save();
+
+    console.log(`🔄 Timer reset for Round ${roundNumber}`);
+
+    res.json({ success: true, data: match });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -902,6 +986,9 @@ module.exports = {
   createMatch,
   deleteMatch,
   startRound,
+  pauseTimer,     // ✅ ADD
+  resumeTimer,    // ✅ ADD
+  resetTimer,     // ✅ ADD
   updateScore,
   endRound,
   completeMatch,

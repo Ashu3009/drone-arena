@@ -7,6 +7,9 @@ const {
   createMatch,
   deleteMatch,
   startRound,
+  pauseTimer,      // ✅ ADD
+  resumeTimer,     // ✅ ADD
+  resetTimer,      // ✅ ADD
   updateScore,
   endRound,
   completeMatch,
@@ -33,6 +36,11 @@ router.put('/:matchId/end-round', protect, endRound);
 router.put('/:matchId/complete', protect, completeMatch);
 router.post('/:matchId/register-drones', protect, registerDrones);
 router.put('/:matchId/set-current', protect, setCurrentMatch);
+
+// Timer control routes (admin only)
+router.put('/:matchId/rounds/:roundNumber/pause', protect, pauseTimer);
+router.put('/:matchId/rounds/:roundNumber/resume', protect, resumeTimer);
+router.put('/:matchId/rounds/:roundNumber/reset', protect, resetTimer);
 
 // Batch drone commands (admin only)
 router.post('/:matchId/start-all-drones', protect, startAllDrones);

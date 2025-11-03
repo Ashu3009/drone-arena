@@ -139,6 +139,37 @@ export const updateScore = async (matchId, roundNumber, teamAScore, teamBScore) 
   return response.data;
 };
 
+// ==================== TIMER CONTROLS ====================
+
+// Pause timer (ADMIN ONLY)
+export const pauseTimer = async (matchId, roundNumber) => {
+  const response = await axios.put(`${API_BASE_URL}/matches/${matchId}/rounds/${roundNumber}/pause`);
+  return response.data;
+};
+
+// Resume timer (ADMIN ONLY)
+export const resumeTimer = async (matchId, roundNumber) => {
+  const response = await axios.put(`${API_BASE_URL}/matches/${matchId}/rounds/${roundNumber}/resume`);
+  return response.data;
+};
+
+// Reset timer (ADMIN ONLY)
+export const resetTimer = async (matchId, roundNumber) => {
+  const response = await axios.put(`${API_BASE_URL}/matches/${matchId}/rounds/${roundNumber}/reset`);
+  return response.data;
+};
+
+// ==================== DRONE REGISTRATION ====================
+
+// Register drones for round (ADMIN ONLY)
+export const registerDronesForRound = async (matchId, roundNumber, drones) => {
+  const response = await axios.post(`${API_BASE_URL}/matches/${matchId}/register-drones`, {
+    roundNumber,
+    drones
+  });
+  return response.data;
+};
+
 // ==================== BATCH DRONE COMMANDS ====================
 
 // Start all drones (ADMIN ONLY)
