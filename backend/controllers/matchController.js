@@ -718,10 +718,11 @@ const registerDrones = async (req, res) => {
       });
     }
 
-    // Validate drones array length (should be 8: 4 for each team)
-    if (drones.length !== 8) {
+    // Validate drones array length (should be 2-16: 1-8 per team)
+    if (drones.length < 2 || drones.length > 16) {
       return res.status(400).json({ 
-        message: 'Exactly 8 drones required (4 per team)' 
+        success: false,
+        message: 'At least 2 drones required (1-8 per team)' 
       });
     }
 

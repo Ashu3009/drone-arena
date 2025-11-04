@@ -37,8 +37,8 @@ const Leaderboard = ({ tournamentId }) => {
             }
 
             // Update stats
-            const scoreA = match.teamAScore || 0;
-            const scoreB = match.teamBScore || 0;
+            const scoreA = match.finalScoreA || 0;
+            const scoreB = match.finalScoreB || 0;
 
             teamStats[teamAId].totalScore += scoreA;
             teamStats[teamBId].totalScore += scoreB;

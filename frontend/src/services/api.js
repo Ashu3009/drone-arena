@@ -2,6 +2,21 @@ import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:5000/api';
 
+// ==================== AXIOS INTERCEPTOR FOR AUTH ====================
+// Add token to all requests
+axios.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 // ==================== TOURNAMENTS ====================
 
 // Get all tournaments
@@ -112,21 +127,21 @@ export const deleteMatch = async (matchId) => {
 
 // Complete match (ADMIN ONLY)
 export const completeMatch = async (matchId) => {
-  const response = await axios.post(`${API_BASE_URL}/matches/${matchId}/complete`);
+  const response = await axios.put(`${API_BASE_URL}/matches/${matchId}/complete`);
   return response.data;
 };
 
 // ==================== ROUNDS ====================
 
 // Start round (ADMIN ONLY)
-export const startRound = async (matchId, roundNumber) => {
-  const response = await axios.post(`${API_BASE_URL}/matches/${matchId}/rounds/${roundNumber}/start`);
+export const startRound = async (matchId) => {
+  const response = await axios.put(`${API_BASE_URL}/matches/${matchId}/start-round`);
   return response.data;
 };
 
 // End round (ADMIN ONLY)
-export const endRound = async (matchId, roundNumber, scores) => {
-  const response = await axios.post(`${API_BASE_URL}/matches/${matchId}/rounds/${roundNumber}/end`, scores);
+export const endRound = async (matchId) => {
+  const response = await axios.put(`${API_BASE_URL}/matches/${matchId}/end-round`);
   return response.data;
 };
 
@@ -209,6 +224,37 @@ export const getAllTelemetry = async (matchId) => {
 // Get analysis for a round
 export const getAnalysis = async (matchId, roundNumber) => {
   const response = await axios.get(`${API_BASE_URL}/analysis/${matchId}/${roundNumber}`);
+  return response.data;
+};
+
+// ==================== MANUAL SCORE UPDATE ====================
+
+// Manual score update (ADMIN ONLY)
+export const updateMatchScore = async (matchId, team, increment) => {
+  const response = await axios.put(`${API_BASE_URL}/matches/${matchId}/update-score`, {
+    team,
+    increment
+  });
+  return response.data;
+};
+
+// ==================== DRONE REPORTS ====================
+
+// Get reports for tournament
+export const getTournamentReports = async (tournamentId) => {
+  const response = await axios.get(`${API_BASE_URL}/reports/tournament/${tournamentId}`);
+  return response.data;
+};
+
+// Get reports for match
+export const getMatchReports = async (matchId) => {
+  const response = await axios.get(`${API_BASE_URL}/reports/match/${matchId}`);
+  return response.data;
+};
+
+// Get single report
+export const getReportById = async (reportId) => {
+  const response = await axios.get(`${API_BASE_URL}/reports/${reportId}`);
   return response.data;
 };
 

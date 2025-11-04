@@ -14,9 +14,9 @@ const DroneSelector = ({ matchId, roundNumber, teamA, teamB, onRegister }) => {
       const teamDrones = prev[team];
       const isSelected = teamDrones.includes(droneId);
 
-      // Max 4 drones per team
-      if (!isSelected && teamDrones.length >= 4) {
-        alert('Maximum 4 drones allowed per team');
+      // Max 8 drones per team
+      if (!isSelected && teamDrones.length >= 8) {
+        alert('Maximum 8 drones allowed per team');
         return prev;
       }
 
@@ -30,13 +30,13 @@ const DroneSelector = ({ matchId, roundNumber, teamA, teamB, onRegister }) => {
   };
 
   const handleRegister = async () => {
-    // Validation
-    if (selectedDrones.teamA.length < 2 || selectedDrones.teamA.length > 4) {
-      alert('Team A must select 2-4 drones');
+    // Validation - at least 1 drone per team, max 8
+    if (selectedDrones.teamA.length < 1 || selectedDrones.teamA.length > 8) {
+      alert('Team A must select 1-8 drones');
       return;
     }
-    if (selectedDrones.teamB.length < 2 || selectedDrones.teamB.length > 4) {
-      alert('Team B must select 2-4 drones');
+    if (selectedDrones.teamB.length < 1 || selectedDrones.teamB.length > 8) {
+      alert('Team B must select 1-8 drones');
       return;
     }
 
@@ -76,7 +76,7 @@ const DroneSelector = ({ matchId, roundNumber, teamA, teamB, onRegister }) => {
             </button>
           ))}
         </div>
-        <p>Selected: {selectedDrones.teamA.length} / 4</p>
+        <p>Selected: {selectedDrones.teamA.length} / 8</p>
       </div>
 
       <div style={styles.teamSection}>
@@ -96,13 +96,13 @@ const DroneSelector = ({ matchId, roundNumber, teamA, teamB, onRegister }) => {
             </button>
           ))}
         </div>
-        <p>Selected: {selectedDrones.teamB.length} / 4</p>
+        <p>Selected: {selectedDrones.teamB.length} / 8</p>
       </div>
 
       <button
         onClick={handleRegister}
         style={styles.registerButton}
-        disabled={selectedDrones.teamA.length < 2 || selectedDrones.teamB.length < 2}
+        disabled={selectedDrones.teamA.length < 1 || selectedDrones.teamB.length < 1}
       >
         Register Drones
       </button>

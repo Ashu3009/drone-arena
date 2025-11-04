@@ -16,7 +16,8 @@ import {
   pauseTimer,
   resumeTimer,
   resetTimer,
-  registerDronesForRound
+  registerDronesForRound,
+  updateMatchScore
 } from '../../services/api';
 import DroneSelector from './DroneSelector';
 import TimerDisplay from './TimerDisplay';
@@ -112,7 +113,7 @@ const MatchManager = () => {
   const handleStartRound = async (matchId, roundNumber) => {
     setLoading(true);
     try {
-      const response = await startRound(matchId, roundNumber);
+      const response = await startRound(matchId);
       if (response.success) {
         alert(`Round ${roundNumber} started!`);
         loadData();
@@ -126,14 +127,13 @@ const MatchManager = () => {
   };
 
   const handleEndRound = async (matchId, roundNumber) => {
-    const teamAScore = parseInt(prompt('Enter Team A Score:') || '0');
-    const teamBScore = parseInt(prompt('Enter Team B Score:') || '0');
+    if (!window.confirm(`End Round ${roundNumber}? This will trigger ML analysis.`)) return;
 
     setLoading(true);
     try {
-      const response = await endRound(matchId, roundNumber, { teamAScore, teamBScore });
+      const response = await endRound(matchId);
       if (response.success) {
-        alert(`Round ${roundNumber} ended! ML Analysis: ${response.data.analysis?.summary || 'Pending'}`);
+        alert(`Round ${roundNumber} ended successfully!`);
         loadData();
       }
     } catch (error) {
@@ -268,6 +268,19 @@ const MatchManager = () => {
       alert(error.response?.data?.message || 'Failed to register drones');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Manual Score Update Handler
+  const handleScoreUpdate = async (matchId, team, increment) => {
+    try {
+      const response = await updateMatchScore(matchId, team, increment);
+      if (response.success) {
+        loadData();
+      }
+    } catch (error) {
+      console.error('Error updating score:', error);
+      alert(error.response?.data?.message || 'Failed to update score');
     }
   };
 
@@ -415,10 +428,48 @@ const MatchManager = () => {
                           <div style={styles.roundScore}>
                             <span style={styles.scoreLabel}>{match.teamA?.name}</span>
                             <span style={styles.scoreValue}>{round.teamAScore || 0}</span>
+                            {/* Manual Score Control - Team A */}
+                            {round.status === 'in_progress' && (
+                              <div style={styles.scoreControls}>
+                                <button
+                                  onClick={() => handleScoreUpdate(match._id, 'A', -1)}
+                                  style={{...styles.scoreButton, backgroundColor: '#ff5722'}}
+                                  disabled={loading}
+                                >
+                                  -1
+                                </button>
+                                <button
+                                  onClick={() => handleScoreUpdate(match._id, 'A', 1)}
+                                  style={{...styles.scoreButton, backgroundColor: '#4CAF50'}}
+                                  disabled={loading}
+                                >
+                                  +1
+                                </button>
+                              </div>
+                            )}
                           </div>
                           <div style={styles.roundScore}>
                             <span style={styles.scoreLabel}>{match.teamB?.name}</span>
                             <span style={styles.scoreValue}>{round.teamBScore || 0}</span>
+                            {/* Manual Score Control - Team B */}
+                            {round.status === 'in_progress' && (
+                              <div style={styles.scoreControls}>
+                                <button
+                                  onClick={() => handleScoreUpdate(match._id, 'B', -1)}
+                                  style={{...styles.scoreButton, backgroundColor: '#ff5722'}}
+                                  disabled={loading}
+                                >
+                                  -1
+                                </button>
+                                <button
+                                  onClick={() => handleScoreUpdate(match._id, 'B', 1)}
+                                  style={{...styles.scoreButton, backgroundColor: '#4CAF50'}}
+                                  disabled={loading}
+                                >
+                                  +1
+                                </button>
+                              </div>
+                            )}
                           </div>
                         </div>
                       )}
@@ -864,6 +915,23 @@ const styles = {
     fontSize: '11px',
     fontWeight: 'bold',
     color: 'white'
+  },
+  scoreControls: {
+    display: 'flex',
+    gap: '8px',
+    marginTop: '12px',
+    justifyContent: 'center'
+  },
+  scoreButton: {
+    color: 'white',
+    border: 'none',
+    borderRadius: '6px',
+    padding: '8px 20px',
+    fontSize: '14px',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    minWidth: '50px',
+    transition: 'transform 0.1s ease'
   }
 };
 

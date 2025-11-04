@@ -3,6 +3,7 @@ import { getCurrentMatch } from '../../services/api';
 import { initSocket, joinMatch, leaveMatch, onRoundStarted, onScoreUpdated, onRoundEnded, onMatchCompleted, onTelemetry, removeAllListeners } from '../../services/socket';
 import Arena3D from './Arena3D';
 import Leaderboard from './Leaderboard';
+import TimerDisplayPublic from './TimerDisplayPublic';
 
 const PublicViewer = () => {
   const [currentMatch, setCurrentMatch] = useState(null);
@@ -43,10 +44,10 @@ const PublicViewer = () => {
         console.log('Score updated:', data);
         setCurrentMatch(prev => ({
           ...prev,
-          teamAScore: data.teamAScore,
-          teamBScore: data.teamBScore
+          finalScoreA: data.finalScoreA,
+          finalScoreB: data.finalScoreB
         }));
-        setLiveUpdate(`Score updated: ${data.teamAScore} - ${data.teamBScore}`);
+        setLiveUpdate(`Score updated: ${data.finalScoreA} - ${data.finalScoreB}`);
         setTimeout(() => setLiveUpdate(null), 3000);
       });
 
@@ -137,7 +138,7 @@ const PublicViewer = () => {
       <div style={styles.matchInfo}>
         <div style={styles.team}>
           <h2 style={styles.teamName}>{currentMatch.teamA?.name || 'Team A'}</h2>
-          <div style={styles.scoreDisplay}>{currentMatch.teamAScore || 0}</div>
+          <div style={styles.scoreDisplay}>{currentMatch.finalScoreA || 0}</div>
         </div>
 
         <div style={styles.vsSection}>
@@ -150,9 +151,17 @@ const PublicViewer = () => {
 
         <div style={styles.team}>
           <h2 style={styles.teamName}>{currentMatch.teamB?.name || 'Team B'}</h2>
-          <div style={styles.scoreDisplay}>{currentMatch.teamBScore || 0}</div>
+          <div style={styles.scoreDisplay}>{currentMatch.finalScoreB || 0}</div>
         </div>
       </div>
+
+      {/* Timer Display - Visible to Viewers (No Controls) */}
+      {activeRound && activeRound.timerStatus && (
+        <div style={styles.timerSection}>
+          <h3 style={styles.sectionTitle}>Round Timer</h3>
+          <TimerDisplayPublic round={activeRound} />
+        </div>
+      )}
 
       {/* 3D Arena View */}
       <div style={styles.arenaSection}>
@@ -289,6 +298,10 @@ const styles = {
     borderRadius: '16px',
     fontSize: '13px',
     fontWeight: 'bold'
+  },
+  timerSection: {
+    padding: '0 40px',
+    marginBottom: '30px'
   },
   arenaSection: {
     padding: '0 40px',

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import TournamentManager from './TournamentManager';
 import TeamManager from './TeamManager';
 import MatchManager from './MatchManager';
+import ReportsManager from './ReportsManager';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('tournaments');
@@ -23,6 +24,8 @@ const AdminDashboard = () => {
         return <TeamManager />;
       case 'matches':
         return <MatchManager />;
+      case 'reports':
+        return <ReportsManager />;
       default:
         return <TournamentManager />;
     }
@@ -62,6 +65,12 @@ const AdminDashboard = () => {
           onClick={() => setActiveTab('matches')}
         >
           Matches
+        </button>
+        <button
+          style={activeTab === 'reports' ? {...styles.navButton, ...styles.navButtonActive} : styles.navButton}
+          onClick={() => setActiveTab('reports')}
+        >
+          Reports
         </button>
         <a href="/" style={styles.viewPublicLink} target="_blank" rel="noopener noreferrer">
           View Public Dashboard
