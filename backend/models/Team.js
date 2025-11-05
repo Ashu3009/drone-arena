@@ -13,17 +13,29 @@ const teamSchema = new mongoose.Schema({
     required: [true, 'Please provide team color'],
     default: '#3B82F6'
   },
-  droneIds: [{
-    type: String,
-    trim: true
-  }],
   captain: {
     type: String,
     trim: true
   },
   members: [{
-    type: String,
-    trim: true
+    name: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    role: {
+      type: String,
+      enum: ['Forward', 'Center', 'Defender', 'Keeper', 'All-rounder'],
+      required: true
+    },
+    contactEmail: {
+      type: String,
+      trim: true
+    },
+    isPrimary: {
+      type: Boolean,
+      default: true
+    }
   }],
   wins: {
     type: Number,

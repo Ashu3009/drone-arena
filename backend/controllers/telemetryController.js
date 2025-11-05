@@ -3,34 +3,58 @@ const DroneTelemetry = require('../models/DroneTelemetry');
 
 const receiveTelemetry = async (req, res) => {
   try {
-    const { droneId, matchId, roundNumber, espMacAddress } = req.body;
-    
-    // Save telemetry
-    const telemetry = new DroneTelemetry({
-      ...req.body,
-      timestamp: new Date(),
-      source: espMacAddress ? 'physical' : 'mock'  // ✅ Track source
+    const { droneId, matchId, roundNumber, teamId, x, y, z, pitch, roll, yaw, battery } = req.body;
+
+    // Find or create telemetry document for this match/drone/round
+    let telemetry = await DroneTelemetry.findOne({
+      matchId,
+      droneId,
+      roundNumber
     });
 
-    await telemetry.save();
+    // Create log entry
+    const logEntry = {
+      timestamp: Date.now(),
+      x: x || 0,
+      y: y || 0,
+      z: z || 0,
+      pitch: pitch || 0,
+      roll: roll || 0,
+      yaw: yaw || 0,
+      battery: battery || 100
+    };
 
-    // Log for debugging
-    console.log(`📡 Telemetry received: ${droneId} [${telemetry.source}]`);
+    if (telemetry) {
+      // Append to existing logs
+      telemetry.logs.push(logEntry);
+      await telemetry.save();
+      console.log(`📡 Telemetry appended: ${droneId} [${telemetry.logs.length} logs]`);
+    } else {
+      // Create new telemetry document
+      telemetry = await DroneTelemetry.create({
+        matchId,
+        teamId,
+        droneId,
+        roundNumber,
+        logs: [logEntry]
+      });
+      console.log(`📡 Telemetry created: ${droneId} [new document]`);
+    }
 
-    // ✅ Emit Socket.io event for real-time telemetry
+    // Emit Socket.io event for real-time 3D visualization
     if (global.io && matchId) {
       global.io.to(`match-${matchId}`).emit('telemetry', {
         droneId,
         matchId,
         roundNumber,
-        x: req.body.x,
-        y: req.body.y,
-        z: req.body.z,
-        pitch: req.body.pitch,
-        roll: req.body.roll,
-        yaw: req.body.yaw,
-        battery: req.body.battery,
-        timestamp: telemetry.timestamp
+        x: x || 0,
+        y: y || 0,
+        z: z || 0,
+        pitch: pitch || 0,
+        roll: roll || 0,
+        yaw: yaw || 0,
+        battery: battery || 100,
+        timestamp: logEntry.timestamp
       });
     }
 
@@ -38,7 +62,7 @@ const receiveTelemetry = async (req, res) => {
       success: true,
       message: 'Telemetry received',
       droneId,
-      source: telemetry.source
+      logsCount: telemetry.logs.length
     });
   } catch (error) {
     console.error('❌ Telemetry error:', error.message);

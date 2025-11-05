@@ -13,13 +13,29 @@ const roundSchema = new mongoose.Schema({
   registeredDrones: [{
     droneId: {
       type: String,
-      required: true,
-      enum: ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8']
+      required: true
     },
     team: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Team',
       required: true
+    },
+    role: {
+      type: String,
+      enum: ['Forward', 'Center', 'Defender', 'Keeper'],
+      required: true
+    },
+    pilot: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    specifications: {
+      speed: Number,
+      agility: Number,
+      stability: Number,
+      batteryCapacity: Number,
+      weight: Number
     }
   }],
   

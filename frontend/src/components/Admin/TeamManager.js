@@ -8,8 +8,14 @@ const TeamManager = () => {
   const [editingTeam, setEditingTeam] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
-    captainName: '',
-    members: ''
+    captain: '',
+    color: '#3B82F6',
+    members: [
+      { name: '', role: 'Forward', contactEmail: '', isPrimary: true },
+      { name: '', role: 'Center', contactEmail: '', isPrimary: true },
+      { name: '', role: 'Defender', contactEmail: '', isPrimary: true },
+      { name: '', role: 'Keeper', contactEmail: '', isPrimary: true }
+    ]
   });
 
   useEffect(() => {
@@ -31,21 +37,46 @@ const TeamManager = () => {
     }
   };
 
+  const handleMemberChange = (index, field, value) => {
+    const newMembers = [...formData.members];
+    newMembers[index] = { ...newMembers[index], [field]: value };
+    setFormData({ ...formData, members: newMembers });
+  };
+
+  const addExtraMember = () => {
+    setFormData({
+      ...formData,
+      members: [...formData.members, { name: '', role: 'All-rounder', contactEmail: '', isPrimary: false }]
+    });
+  };
+
+  const removeMember = (index) => {
+    if (index < 4) {
+      alert('Cannot remove primary members (Forward, Center, Defender, Keeper)');
+      return;
+    }
+    const newMembers = formData.members.filter((_, i) => i !== index);
+    setFormData({ ...formData, members: newMembers });
+  };
+
   const handleCreateOrUpdate = async (e) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.captainName) {
-      alert('Please fill all required fields');
+    // Validate: At least 4 primary members with names
+    const primaryMembers = formData.members.slice(0, 4);
+    if (primaryMembers.some(m => !m.name || !m.name.trim())) {
+      alert('Please fill names for all 4 primary members (Forward, Center, Defender, Keeper)');
       return;
     }
 
-    // Convert comma-separated members to array
+    // Filter out empty extra members
+    const validMembers = formData.members.filter(m => m.name && m.name.trim());
+
     const teamData = {
       name: formData.name,
-      captainName: formData.captainName,
-      members: formData.members
-        ? formData.members.split(',').map(m => m.trim()).filter(m => m)
-        : []
+      captain: formData.captain,
+      color: formData.color,
+      members: validMembers
     };
 
     setLoading(true);
@@ -59,9 +90,7 @@ const TeamManager = () => {
 
       if (response.success) {
         alert(editingTeam ? 'Team updated!' : 'Team created!');
-        setShowCreateForm(false);
-        setEditingTeam(null);
-        setFormData({ name: '', captainName: '', members: '' });
+        handleCancelEdit();
         loadTeams();
       }
     } catch (error) {
@@ -94,10 +123,22 @@ const TeamManager = () => {
 
   const handleEdit = (team) => {
     setEditingTeam(team);
+
+    // Ensure at least 4 primary members
+    const members = team.members && team.members.length >= 4
+      ? team.members
+      : [
+          { name: '', role: 'Forward', contactEmail: '', isPrimary: true },
+          { name: '', role: 'Center', contactEmail: '', isPrimary: true },
+          { name: '', role: 'Defender', contactEmail: '', isPrimary: true },
+          { name: '', role: 'Keeper', contactEmail: '', isPrimary: true }
+        ];
+
     setFormData({
       name: team.name,
-      captainName: team.captainName || '',
-      members: team.members?.join(', ') || ''
+      captain: team.captain || '',
+      color: team.color || '#3B82F6',
+      members
     });
     setShowCreateForm(true);
   };
@@ -105,7 +146,28 @@ const TeamManager = () => {
   const handleCancelEdit = () => {
     setShowCreateForm(false);
     setEditingTeam(null);
-    setFormData({ name: '', captainName: '', members: '' });
+    setFormData({
+      name: '',
+      captain: '',
+      color: '#3B82F6',
+      members: [
+        { name: '', role: 'Forward', contactEmail: '', isPrimary: true },
+        { name: '', role: 'Center', contactEmail: '', isPrimary: true },
+        { name: '', role: 'Defender', contactEmail: '', isPrimary: true },
+        { name: '', role: 'Keeper', contactEmail: '', isPrimary: true }
+      ]
+    });
+  };
+
+  const getRoleEmoji = (role) => {
+    const emojis = {
+      Forward: '⚡',
+      Center: '⚖️',
+      Defender: '🛡️',
+      Keeper: '🔋',
+      'All-rounder': '🌟'
+    };
+    return emojis[role] || '👤';
   };
 
   return (
@@ -135,34 +197,109 @@ const TeamManager = () => {
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               style={styles.input}
-              placeholder="e.g., Team Alpha"
+              placeholder="e.g., Red Dragons"
               required
             />
           </div>
 
           <div style={styles.formGroup}>
-            <label style={styles.label}>Captain Name *</label>
+            <label style={styles.label}>Captain Name</label>
             <input
               type="text"
-              value={formData.captainName}
-              onChange={(e) => setFormData({ ...formData, captainName: e.target.value })}
+              value={formData.captain}
+              onChange={(e) => setFormData({ ...formData, captain: e.target.value })}
               style={styles.input}
               placeholder="e.g., John Doe"
-              required
             />
           </div>
 
           <div style={styles.formGroup}>
-            <label style={styles.label}>Team Members (comma-separated)</label>
+            <label style={styles.label}>Team Color</label>
             <input
-              type="text"
-              value={formData.members}
-              onChange={(e) => setFormData({ ...formData, members: e.target.value })}
-              style={styles.input}
-              placeholder="e.g., Alice, Bob, Charlie"
+              type="color"
+              value={formData.color}
+              onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+              style={styles.colorInput}
             />
-            <small style={styles.hint}>Enter member names separated by commas</small>
           </div>
+
+          <div style={styles.membersSection}>
+            <h4 style={styles.sectionTitle}>Core Members (Required)</h4>
+
+            {formData.members.slice(0, 4).map((member, index) => (
+              <div key={index} style={styles.memberRow}>
+                <div style={styles.memberNumber}>
+                  {getRoleEmoji(member.role)} {member.role}
+                </div>
+                <input
+                  type="text"
+                  value={member.name}
+                  onChange={(e) => handleMemberChange(index, 'name', e.target.value)}
+                  style={styles.memberInput}
+                  placeholder={`${member.role} player name`}
+                  required
+                />
+                <input
+                  type="email"
+                  value={member.contactEmail}
+                  onChange={(e) => handleMemberChange(index, 'contactEmail', e.target.value)}
+                  style={styles.memberInput}
+                  placeholder="Email (optional)"
+                />
+              </div>
+            ))}
+          </div>
+
+          {formData.members.length > 4 && (
+            <div style={styles.membersSection}>
+              <h4 style={styles.sectionTitle}>Additional Members</h4>
+
+              {formData.members.slice(4).map((member, index) => (
+                <div key={index + 4} style={styles.memberRow}>
+                  <select
+                    value={member.role}
+                    onChange={(e) => handleMemberChange(index + 4, 'role', e.target.value)}
+                    style={styles.memberSelect}
+                  >
+                    <option value="Forward">⚡ Forward</option>
+                    <option value="Center">⚖️ Center</option>
+                    <option value="Defender">🛡️ Defender</option>
+                    <option value="Keeper">🔋 Keeper</option>
+                    <option value="All-rounder">🌟 All-rounder</option>
+                  </select>
+                  <input
+                    type="text"
+                    value={member.name}
+                    onChange={(e) => handleMemberChange(index + 4, 'name', e.target.value)}
+                    style={styles.memberInput}
+                    placeholder="Player name"
+                  />
+                  <input
+                    type="email"
+                    value={member.contactEmail}
+                    onChange={(e) => handleMemberChange(index + 4, 'contactEmail', e.target.value)}
+                    style={styles.memberInput}
+                    placeholder="Email (optional)"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeMember(index + 4)}
+                    style={styles.removeButton}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={addExtraMember}
+            style={styles.addMemberButton}
+          >
+            + Add Extra Member
+          </button>
 
           <div style={styles.formActions}>
             <button type="submit" style={styles.submitButton} disabled={loading}>
@@ -185,20 +322,30 @@ const TeamManager = () => {
           teams.map((team) => (
             <div key={team._id} style={styles.teamCard}>
               <div style={styles.cardHeader}>
-                <h3 style={styles.cardTitle}>{team.name}</h3>
+                <h3 style={styles.cardTitle}>
+                  <span style={{ ...styles.colorBadge, backgroundColor: team.color }}></span>
+                  {team.name}
+                </h3>
               </div>
 
               <div style={styles.cardInfo}>
-                <p style={styles.infoRow}>
-                  <strong>Captain:</strong> {team.captainName || 'N/A'}
-                </p>
-                {team.members && team.members.length > 0 && (
+                {team.captain && (
                   <p style={styles.infoRow}>
-                    <strong>Members:</strong> {team.members.join(', ')}
+                    <strong>Captain:</strong> {team.captain}
                   </p>
                 )}
+                {team.members && team.members.length > 0 && (
+                  <div style={styles.membersList}>
+                    <strong>Members:</strong>
+                    {team.members.map((member, idx) => (
+                      <div key={idx} style={styles.memberBadge}>
+                        {getRoleEmoji(member.role)} {member.name} ({member.role})
+                      </div>
+                    ))}
+                  </div>
+                )}
                 <p style={styles.infoRow}>
-                  <strong>Created:</strong> {new Date(team.createdAt).toLocaleDateString()}
+                  <strong>Wins:</strong> {team.wins || 0} | <strong>Losses:</strong> {team.losses || 0}
                 </p>
               </div>
 
@@ -229,7 +376,8 @@ const TeamManager = () => {
 const styles = {
   container: {
     maxWidth: '1200px',
-    margin: '0 auto'
+    margin: '0 auto',
+    padding: '20px'
   },
   header: {
     display: 'flex',
@@ -281,11 +429,77 @@ const styles = {
     fontSize: '14px',
     boxSizing: 'border-box'
   },
-  hint: {
-    display: 'block',
-    marginTop: '4px',
-    fontSize: '12px',
-    color: '#888'
+  colorInput: {
+    width: '100px',
+    height: '40px',
+    backgroundColor: '#2a2a2a',
+    border: '1px solid #444',
+    borderRadius: '6px',
+    cursor: 'pointer'
+  },
+  membersSection: {
+    marginTop: '24px',
+    marginBottom: '16px',
+    padding: '16px',
+    backgroundColor: '#2a2a2a',
+    borderRadius: '6px'
+  },
+  sectionTitle: {
+    margin: '0 0 16px 0',
+    fontSize: '16px',
+    fontWeight: 'bold'
+  },
+  memberRow: {
+    display: 'flex',
+    gap: '10px',
+    marginBottom: '12px',
+    alignItems: 'center'
+  },
+  memberNumber: {
+    minWidth: '120px',
+    fontSize: '14px',
+    fontWeight: 'bold',
+    color: '#aaa'
+  },
+  memberInput: {
+    flex: 1,
+    backgroundColor: '#1e1e1e',
+    border: '1px solid #444',
+    borderRadius: '4px',
+    padding: '8px',
+    color: '#fff',
+    fontSize: '13px'
+  },
+  memberSelect: {
+    minWidth: '160px',
+    backgroundColor: '#1e1e1e',
+    border: '1px solid #444',
+    borderRadius: '4px',
+    padding: '8px',
+    color: '#fff',
+    fontSize: '13px'
+  },
+  removeButton: {
+    backgroundColor: '#ff4444',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    padding: '8px 12px',
+    fontSize: '14px',
+    cursor: 'pointer',
+    fontWeight: 'bold'
+  },
+  addMemberButton: {
+    backgroundColor: '#2196F3',
+    color: 'white',
+    border: 'none',
+    borderRadius: '6px',
+    padding: '10px 20px',
+    fontSize: '14px',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    marginBottom: '16px',
+    width: '100%'
   },
   formActions: {
     display: 'flex',
@@ -315,18 +529,20 @@ const styles = {
   },
   teamList: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
     gap: '20px'
   },
   loadingText: {
     textAlign: 'center',
     color: '#888',
-    padding: '40px'
+    padding: '40px',
+    gridColumn: '1 / -1'
   },
   emptyText: {
     textAlign: 'center',
     color: '#888',
-    padding: '40px'
+    padding: '40px',
+    gridColumn: '1 / -1'
   },
   teamCard: {
     backgroundColor: '#1e1e1e',
@@ -341,7 +557,16 @@ const styles = {
   },
   cardTitle: {
     margin: 0,
-    fontSize: '18px'
+    fontSize: '18px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px'
+  },
+  colorBadge: {
+    width: '20px',
+    height: '20px',
+    borderRadius: '50%',
+    display: 'inline-block'
   },
   cardInfo: {
     marginBottom: '16px'
@@ -349,6 +574,18 @@ const styles = {
   infoRow: {
     margin: '8px 0',
     fontSize: '14px',
+    color: '#ccc'
+  },
+  membersList: {
+    margin: '8px 0'
+  },
+  memberBadge: {
+    display: 'inline-block',
+    backgroundColor: '#2a2a2a',
+    padding: '4px 8px',
+    borderRadius: '4px',
+    fontSize: '12px',
+    margin: '4px 4px 0 0',
     color: '#ccc'
   },
   cardActions: {

@@ -32,6 +32,7 @@ const telemetryRoutes = require('./routes/telemetry');
 const leaderboardRoutes = require('./routes/leaderboardRoutes');
 const droneLogRoutes = require('./routes/droneLogRoutes');
 const droneReportRoutes = require('./routes/droneReportRoutes');
+const droneRoutes = require('./routes/droneRoutes');
 
 // Mount Routes
 app.use('/api/auth', authRoutes);
@@ -42,6 +43,7 @@ app.use('/api/telemetry', telemetryRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/drone-logs', droneLogRoutes);
 app.use('/api/reports', droneReportRoutes);
+app.use('/api/drones', droneRoutes);
 
 // Basic test route
 app.get('/', (req, res) => {

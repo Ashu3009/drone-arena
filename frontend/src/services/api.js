@@ -258,6 +258,50 @@ export const getReportById = async (reportId) => {
   return response.data;
 };
 
+// ==================== DRONES ====================
+
+// Get all drones
+export const getAllDrones = async () => {
+  const response = await axios.get(`${API_BASE_URL}/drones`);
+  return response.data;
+};
+
+// Get drones by role
+export const getDronesByRole = async (role) => {
+  const response = await axios.get(`${API_BASE_URL}/drones/role/${role}`);
+  return response.data;
+};
+
+// Get role specifications
+export const getRoleSpecs = async () => {
+  const response = await axios.get(`${API_BASE_URL}/drones/specs/roles`);
+  return response.data;
+};
+
+// Get drone by ID
+export const getDroneById = async (droneId) => {
+  const response = await axios.get(`${API_BASE_URL}/drones/${droneId}`);
+  return response.data;
+};
+
+// Create drone (ADMIN ONLY)
+export const createDrone = async (droneData) => {
+  const response = await axios.post(`${API_BASE_URL}/drones`, droneData);
+  return response.data;
+};
+
+// Update drone (ADMIN ONLY)
+export const updateDrone = async (droneId, droneData) => {
+  const response = await axios.put(`${API_BASE_URL}/drones/${droneId}`, droneData);
+  return response.data;
+};
+
+// Delete drone (ADMIN ONLY)
+export const deleteDrone = async (droneId) => {
+  const response = await axios.delete(`${API_BASE_URL}/drones/${droneId}`);
+  return response.data;
+};
+
 export default {
   // Tournaments
   getTournaments,
@@ -298,5 +342,14 @@ export default {
   getAllTelemetry,
 
   // ML Analysis
-  getAnalysis
+  getAnalysis,
+
+  // Drones
+  getAllDrones,
+  getDronesByRole,
+  getRoleSpecs,
+  getDroneById,
+  createDrone,
+  updateDrone,
+  deleteDrone
 };

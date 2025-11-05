@@ -5,6 +5,7 @@ import TournamentManager from './TournamentManager';
 import TeamManager from './TeamManager';
 import MatchManager from './MatchManager';
 import ReportsManager from './ReportsManager';
+import DroneManagement from './DroneManagement';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('tournaments');
@@ -22,6 +23,8 @@ const AdminDashboard = () => {
         return <TournamentManager />;
       case 'teams':
         return <TeamManager />;
+      case 'drones':
+        return <DroneManagement />;
       case 'matches':
         return <MatchManager />;
       case 'reports':
@@ -59,6 +62,12 @@ const AdminDashboard = () => {
           onClick={() => setActiveTab('teams')}
         >
           Teams
+        </button>
+        <button
+          style={activeTab === 'drones' ? {...styles.navButton, ...styles.navButtonActive} : styles.navButton}
+          onClick={() => setActiveTab('drones')}
+        >
+          Drones
         </button>
         <button
           style={activeTab === 'matches' ? {...styles.navButton, ...styles.navButtonActive} : styles.navButton}
