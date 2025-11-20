@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getAllDrones, getDronesByRole } from '../../services/api';
+import { getAllDrones } from '../../services/api';
 
 const DroneSelector = ({ matchId, roundNumber, teamA, teamB, onRegister }) => {
   const [allDrones, setAllDrones] = useState([]);
@@ -32,13 +32,7 @@ const DroneSelector = ({ matchId, roundNumber, teamA, teamB, onRegister }) => {
   };
 
   const getRoleEmoji = (role) => {
-    const emojis = {
-      Forward: '⚡',
-      Center: '⚖️',
-      Defender: '🛡️',
-      Keeper: '🔋'
-    };
-    return emojis[role] || '🤖';
+    return '';
   };
 
   // Get team members filtered by role (including All-rounders)
@@ -145,7 +139,7 @@ const DroneSelector = ({ matchId, roundNumber, teamA, teamB, onRegister }) => {
                 <option value="">Select Pilot</option>
                 {members.map((member, idx) => (
                   <option key={idx} value={member.name}>
-                    {member.name} {member.role === 'All-rounder' ? '🌟' : ''}
+                    {member.name} ({member.role})
                   </option>
                 ))}
               </select>
@@ -177,7 +171,7 @@ const DroneSelector = ({ matchId, roundNumber, teamA, teamB, onRegister }) => {
 
           {item.pilot && item.droneId && (
             <div style={styles.selectionSummary}>
-              ✅ {item.pilot} → {item.droneId}
+              ✓ {item.pilot} → {item.droneId}
             </div>
           )}
         </div>

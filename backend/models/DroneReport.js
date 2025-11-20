@@ -11,8 +11,7 @@ const droneReportSchema = new mongoose.Schema({
   tournament: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Tournament',
-    required: true,
-    index: true
+    required: true
   },
   roundNumber: {
     type: Number,

@@ -45,6 +45,199 @@ const tournamentSchema = new mongoose.Schema({
     type: Number,
     default: 0,
     min: 0
+  },
+
+  // Registered Teams
+  registeredTeams: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Team'
+  }],
+
+  // Tournament Settings
+  settings: {
+    matchType: {
+      type: String,
+      enum: ['Best of 2', 'Best of 3'],
+      default: 'Best of 2'
+    },
+    hasTiebreaker: {
+      type: Boolean,
+      default: true  // Round 3 if draw in Best of 2
+    },
+    roundDuration: {
+      type: Number,
+      default: 3,  // minutes
+      min: 1,
+      max: 10
+    }
+  },
+
+  // Man of the Tournament
+  manOfTheTournament: {
+    playerName: {
+      type: String,
+      trim: true
+    },
+    team: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Team'
+    },
+    photo: {
+      type: String  // URL or file path
+    },
+    stats: {
+      goals: { type: Number, default: 0 },
+      assists: { type: Number, default: 0 },
+      matchesPlayed: { type: Number, default: 0 }
+    }
+  },
+
+  // Location Information
+  location: {
+    city: {
+      type: String,
+      required: [true, 'Tournament city is required'],
+      trim: true
+    },
+    state: {
+      type: String,
+      trim: true
+    },
+    country: {
+      type: String,
+      default: 'India',
+      trim: true
+    },
+    venue: {
+      type: String,
+      trim: true,
+      maxlength: [200, 'Venue name cannot exceed 200 characters']
+    },
+    address: {
+      type: String,
+      trim: true,
+      maxlength: [300, 'Address cannot exceed 300 characters']
+    }
+  },
+
+  // Prize & Awards Information
+  prizePool: {
+    totalAmount: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+    currency: {
+      type: String,
+      default: 'INR',
+      enum: ['INR', 'USD', 'EUR', 'GBP']
+    },
+    prizes: [{
+      position: {
+        type: String,
+        required: true,
+        enum: ['1st', '2nd', '3rd', 'Participation']
+      },
+      amount: {
+        type: Number,
+        default: 0,
+        min: 0
+      },
+      description: {
+        type: String,
+        trim: true,
+        maxlength: [200, 'Prize description cannot exceed 200 characters']
+      }
+    }]
+  },
+
+  // Winners (Populated after tournament completion)
+  winners: {
+    champion: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Team',
+      default: null
+    },
+    runnerUp: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Team',
+      default: null
+    },
+    thirdPlace: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Team',
+      default: null
+    }
+  },
+
+  // Media & Branding
+  media: {
+    bannerImage: {
+      type: String, // URL
+      default: ''
+    },
+    logoImage: {
+      type: String, // URL
+      default: ''
+    },
+    gallery: [{
+      type: String // Array of image URLs
+    }],
+    socialLinks: {
+      website: {
+        type: String,
+        trim: true
+      },
+      facebook: {
+        type: String,
+        trim: true
+      },
+      twitter: {
+        type: String,
+        trim: true
+      },
+      instagram: {
+        type: String,
+        trim: true
+      },
+      youtube: {
+        type: String,
+        trim: true
+      }
+    }
+  },
+
+  // Organizer Information
+  organizer: {
+    name: {
+      type: String,
+      trim: true
+    },
+    email: {
+      type: String,
+      trim: true,
+      lowercase: true
+    },
+    phone: {
+      type: String,
+      trim: true
+    }
+  },
+
+  // Registration Settings
+  registration: {
+    isOpen: {
+      type: Boolean,
+      default: true
+    },
+    deadline: {
+      type: Date
+    },
+    fee: {
+      type: Number,
+      default: 0,
+      min: 0
+    }
   }
 }, {
   timestamps: true // Automatically adds createdAt and updatedAt fields
@@ -52,6 +245,7 @@ const tournamentSchema = new mongoose.Schema({
 
 // Index for faster queries
 tournamentSchema.index({ status: 1, startDate: -1 });
+tournamentSchema.index({ 'location.city': 1, 'location.state': 1 });
 
 // Virtual field to check if tournament is full
 tournamentSchema.virtual('isFull').get(function() {

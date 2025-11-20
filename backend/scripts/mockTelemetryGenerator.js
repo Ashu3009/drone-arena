@@ -1,7 +1,7 @@
 // backend/scripts/mockTelemetryGenerator.js
 const axios = require('axios');
 
-const BACKEND_URL = 'http://192.168.0.136:5000';
+const BACKEND_URL = 'http://localhost:5000';
 
 // ✅ Mock drone configurations
 const mockDrones = [

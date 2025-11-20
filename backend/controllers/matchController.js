@@ -5,7 +5,9 @@ const Team = require('../models/Team');
 const DroneLog = require('../models/DroneLog');
 const axios = require('axios');
 const { updateStandings } = require('./leaderboardController');
-const DroneTelemetry = require('../models/DroneTelemetry');  // ✅ ADD THIS
+const DroneTelemetry = require('../models/DroneTelemetry');
+const DroneReport = require('../models/DroneReport');  // ✅ Individual reports
+const mqttService = require('../services/mqttService');  // ✅ MQTT for ESP32
 
 // @desc    Get all matches
 // @route   GET /api/matches
@@ -17,8 +19,8 @@ const getAllMatches = async (req, res) => {
     
     const matches = await Match.find(filter)
       .populate('tournament', 'name')
-      .populate('teamA', 'name color')
-      .populate('teamB', 'name color')
+      .populate('teamA', 'name color members')
+      .populate('teamB', 'name color members')
       .populate('winner', 'name')
       .sort({ createdAt: -1 });
     
@@ -43,8 +45,8 @@ const getMatchById = async (req, res) => {
     
     const match = await Match.findById(matchId)
       .populate('tournament', 'name')
-      .populate('teamA', 'name color droneIds')
-      .populate('teamB', 'name color droneIds')
+      .populate('teamA', 'name color members')
+      .populate('teamB', 'name color members')
       .populate('winner', 'name');
     
     if (!match) {
@@ -178,10 +180,10 @@ const startRound = async (req, res) => {
     const { matchId } = req.params;
     
     console.log('🎬 Starting round for match:', matchId);
-    
+
     const match = await Match.findById(matchId)
-      .populate('teamA', 'name color')
-      .populate('teamB', 'name color');
+      .populate('teamA', 'name color members')
+      .populate('teamB', 'name color members');
     
     if (!match) {
       return res.status(404).json({
@@ -226,6 +228,32 @@ const startRound = async (req, res) => {
     await match.save();
 
     console.log(`✅ Round ${nextRound.roundNumber} started`);
+
+    // ✅ Send MQTT START commands to all registered drones
+    if (nextRound.registeredDrones && nextRound.registeredDrones.length > 0) {
+      console.log(`📡 Sending START commands to ${nextRound.registeredDrones.length} drones...`);
+
+      for (const drone of nextRound.registeredDrones) {
+        // Extract droneId string from drone object
+        const droneId = typeof drone === 'string' ? drone : (drone.droneId || drone);
+
+        const config = {
+          command: 'START',
+          status: 'active',
+          matchId: matchId,
+          roundNumber: nextRound.roundNumber,
+          teamA: match.teamA._id.toString(),
+          teamB: match.teamB._id.toString(),
+          serverUrl: `http://${process.env.SERVER_IP || '192.168.0.64'}:${process.env.PORT || 5000}/api/telemetry`
+        };
+
+        mqttService.configureDrone(droneId, config);
+        console.log(`   ✅ START sent to ${droneId}`);
+
+        // Small delay between messages
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+    }
 
     // ✅ Emit Socket.io event for real-time updates
     if (global.io) {
@@ -573,13 +601,175 @@ const endRound = async (req, res) => {
     
     await match.save();
 
+    // ✅ CREATE INDIVIDUAL DRONE REPORTS
+    try {
+      console.log('📝 Creating individual drone reports...');
+
+      // Fetch telemetry data again (includes all drones for this round)
+      const telemetryForReports = await DroneTelemetry.find({
+        matchId: matchId,
+        roundNumber: roundNumber
+      });
+
+      let reportsCreated = 0;
+
+      for (const droneData of telemetryForReports) {
+        // Calculate stats from telemetry logs
+        const logs = droneData.logs || [];
+        const logsCount = logs.length;
+
+        if (logsCount === 0) {
+          console.log(`   ⚠️ No logs for ${droneData.droneId}, skipping report`);
+          continue;
+        }
+
+        const firstLog = logs[0];
+        const lastLog = logs[logsCount - 1];
+
+        // Battery calculation
+        const batteryStart = firstLog.battery || 100;
+        const batteryEnd = lastLog.battery || 100;
+        const batteryUsed = batteryStart - batteryEnd;
+
+        // Distance and speed calculations
+        let totalDistance = 0;
+        const speeds = [];
+
+        for (let i = 1; i < logsCount; i++) {
+          const prev = logs[i - 1];
+          const curr = logs[i];
+
+          // 3D distance
+          const dx = (curr.x || 0) - (prev.x || 0);
+          const dy = (curr.y || 0) - (prev.y || 0);
+          const dz = (curr.z || 0) - (prev.z || 0);
+          const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+          totalDistance += dist;
+
+          // Speed (m/s)
+          const timeDiff = ((curr.timestamp || 0) - (prev.timestamp || 0)) / 1000; // seconds
+          if (timeDiff > 0 && dist > 0 && dist < 10) { // Filter unrealistic values
+            const speed = dist / timeDiff;
+            if (speed < 50) { // Filter unrealistic speeds
+              speeds.push(speed);
+            }
+          }
+        }
+
+        const averageSpeed = speeds.length > 0
+          ? speeds.reduce((sum, s) => sum + s, 0) / speeds.length
+          : 0;
+        const maxSpeed = speeds.length > 0 ? Math.max(...speeds) : 0;
+
+        // Sample flight path (take every 10th point to reduce size)
+        const sampleRate = Math.max(1, Math.floor(logsCount / 50)); // Max 50 points
+        const flightPath = logs
+          .filter((_, index) => index % sampleRate === 0)
+          .map(log => ({
+            x: log.x || 0,
+            y: log.y || 0,
+            z: log.z || 0,
+            timestamp: new Date(log.timestamp || Date.now())
+          }));
+
+        // ML Analysis - calculate stability metrics
+        let totalVariance = 0;
+        let rapidMovements = 0;
+        let stablePositions = 0;
+
+        for (let i = 1; i < logsCount; i++) {
+          const pitchDiff = Math.abs((logs[i].pitch || 0) - (logs[i-1].pitch || 0));
+          const rollDiff = Math.abs((logs[i].roll || 0) - (logs[i-1].roll || 0));
+          totalVariance += pitchDiff + rollDiff;
+
+          const dx = (logs[i].x || 0) - (logs[i-1].x || 0);
+          const dy = (logs[i].y || 0) - (logs[i-1].y || 0);
+          const dz = (logs[i].z || 0) - (logs[i-1].z || 0);
+          const moveDist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+
+          if (moveDist > 0.5) rapidMovements++;
+          if (moveDist < 0.1) stablePositions++;
+        }
+
+        const avgVariance = logsCount > 1 ? totalVariance / logsCount : 0;
+        const stabilityScore = Math.max(0, 100 - (avgVariance * 100));
+
+        const aggressiveness = Math.min(100, (rapidMovements / logsCount) * 200);
+        const defensiveness = Math.min(100, (stablePositions / logsCount) * 200);
+        const efficiency = Math.min(100, batteryEnd); // Higher end battery = more efficient
+        const teamwork = 50; // Placeholder (would need multi-drone analysis)
+
+        let summary = '';
+        if (aggressiveness > 60) {
+          summary = 'Aggressive flying with rapid movements';
+        } else if (defensiveness > 60) {
+          summary = 'Defensive flying with stable positioning';
+        } else {
+          summary = 'Balanced flying style';
+        }
+
+        const recommendations = [];
+        if (efficiency < 50) recommendations.push('Optimize battery usage');
+        if (aggressiveness > 70) recommendations.push('Reduce rapid movements');
+        if (defensiveness > 70) recommendations.push('Increase mobility');
+        if (recommendations.length === 0) recommendations.push('Maintain performance');
+
+        // Performance score calculation
+        const performanceScore = Math.round(
+          (stabilityScore * 0.3) +
+          (efficiency * 0.3) +
+          ((totalDistance / 10) * 0.2) +
+          (aggressiveness * 0.1) +
+          (teamwork * 0.1)
+        );
+
+        // Create comprehensive report
+        const report = await DroneReport.create({
+          match: matchId,
+          roundNumber: roundNumber,
+          tournament: match.tournament,
+          team: droneData.teamId,
+          droneId: droneData.droneId,
+          totalDistance: Math.round(totalDistance * 100) / 100,
+          averageSpeed: Math.round(averageSpeed * 100) / 100,
+          maxSpeed: Math.round(maxSpeed * 100) / 100,
+          flightPath: flightPath,
+          batteryUsage: {
+            start: batteryStart,
+            end: batteryEnd,
+            consumed: Math.round(batteryUsed * 10) / 10
+          },
+          mlAnalysis: {
+            aggressiveness: Math.round(aggressiveness),
+            defensiveness: Math.round(defensiveness),
+            teamwork: Math.round(teamwork),
+            efficiency: Math.round(efficiency),
+            summary: summary,
+            recommendations: recommendations
+          },
+          performanceScore: performanceScore,
+          positionAccuracy: Math.round(stabilityScore),
+          status: 'completed'
+        });
+
+        reportsCreated++;
+        console.log(`   ✅ Report created for ${droneData.droneId} (Distance: ${totalDistance.toFixed(1)}m, Score: ${performanceScore})`);
+      }
+
+      console.log(`📝 Created ${reportsCreated} individual drone reports`);
+
+    } catch (reportError) {
+      console.error('❌ Error creating drone reports:', reportError.message);
+      // Don't fail the whole round end if reports fail
+    }
+
     console.log(`✅ Round ${roundNumber} completed!`);
     console.log(`   - Team A Score: ${activeRound.teamAScore}`);
     console.log(`   - Team B Score: ${activeRound.teamBScore}`);
     console.log('=====================================\n');
 
-    await match.populate('teamA', 'name color');
-    await match.populate('teamB', 'name color');
+    await match.populate('teamA', 'name color members');
+    await match.populate('teamB', 'name color members');
 
     // ✅ Emit Socket.io event for round completion
     if (global.io) {
@@ -794,8 +984,8 @@ const setCurrentMatch = async (req, res) => {
       { new: true }
     )
       .populate('tournament', 'name')
-      .populate('teamA', 'name color')
-      .populate('teamB', 'name color');
+      .populate('teamA', 'name color members')
+      .populate('teamB', 'name color members');
 
     if (!match) {
       return res.status(404).json({
@@ -839,8 +1029,8 @@ const getCurrentMatch = async (req, res) => {
   try {
     const match = await Match.findOne({ isCurrentMatch: true })
       .populate('tournament', 'name')
-      .populate('teamA', 'name color droneIds')
-      .populate('teamB', 'name color droneIds')
+      .populate('teamA', 'name color members')
+      .populate('teamB', 'name color members')
       .populate('winner', 'name');
 
     if (!match) {

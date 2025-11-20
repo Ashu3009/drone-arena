@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import {
   getMatches,
   getTournaments,
+  getTournamentById,
   getTeams,
   createMatch,
   deleteMatch,
   setCurrentMatch,
   startRound,
   endRound,
-  updateScore,
   completeMatch,
   startAllDrones,
   stopAllDrones,
@@ -26,9 +26,9 @@ const MatchManager = () => {
   const [matches, setMatches] = useState([]);
   const [tournaments, setTournaments] = useState([]);
   const [teams, setTeams] = useState([]);
+  const [availableTeams, setAvailableTeams] = useState([]); // Filtered teams based on selected tournament
   const [loading, setLoading] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [selectedMatch, setSelectedMatch] = useState(null);
   const [formData, setFormData] = useState({
     tournament: '',
     teamA: '',
@@ -38,6 +38,30 @@ const MatchManager = () => {
   useEffect(() => {
     loadData();
   }, []);
+
+  // Fetch tournament's registered teams when tournament is selected
+  useEffect(() => {
+    const fetchTournamentTeams = async () => {
+      if (!formData.tournament) {
+        setAvailableTeams([]);
+        return;
+      }
+
+      try {
+        const response = await getTournamentById(formData.tournament);
+        if (response.success && response.data.registeredTeams) {
+          setAvailableTeams(response.data.registeredTeams);
+          // Reset team selection when tournament changes
+          setFormData(prev => ({ ...prev, teamA: '', teamB: '' }));
+        }
+      } catch (error) {
+        console.error('Error fetching tournament teams:', error);
+        setAvailableTeams([]);
+      }
+    };
+
+    fetchTournamentTeams();
+  }, [formData.tournament]);
 
   const loadData = async () => {
     setLoading(true);
@@ -325,9 +349,16 @@ const MatchManager = () => {
                 onChange={(e) => setFormData({ ...formData, teamA: e.target.value })}
                 style={styles.input}
                 required
+                disabled={!formData.tournament || availableTeams.length === 0}
               >
-                <option value="">Select Team A</option>
-                {teams.map(t => (
+                <option value="">
+                  {!formData.tournament
+                    ? 'Select Tournament First'
+                    : availableTeams.length === 0
+                    ? 'No Teams Registered in Tournament'
+                    : 'Select Team A'}
+                </option>
+                {availableTeams.map(t => (
                   <option key={t._id} value={t._id}>{t.name}</option>
                 ))}
               </select>
@@ -339,10 +370,17 @@ const MatchManager = () => {
                 value={formData.teamB}
                 onChange={(e) => setFormData({ ...formData, teamB: e.target.value })}
                 style={styles.input}
+                disabled={!formData.tournament || availableTeams.length === 0}
                 required
               >
-                <option value="">Select Team B</option>
-                {teams.map(t => (
+                <option value="">
+                  {!formData.tournament
+                    ? 'Select Tournament First'
+                    : availableTeams.length === 0
+                    ? 'No Teams Registered in Tournament'
+                    : 'Select Team B'}
+                </option>
+                {availableTeams.map(t => (
                   <option key={t._id} value={t._id}>{t.name}</option>
                 ))}
               </select>

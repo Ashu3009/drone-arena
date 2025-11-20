@@ -5,8 +5,10 @@ const Team = require('../models/Team');
 // @route   GET /api/teams
 exports.getAllTeams = async (req, res) => {
   try {
-    const teams = await Team.find().sort({ name: 1 });
-    
+    const teams = await Team.find()
+      .populate('school', 'name location') // Populate school details
+      .sort({ name: 1 });
+
     res.json({
       success: true,
       count: teams.length,
@@ -24,15 +26,16 @@ exports.getAllTeams = async (req, res) => {
 // @route   GET /api/teams/:id
 exports.getTeamById = async (req, res) => {
   try {
-    const team = await Team.findById(req.params.id);
-    
+    const team = await Team.findById(req.params.id)
+      .populate('school', 'name location'); // Populate school details
+
     if (!team) {
       return res.status(404).json({
         success: false,
         message: 'Team not found'
       });
     }
-    
+
     res.json({
       success: true,
       data: team
@@ -49,13 +52,20 @@ exports.getTeamById = async (req, res) => {
 // @route   POST /api/teams
 exports.createTeam = async (req, res) => {
   try {
-    const { name, color, captainName, members, droneIds } = req.body;
+    const { name, school, teamType, location, color, captainName, members, droneIds } = req.body;
 
     // Validation
     if (!name) {
       return res.status(400).json({
         success: false,
         message: 'Please provide team name'
+      });
+    }
+
+    if (!location || !location.city) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide team location (city is required)'
       });
     }
 
@@ -70,6 +80,9 @@ exports.createTeam = async (req, res) => {
 
     const team = await Team.create({
       name,
+      school: school || null, // Optional
+      teamType: teamType || 'School',
+      location,
       color: color || '#3B82F6',
       captain: captainName,
       members,

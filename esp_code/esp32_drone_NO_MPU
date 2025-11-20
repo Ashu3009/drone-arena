@@ -1,0 +1,369 @@
+// ================================================================
+// 🚁 DRONE ARENA - ESP32 + MQTT (NO MPU-6050 NEEDED FOR TESTING)
+// ================================================================
+
+#include <WiFi.h>
+#include <HTTPClient.h>
+#include <ArduinoJson.h>
+#include <PubSubClient.h>
+
+// ==================== CONFIGURATION =============================
+
+// WiFi Credentials
+const char* ssid = "The Student Scoop";
+const char* password = "TSS@2023";
+
+// MQTT Broker
+const char* mqttServer = "192.168.0.64";
+const int mqttPort = 1883;
+
+// Drone ID
+const char* droneId = "R1";
+
+// Dynamic - Received via MQTT
+String matchId = "";
+String teamId = "";
+int roundNumber = 0;
+String serverUrl = "http://192.168.0.64:5000/api/telemetry";
+bool isActive = false;
+
+// Status LED
+#define STATUS_LED 33
+
+// ==================== GLOBAL VARIABLES ====================
+
+WiFiClient wifiClient;
+PubSubClient mqttClient(wifiClient);
+
+// Simulated position (no real sensor)
+float x = 25.0;
+float y = 25.0;
+float z = 2.0;
+
+// Simulated orientation (no real sensor)
+float pitch = 0.0;
+float roll = 0.0;
+float yaw = 0.0;
+
+// Battery
+int battery = 100;
+
+// Timing
+unsigned long lastSendTime = 0;
+const int sendInterval = 200;
+
+// Statistics
+int successCount = 0;
+int errorCount = 0;
+
+// ==================== MQTT CALLBACK =============================
+
+void mqttCallback(char* topic, byte* payload, unsigned int length) {
+  Serial.println("\n📩 ========== MQTT MESSAGE ==========");
+  Serial.print("Topic: ");
+  Serial.println(topic);
+
+  StaticJsonDocument<512> doc;
+  DeserializationError error = deserializeJson(doc, payload, length);
+
+  if (error) {
+    Serial.print("❌ JSON Parse Error: ");
+    Serial.println(error.c_str());
+    return;
+  }
+
+  Serial.print("Payload: ");
+  serializeJsonPretty(doc, Serial);
+  Serial.println();
+
+  String command = doc["command"] | "";
+
+  if (command == "START") {
+    matchId = doc["matchId"] | "";
+    teamId = doc["teamId"] | "";
+    roundNumber = doc["roundNumber"] | 0;
+
+    if (doc.containsKey("serverUrl")) {
+      serverUrl = doc["serverUrl"] | serverUrl;
+    }
+
+    isActive = true;
+
+    Serial.println("\n🚀 ========== DRONE ACTIVATED ==========");
+    Serial.print("   Match ID: ");
+    Serial.println(matchId);
+    Serial.print("   Team ID: ");
+    Serial.println(teamId);
+    Serial.print("   Round: ");
+    Serial.println(roundNumber);
+    Serial.print("   Server: ");
+    Serial.println(serverUrl);
+    Serial.println("=========================================\n");
+
+    blinkLED(5, 100);
+  }
+  else if (command == "STOP") {
+    isActive = false;
+    Serial.println("\n🛑 DRONE STOPPED\n");
+    blinkLED(3, 200);
+  }
+  else if (command == "RESET") {
+    matchId = "";
+    teamId = "";
+    roundNumber = 0;
+    isActive = false;
+    x = 25.0;
+    y = 25.0;
+    z = 2.0;
+    battery = 100;
+    Serial.println("\n🔄 DRONE RESET\n");
+    blinkLED(2, 500);
+  }
+
+  Serial.println("====================================\n");
+}
+
+// ==================== MQTT FUNCTIONS ====================
+
+void connectMQTT() {
+  int retries = 0;
+  int maxRetries = 5;
+
+  while (!mqttClient.connected() && retries < maxRetries) {
+    Serial.print("📡 Connecting to MQTT (");
+    Serial.print(retries + 1);
+    Serial.print("/");
+    Serial.print(maxRetries);
+    Serial.print(")...");
+
+    String clientId = "ESP32_Drone_";
+    clientId += String(droneId);
+
+    if (mqttClient.connect(clientId.c_str())) {
+      Serial.println(" ✅ Connected!");
+
+      String droneTopic = "drone/" + String(droneId) + "/config";
+      mqttClient.subscribe(droneTopic.c_str());
+      Serial.print("   Subscribed: ");
+      Serial.println(droneTopic);
+
+      mqttClient.subscribe("drone/all/command");
+      Serial.println("   Subscribed: drone/all/command");
+
+      String statusTopic = "drone/" + String(droneId) + "/status";
+      mqttClient.publish(statusTopic.c_str(), "online");
+
+      blinkLED(3, 100);
+
+    } else {
+      Serial.print(" ❌ Failed, rc=");
+      Serial.println(mqttClient.state());
+      blinkLED(1, 1000);
+      delay(3000);
+      retries++;
+    }
+  }
+}
+
+// ==================== SETUP ====================
+
+void setup() {
+  Serial.begin(115200);
+  delay(2000);
+
+  Serial.println("\n================================");
+  Serial.println("🚁 ESP32 DRONE (NO SENSOR)");
+  Serial.println("================================");
+  Serial.print("Drone ID: ");
+  Serial.println(droneId);
+  Serial.println("⚠️  MPU-6050 BYPASSED - Using simulated data");
+
+  pinMode(STATUS_LED, OUTPUT);
+  digitalWrite(STATUS_LED, LOW);
+  blinkLED(3, 200);
+
+  Serial.println("\n📡 Connecting to WiFi...");
+  WiFi.begin(ssid, password);
+
+  int attempts = 0;
+  while (WiFi.status() != WL_CONNECTED && attempts < 20) {
+    delay(500);
+    Serial.print(".");
+    blinkLED(1, 100);
+    attempts++;
+  }
+
+  if (WiFi.status() == WL_CONNECTED) {
+    Serial.println("\n✅ WiFi Connected!");
+    Serial.print("   IP: ");
+    Serial.println(WiFi.localIP());
+    Serial.print("   RSSI: ");
+    Serial.print(WiFi.RSSI());
+    Serial.println(" dBm");
+    blinkLED(5, 100);
+  } else {
+    Serial.println("\n❌ WiFi Failed!");
+    while (1) {
+      blinkLED(1, 1000);
+    }
+  }
+
+  Serial.println("\n📡 Setting up MQTT...");
+  mqttClient.setServer(mqttServer, mqttPort);
+  mqttClient.setCallback(mqttCallback);
+  mqttClient.setKeepAlive(60);
+  mqttClient.setSocketTimeout(10);
+
+  connectMQTT();
+
+  Serial.println("\n================================");
+  Serial.println("✅ DRONE READY");
+  Serial.println("================================");
+  Serial.println("⏳ Waiting for commands...");
+  Serial.println("================================\n");
+}
+
+// ==================== MAIN LOOP ====================
+
+void loop() {
+  if (!mqttClient.connected()) {
+    Serial.println("⚠️  MQTT disconnected. Reconnecting...");
+    connectMQTT();
+  }
+  mqttClient.loop();
+
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("❌ WiFi Disconnected!");
+    WiFi.reconnect();
+    delay(5000);
+    return;
+  }
+
+  if (isActive && matchId != "" && teamId != "") {
+    unsigned long currentTime = millis();
+
+    if (currentTime - lastSendTime >= sendInterval) {
+      lastSendTime = currentTime;
+
+      // Simulate movement (no real sensor)
+      x += random(-10, 10) / 10.0;
+      y += random(-10, 10) / 10.0;
+      z = 2.0 + random(-5, 5) / 10.0;
+
+      x = constrain(x, 0, 50);
+      y = constrain(y, 0, 50);
+      z = constrain(z, 0.5, 10);
+
+      pitch += random(-5, 5) / 100.0;
+      roll += random(-5, 5) / 100.0;
+      yaw += random(-10, 10) / 100.0;
+
+      sendTelemetry();
+
+      if (random(0, 100) < 2) {
+        battery--;
+        if (battery < 0) battery = 0;
+      }
+
+      if (battery < 20 && battery % 5 == 0) {
+        Serial.println("⚠️  LOW BATTERY: " + String(battery) + "%");
+      }
+
+      if ((successCount + errorCount) % 50 == 0 && (successCount + errorCount) > 0) {
+        printStats();
+      }
+    }
+  } else {
+    static unsigned long lastIdleBlink = 0;
+    if (millis() - lastIdleBlink > 5000) {
+      lastIdleBlink = millis();
+      digitalWrite(STATUS_LED, HIGH);
+      delay(50);
+      digitalWrite(STATUS_LED, LOW);
+    }
+  }
+}
+
+// ==================== FUNCTIONS ====================
+
+void sendTelemetry() {
+  HTTPClient http;
+
+  http.begin(serverUrl);
+  http.addHeader("Content-Type", "application/json");
+  http.setTimeout(3000);
+
+  StaticJsonDocument<400> doc;
+  doc["matchId"] = matchId;
+  doc["teamId"] = teamId;
+  doc["droneId"] = droneId;
+  doc["roundNumber"] = roundNumber;
+  doc["x"] = round(x * 100) / 100.0;
+  doc["y"] = round(y * 100) / 100.0;
+  doc["z"] = round(z * 100) / 100.0;
+  doc["pitch"] = round(pitch * 1000) / 1000.0;
+  doc["roll"] = round(roll * 1000) / 1000.0;
+  doc["yaw"] = round(yaw * 1000) / 1000.0;
+  doc["battery"] = battery;
+  doc["timestamp"] = millis();
+
+  String jsonString;
+  serializeJson(doc, jsonString);
+
+  digitalWrite(STATUS_LED, HIGH);
+  int httpCode = http.POST(jsonString);
+  digitalWrite(STATUS_LED, LOW);
+
+  if (httpCode > 0) {
+    successCount++;
+    if (successCount % 10 == 0) {
+      Serial.print("✅ [");
+      Serial.print(successCount);
+      Serial.print("] HTTP ");
+      Serial.print(httpCode);
+      Serial.print(" | Pos: (");
+      Serial.print(x, 1);
+      Serial.print(", ");
+      Serial.print(y, 1);
+      Serial.print(", ");
+      Serial.print(z, 1);
+      Serial.print(") | Bat:");
+      Serial.print(battery);
+      Serial.println("%");
+    }
+  } else {
+    errorCount++;
+    Serial.print("❌ [");
+    Serial.print(errorCount);
+    Serial.print("] Error: ");
+    Serial.println(httpCode);
+  }
+
+  http.end();
+}
+
+void printStats() {
+  Serial.println("\n📊 ========== STATS ==========");
+  Serial.print("   ✅ Success: ");
+  Serial.println(successCount);
+  Serial.print("   ❌ Errors: ");
+  Serial.println(errorCount);
+
+  if (successCount + errorCount > 0) {
+    float rate = (float)successCount / (successCount + errorCount) * 100;
+    Serial.print("   📈 Success Rate: ");
+    Serial.print(rate, 1);
+    Serial.println("%");
+  }
+
+  Serial.println("==============================\n");
+}
+
+void blinkLED(int times, int delayMs) {
+  for (int i = 0; i < times; i++) {
+    digitalWrite(STATUS_LED, HIGH);
+    delay(delayMs);
+    digitalWrite(STATUS_LED, LOW);
+    delay(delayMs);
+  }
+}

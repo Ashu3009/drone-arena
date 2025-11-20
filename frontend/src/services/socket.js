@@ -76,7 +76,10 @@ export const onMatchCompleted = (callback) => {
 // Listen to telemetry event
 export const onTelemetry = (callback) => {
   const s = getSocket();
-  s.on('telemetry', callback);
+  s.on('telemetry', (data) => {
+    console.log('📡 Telemetry received:', data.droneId, `X:${data.x}, Y:${data.y}, Z:${data.z}`);
+    callback(data);
+  });
 };
 
 // Listen to current-match-updated event
@@ -105,7 +108,7 @@ export const disconnectSocket = () => {
   }
 };
 
-export default {
+const socketService = {
   initSocket,
   getSocket,
   joinMatch,
@@ -119,3 +122,5 @@ export default {
   removeAllListeners,
   disconnectSocket
 };
+
+export default socketService;

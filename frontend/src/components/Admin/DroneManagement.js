@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   getAllDrones,
-  getDronesByRole,
   createDrone,
   updateDrone,
   deleteDrone,
@@ -159,13 +158,7 @@ const DroneManagement = () => {
   };
 
   const getRoleEmoji = (role) => {
-    const emojis = {
-      Forward: '⚡',
-      Center: '⚖️',
-      Defender: '🛡️',
-      Keeper: '🔋'
-    };
-    return emojis[role] || '🤖';
+    return '';
   };
 
   const getStatusColor = (status) => {
@@ -298,10 +291,10 @@ const DroneManagement = () => {
                   onChange={(e) => handleRoleChange(e.target.value)}
                   style={styles.select}
                 >
-                  <option value="Forward">⚡ Forward</option>
-                  <option value="Center">⚖️ Center</option>
-                  <option value="Defender">🛡️ Defender</option>
-                  <option value="Keeper">🔋 Keeper</option>
+                  <option value="Forward">Forward</option>
+                  <option value="Center">Center</option>
+                  <option value="Defender">Defender</option>
+                  <option value="Keeper">Keeper</option>
                 </select>
               </div>
 

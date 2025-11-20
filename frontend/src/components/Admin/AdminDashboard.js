@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import TournamentManager from './TournamentManager';
+import SchoolManager from './SchoolManager';
 import TeamManager from './TeamManager';
 import MatchManager from './MatchManager';
 import ReportsManager from './ReportsManager';
@@ -21,6 +22,8 @@ const AdminDashboard = () => {
     switch (activeTab) {
       case 'tournaments':
         return <TournamentManager />;
+      case 'schools':
+        return <SchoolManager />;
       case 'teams':
         return <TeamManager />;
       case 'drones':
@@ -56,6 +59,12 @@ const AdminDashboard = () => {
           onClick={() => setActiveTab('tournaments')}
         >
           Tournaments
+        </button>
+        <button
+          style={activeTab === 'schools' ? {...styles.navButton, ...styles.navButtonActive} : styles.navButton}
+          onClick={() => setActiveTab('schools')}
+        >
+          Schools
         </button>
         <button
           style={activeTab === 'teams' ? {...styles.navButton, ...styles.navButtonActive} : styles.navButton}

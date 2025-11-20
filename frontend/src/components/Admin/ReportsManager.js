@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { getTournaments, getTournamentReports, getMatchReports } from '../../services/api';
+import { getTournaments, getMatches, getMatchReports } from '../../services/api';
 
 const ReportsManager = () => {
   const [tournaments, setTournaments] = useState([]);
   const [selectedTournament, setSelectedTournament] = useState(null);
+  const [matches, setMatches] = useState([]);
+  const [selectedMatch, setSelectedMatch] = useState(null);
   const [reports, setReports] = useState([]);
   const [groupedReports, setGroupedReports] = useState({});
   const [loading, setLoading] = useState(false);
@@ -25,13 +27,13 @@ const ReportsManager = () => {
     }
   };
 
-  const loadTournamentReports = async (tournamentId) => {
+  const loadMatchReports = async (matchId) => {
     setLoading(true);
     try {
-      const response = await getTournamentReports(tournamentId);
+      const response = await getMatchReports(matchId);
       if (response.success) {
         setReports(response.data);
-        groupReportsByMatch(response.data);
+        groupReportsByRound(response.data);
       }
     } catch (error) {
       console.error('Error loading reports:', error);
@@ -41,32 +43,41 @@ const ReportsManager = () => {
     }
   };
 
-  const groupReportsByMatch = (reportsData) => {
+  const groupReportsByRound = (reportsData) => {
     const grouped = {};
 
     reportsData.forEach(report => {
-      const matchId = report.match._id;
-      if (!grouped[matchId]) {
-        grouped[matchId] = {
-          matchInfo: report.match,
-          rounds: {}
-        };
-      }
-
       const roundNum = report.roundNumber;
-      if (!grouped[matchId].rounds[roundNum]) {
-        grouped[matchId].rounds[roundNum] = [];
+      if (!grouped[roundNum]) {
+        grouped[roundNum] = [];
       }
-
-      grouped[matchId].rounds[roundNum].push(report);
+      grouped[roundNum].push(report);
     });
 
     setGroupedReports(grouped);
   };
 
-  const handleTournamentSelect = (tournamentId) => {
+  const handleTournamentSelect = async (tournamentId) => {
     setSelectedTournament(tournamentId);
-    loadTournamentReports(tournamentId);
+    setSelectedMatch(null);
+    setReports([]);
+    setGroupedReports({});
+    
+    // Load matches for this tournament
+    try {
+      const response = await getMatches();
+      if (response.success) {
+        const filteredMatches = response.data.filter(m => m.tournament === tournamentId);
+        setMatches(filteredMatches);
+      }
+    } catch (error) {
+      console.error('Error loading matches:', error);
+    }
+  };
+
+  const handleMatchSelect = (matchId) => {
+    setSelectedMatch(matchId);
+    loadMatchReports(matchId);
     setSelectedReport(null);
   };
 
@@ -78,13 +89,61 @@ const ReportsManager = () => {
     setSelectedReport(null);
   };
 
+  const downloadReport = (report) => {
+    const reportData = {
+      droneId: report.droneId,
+      team: report.team?.name || 'Unknown',
+      round: report.roundNumber,
+      batteryUsed: report.batteryUsage?.consumed || 0,
+      totalDistance: report.totalDistance || 0,
+      avgSpeed: report.averageSpeed || 0,
+      maxSpeed: report.maxSpeed || 0,
+      performanceScore: report.performanceScore || 0,
+      generatedAt: new Date(report.generatedAt).toLocaleString()
+    };
+
+    const dataStr = JSON.stringify(reportData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${report.droneId}_Round${report.roundNumber}_Report.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const downloadAllReports = () => {
+    if (reports.length === 0) return;
+
+    const allReportsData = reports.map(report => ({
+      droneId: report.droneId,
+      team: report.team?.name || 'Unknown',
+      round: report.roundNumber,
+      batteryUsed: report.batteryUsage?.consumed || 0,
+      totalDistance: report.totalDistance || 0,
+      avgSpeed: report.averageSpeed || 0,
+      maxSpeed: report.maxSpeed || 0,
+      performanceScore: report.performanceScore || 0,
+      generatedAt: new Date(report.generatedAt).toLocaleString()
+    }));
+
+    const dataStr = JSON.stringify(allReportsData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Match_Reports_${new Date().toISOString().slice(0,10)}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div style={styles.container}>
-      <h2 style={styles.title}>Reports Management</h2>
+      <h2 style={styles.title}>📊 Reports Management</h2>
 
       {/* Tournament Selection */}
       <div style={styles.section}>
-        <h3 style={styles.sectionTitle}>Select Tournament</h3>
+        <h3 style={styles.sectionTitle}>🏆 Select Tournament</h3>
         <div style={styles.tournamentGrid}>
           {tournaments.map(tournament => (
             <button
@@ -101,76 +160,115 @@ const ReportsManager = () => {
         </div>
       </div>
 
-      {/* Reports Display */}
-      {loading && <p style={styles.loading}>Loading reports...</p>}
-
-      {!loading && selectedTournament && reports.length === 0 && (
-        <p style={styles.noData}>No reports found for this tournament.</p>
+      {/* Match Selection */}
+      {selectedTournament && matches.length > 0 && (
+        <div style={styles.section}>
+          <h3 style={styles.sectionTitle}>⚽ Select Match</h3>
+          <div style={styles.matchGrid}>
+            {matches.map(match => (
+              <button
+                key={match._id}
+                onClick={() => handleMatchSelect(match._id)}
+                style={{
+                  ...styles.matchButton,
+                  backgroundColor: selectedMatch === match._id ? '#2196F3' : '#444'
+                }}
+              >
+                <div>{match.teamA?.name || 'Team A'} vs {match.teamB?.name || 'Team B'}</div>
+                <div style={styles.matchDate}>
+                  {new Date(match.createdAt).toLocaleDateString()}
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
       )}
 
-      {!loading && selectedTournament && reports.length > 0 && (
-        <div style={styles.section}>
-          <h3 style={styles.sectionTitle}>
-            Reports ({reports.length} drones)
-          </h3>
+      {/* Loading State */}
+      {loading && <p style={styles.loading}>Loading reports...</p>}
 
-          {/* Grouped by Match */}
-          {Object.keys(groupedReports).map(matchId => {
-            const matchData = groupedReports[matchId];
+      {/* No Match Selected */}
+      {selectedTournament && matches.length > 0 && !selectedMatch && !loading && (
+        <p style={styles.noData}>👆 Select a match to view reports</p>
+      )}
+
+      {/* No Reports */}
+      {!loading && selectedMatch && reports.length === 0 && (
+        <p style={styles.noData}>No reports found for this match.</p>
+      )}
+
+      {/* Reports Display */}
+      {!loading && selectedMatch && reports.length > 0 && (
+        <div style={styles.section}>
+          <div style={styles.sectionHeader}>
+            <h3 style={styles.sectionTitle}>
+              📋 Reports ({reports.length} drones)
+            </h3>
+            <button style={styles.downloadAllButton} onClick={downloadAllReports}>
+              ⬇️ Download All Reports
+            </button>
+          </div>
+
+          {/* Grouped by Round */}
+          {Object.keys(groupedReports).sort((a, b) => Number(a) - Number(b)).map(roundNum => {
+            const roundReports = groupedReports[roundNum];
 
             return (
-              <div key={matchId} style={styles.matchGroup}>
-                <h4 style={styles.matchTitle}>
-                  Match: {matchData.matchInfo.teamA?.name || 'Team A'} vs {matchData.matchInfo.teamB?.name || 'Team B'}
-                </h4>
+              <div key={roundNum} style={styles.roundGroup}>
+                <h4 style={styles.roundTitle}>Round {roundNum}</h4>
 
-                {/* Grouped by Round */}
-                {Object.keys(matchData.rounds).sort().map(roundNum => {
-                  const roundReports = matchData.rounds[roundNum];
+                <div style={styles.reportsGrid}>
+                  {roundReports.map(report => (
+                    <div
+                      key={report._id}
+                      style={styles.reportCard}
+                    >
+                      <div style={styles.reportHeader}>
+                        <span style={styles.droneId}>{report.droneId}</span>
+                        <span style={{
+                          ...styles.teamBadge,
+                          backgroundColor: report.team?.color || '#888'
+                        }}>
+                          {report.team?.name || 'Team'}
+                        </span>
+                      </div>
 
-                  return (
-                    <div key={roundNum} style={styles.roundGroup}>
-                      <h5 style={styles.roundTitle}>Round {roundNum}</h5>
+                      <div style={styles.reportStats}>
+                        <div style={styles.stat}>
+                          <span style={styles.statLabel}>Battery Used:</span>
+                          <span style={styles.statValue}>{(report.batteryUsage?.consumed || 0).toFixed(1)}%</span>
+                        </div>
+                        <div style={styles.stat}>
+                          <span style={styles.statLabel}>Distance:</span>
+                          <span style={styles.statValue}>{(report.totalDistance || 0).toFixed(1)}m</span>
+                        </div>
+                        <div style={styles.stat}>
+                          <span style={styles.statLabel}>Avg Speed:</span>
+                          <span style={styles.statValue}>{(report.averageSpeed || 0).toFixed(2)} m/s</span>
+                        </div>
+                        <div style={styles.stat}>
+                          <span style={styles.statLabel}>Performance:</span>
+                          <span style={styles.statValue}>{(report.performanceScore || 0).toFixed(0)}</span>
+                        </div>
+                      </div>
 
-                      <div style={styles.reportsGrid}>
-                        {roundReports.map(report => (
-                          <div
-                            key={report._id}
-                            style={styles.reportCard}
-                            onClick={() => viewReportDetails(report)}
-                          >
-                            <div style={styles.reportHeader}>
-                              <span style={styles.droneId}>{report.droneId}</span>
-                              <span style={{
-                                ...styles.teamBadge,
-                                backgroundColor: report.team?.color || '#888'
-                              }}>
-                                {report.team?.name || 'Team'}
-                              </span>
-                            </div>
-
-                            <div style={styles.reportStats}>
-                              <div style={styles.stat}>
-                                <span style={styles.statLabel}>Score:</span>
-                                <span style={styles.statValue}>{report.score || 0}</span>
-                              </div>
-                              <div style={styles.stat}>
-                                <span style={styles.statLabel}>Targets:</span>
-                                <span style={styles.statValue}>{report.targetsHit || 0}</span>
-                              </div>
-                              <div style={styles.stat}>
-                                <span style={styles.statLabel}>Distance:</span>
-                                <span style={styles.statValue}>{(report.totalDistance || 0).toFixed(1)}m</span>
-                              </div>
-                            </div>
-
-                            <button style={styles.viewButton}>View Details</button>
-                          </div>
-                        ))}
+                      <div style={styles.buttonGroup}>
+                        <button 
+                          style={styles.viewButton}
+                          onClick={() => viewReportDetails(report)}
+                        >
+                          👁️ View Details
+                        </button>
+                        <button 
+                          style={styles.downloadButton}
+                          onClick={() => downloadReport(report)}
+                        >
+                          ⬇️ Download
+                        </button>
                       </div>
                     </div>
-                  );
-                })}
+                  ))}
+                </div>
               </div>
             );
           })}
@@ -184,7 +282,7 @@ const ReportsManager = () => {
             <button style={styles.closeButton} onClick={closeReportDetails}>×</button>
 
             <h3 style={styles.modalTitle}>
-              Drone Report: {selectedReport.droneId}
+              🚁 Drone Report: {selectedReport.droneId}
             </h3>
 
             <div style={styles.modalSection}>
@@ -199,12 +297,14 @@ const ReportsManager = () => {
                   <span style={styles.infoValue}>{selectedReport.roundNumber}</span>
                 </div>
                 <div style={styles.infoItem}>
-                  <span style={styles.infoLabel}>Score:</span>
-                  <span style={styles.infoValue}>{selectedReport.score || 0}</span>
+                  <span style={styles.infoLabel}>Status:</span>
+                  <span style={styles.infoValue}>{selectedReport.status}</span>
                 </div>
                 <div style={styles.infoItem}>
-                  <span style={styles.infoLabel}>Targets Hit:</span>
-                  <span style={styles.infoValue}>{selectedReport.targetsHit || 0}</span>
+                  <span style={styles.infoLabel}>Generated At:</span>
+                  <span style={styles.infoValue}>
+                    {new Date(selectedReport.generatedAt).toLocaleString()}
+                  </span>
                 </div>
               </div>
             </div>
@@ -217,42 +317,58 @@ const ReportsManager = () => {
                   <span style={styles.infoValue}>{(selectedReport.totalDistance || 0).toFixed(2)}m</span>
                 </div>
                 <div style={styles.infoItem}>
-                  <span style={styles.infoLabel}>Avg Velocity:</span>
-                  <span style={styles.infoValue}>{(selectedReport.avgVelocity || 0).toFixed(2)} m/s</span>
+                  <span style={styles.infoLabel}>Avg Speed:</span>
+                  <span style={styles.infoValue}>{(selectedReport.averageSpeed || 0).toFixed(2)} m/s</span>
                 </div>
                 <div style={styles.infoItem}>
-                  <span style={styles.infoLabel}>Max Velocity:</span>
-                  <span style={styles.infoValue}>{(selectedReport.maxVelocity || 0).toFixed(2)} m/s</span>
+                  <span style={styles.infoLabel}>Max Speed:</span>
+                  <span style={styles.infoValue}>{(selectedReport.maxSpeed || 0).toFixed(2)} m/s</span>
                 </div>
                 <div style={styles.infoItem}>
-                  <span style={styles.infoLabel}>Time in Arena:</span>
-                  <span style={styles.infoValue}>{(selectedReport.timeInArena || 0).toFixed(1)}s</span>
+                  <span style={styles.infoLabel}>Performance Score:</span>
+                  <span style={styles.infoValue}>{(selectedReport.performanceScore || 0).toFixed(0)}</span>
                 </div>
               </div>
             </div>
 
-            {selectedReport.mlAnalysis && (
+            <div style={styles.modalSection}>
+              <h4 style={styles.modalSectionTitle}>Battery Usage</h4>
+              <div style={styles.infoGrid}>
+                <div style={styles.infoItem}>
+                  <span style={styles.infoLabel}>Start:</span>
+                  <span style={styles.infoValue}>{(selectedReport.batteryUsage?.start || 100)}%</span>
+                </div>
+                <div style={styles.infoItem}>
+                  <span style={styles.infoLabel}>End:</span>
+                  <span style={styles.infoValue}>{(selectedReport.batteryUsage?.end || 100)}%</span>
+                </div>
+                <div style={styles.infoItem}>
+                  <span style={styles.infoLabel}>Consumed:</span>
+                  <span style={styles.infoValue}>{(selectedReport.batteryUsage?.consumed || 0).toFixed(1)}%</span>
+                </div>
+              </div>
+            </div>
+
+            {selectedReport.mlAnalysis && Object.keys(selectedReport.mlAnalysis).some(k => selectedReport.mlAnalysis[k] !== 0) && (
               <div style={styles.modalSection}>
                 <h4 style={styles.modalSectionTitle}>ML Analysis</h4>
                 <div style={styles.mlAnalysis}>
                   <div style={styles.infoItem}>
-                    <span style={styles.infoLabel}>Strategy:</span>
-                    <span style={styles.infoValue}>{selectedReport.mlAnalysis.strategy || 'N/A'}</span>
+                    <span style={styles.infoLabel}>Aggressiveness:</span>
+                    <span style={styles.infoValue}>{selectedReport.mlAnalysis.aggressiveness || 0}</span>
+                  </div>
+                  <div style={styles.infoItem}>
+                    <span style={styles.infoLabel}>Defensiveness:</span>
+                    <span style={styles.infoValue}>{selectedReport.mlAnalysis.defensiveness || 0}</span>
+                  </div>
+                  <div style={styles.infoItem}>
+                    <span style={styles.infoLabel}>Teamwork:</span>
+                    <span style={styles.infoValue}>{selectedReport.mlAnalysis.teamwork || 0}</span>
                   </div>
                   <div style={styles.infoItem}>
                     <span style={styles.infoLabel}>Efficiency:</span>
-                    <span style={styles.infoValue}>{selectedReport.mlAnalysis.efficiency || 'N/A'}</span>
+                    <span style={styles.infoValue}>{selectedReport.mlAnalysis.efficiency || 0}</span>
                   </div>
-                  <div style={styles.infoItem}>
-                    <span style={styles.infoLabel}>Pattern:</span>
-                    <span style={styles.infoValue}>{selectedReport.mlAnalysis.pattern || 'N/A'}</span>
-                  </div>
-                  {selectedReport.mlAnalysis.insights && (
-                    <div style={styles.insights}>
-                      <span style={styles.infoLabel}>Insights:</span>
-                      <p style={styles.insightsText}>{selectedReport.mlAnalysis.insights}</p>
-                    </div>
-                  )}
                 </div>
               </div>
             )}
@@ -266,7 +382,8 @@ const ReportsManager = () => {
 const styles = {
   container: {
     padding: '20px',
-    color: 'white'
+    color: 'white',
+    minHeight: '100vh'
   },
   title: {
     fontSize: '28px',
@@ -280,14 +397,25 @@ const styles = {
     borderRadius: '8px',
     marginBottom: '25px'
   },
+  sectionHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '20px'
+  },
   sectionTitle: {
     fontSize: '20px',
-    marginBottom: '20px',
+    margin: 0,
     color: '#4CAF50'
   },
   tournamentGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+    gap: '15px'
+  },
+  matchGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
     gap: '15px'
   },
   tournamentButton: {
@@ -300,50 +428,70 @@ const styles = {
     fontSize: '16px',
     transition: 'all 0.3s ease'
   },
+  matchButton: {
+    padding: '15px',
+    borderRadius: '6px',
+    border: '1px solid #555',
+    color: 'white',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    fontSize: '14px',
+    transition: 'all 0.3s ease',
+    textAlign: 'left'
+  },
+  matchDate: {
+    fontSize: '12px',
+    color: '#aaa',
+    marginTop: '5px'
+  },
+  downloadAllButton: {
+    padding: '10px 20px',
+    backgroundColor: '#FF9800',
+    border: 'none',
+    borderRadius: '6px',
+    color: 'white',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    fontSize: '14px'
+  },
   loading: {
     textAlign: 'center',
     fontSize: '18px',
-    color: '#888'
+    color: '#888',
+    padding: '40px'
   },
   noData: {
     textAlign: 'center',
     fontSize: '16px',
     color: '#888',
-    padding: '40px'
+    padding: '40px',
+    backgroundColor: '#1e1e1e',
+    borderRadius: '8px'
   },
-  matchGroup: {
+  roundGroup: {
     marginBottom: '30px',
     backgroundColor: '#2a2a2a',
     padding: '20px',
     borderRadius: '8px'
   },
-  matchTitle: {
+  roundTitle: {
     fontSize: '18px',
     marginBottom: '20px',
     color: '#4CAF50',
     borderBottom: '1px solid #333',
     paddingBottom: '10px'
   },
-  roundGroup: {
-    marginBottom: '25px'
-  },
-  roundTitle: {
-    fontSize: '16px',
-    marginBottom: '15px',
-    color: '#aaa'
-  },
   reportsGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
     gap: '15px'
   },
   reportCard: {
     backgroundColor: '#333',
     padding: '15px',
     borderRadius: '8px',
-    cursor: 'pointer',
-    transition: 'all 0.3s ease',
-    border: '2px solid transparent'
+    border: '2px solid transparent',
+    transition: 'all 0.3s ease'
   },
   reportHeader: {
     display: 'flex',
@@ -380,10 +528,24 @@ const styles = {
     fontSize: '14px',
     fontWeight: 'bold'
   },
+  buttonGroup: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: '10px'
+  },
   viewButton: {
-    width: '100%',
     padding: '10px',
     backgroundColor: '#4CAF50',
+    border: 'none',
+    borderRadius: '6px',
+    color: 'white',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    fontSize: '14px'
+  },
+  downloadButton: {
+    padding: '10px',
+    backgroundColor: '#2196F3',
     border: 'none',
     borderRadius: '6px',
     color: 'white',
@@ -461,24 +623,9 @@ const styles = {
     fontWeight: 'bold'
   },
   mlAnalysis: {
-    display: 'flex',
-    flexDirection: 'column',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, 1fr)',
     gap: '15px'
-  },
-  insights: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '10px',
-    gridColumn: '1 / -1'
-  },
-  insightsText: {
-    color: '#ddd',
-    fontSize: '14px',
-    lineHeight: '1.6',
-    backgroundColor: '#2a2a2a',
-    padding: '15px',
-    borderRadius: '6px',
-    margin: 0
   }
 };
 

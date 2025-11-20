@@ -7,6 +7,7 @@ const Leaderboard = ({ tournamentId }) => {
 
   useEffect(() => {
     loadLeaderboard();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tournamentId]);
 
   const loadLeaderboard = async () => {
@@ -102,7 +103,7 @@ const Leaderboard = ({ tournamentId }) => {
                 <td style={styles.td}>{index + 1}</td>
                 <td style={{...styles.td, textAlign: 'left', fontWeight: 'bold'}}>
                   {team.name}
-                  {index === 0 && <span style={styles.trophy}>🏆</span>}
+                  {index === 0 && <span style={styles.trophy}>★</span>}
                 </td>
                 <td style={styles.td}>{team.wins}</td>
                 <td style={styles.td}>{team.draws}</td>

@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { getCurrentMatch } from '../../services/api';
 import { initSocket, joinMatch, leaveMatch, onRoundStarted, onScoreUpdated, onRoundEnded, onMatchCompleted, onTelemetry, removeAllListeners } from '../../services/socket';
-import Arena3D from './Arena3D';
+// import Arena3D from './Arena3D';
+
+import DroneView3D from '../DroneView3D';
 import Leaderboard from './Leaderboard';
 import TimerDisplayPublic from './TimerDisplayPublic';
 
 const PublicViewer = () => {
   const [currentMatch, setCurrentMatch] = useState(null);
-  const [telemetryData, setTelemetryData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [liveUpdate, setLiveUpdate] = useState(null);
 
@@ -25,9 +26,11 @@ const PublicViewer = () => {
       }
       removeAllListeners();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     if (currentMatch) {
       // Join match room
       joinMatch(currentMatch._id);
@@ -66,15 +69,8 @@ const PublicViewer = () => {
       });
 
       onTelemetry((data) => {
-        // Update telemetry data for 3D visualization
-        setTelemetryData(prev => {
-          const existing = prev.find(d => d.droneId === data.droneId);
-          if (existing) {
-            return prev.map(d => d.droneId === data.droneId ? data : d);
-          } else {
-            return [...prev, data];
-          }
-        });
+        // Telemetry received - handled by DroneView3D component
+        console.log('Telemetry update:', data.droneId);
       });
     }
   }, [currentMatch]);
@@ -166,7 +162,7 @@ const PublicViewer = () => {
       {/* 3D Arena View */}
       <div style={styles.arenaSection}>
         <h3 style={styles.sectionTitle}>3D Arena View</h3>
-        <Arena3D telemetryData={telemetryData} />
+        <DroneView3D matchId={currentMatch?._id} />
       </div>
 
       {/* Leaderboard */}

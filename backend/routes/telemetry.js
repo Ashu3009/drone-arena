@@ -1,3 +1,4 @@
+// backend/routes/telemetry.js - TESTING VERSION (No round validation)
 const express = require('express');
 const router = express.Router();
 const Match = require('../models/Match');
@@ -6,44 +7,28 @@ const DroneTelemetry = require('../models/DroneTelemetry');
 // POST - Receive telemetry data from drone
 router.post('/', async (req, res) => {
   try {
-    console.log('📡 Telemetry request received');
-    
     const { matchId, teamId, droneId, x, y, z, pitch, roll, yaw, battery } = req.body;
 
     // Validate required fields
     if (!matchId || !droneId) {
-      console.log('❌ Missing matchId or droneId');
-      return res.status(400).json({ 
-        success: false, 
-        message: 'matchId and droneId are required' 
+      return res.status(400).json({
+        success: false,
+        message: 'matchId and droneId are required'
       });
     }
 
-    // Check if match exists and round is active
+    // Check if match exists
     const match = await Match.findById(matchId);
-    
+
     if (!match) {
-      console.log('❌ Match not found:', matchId);
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Match not found' 
+      return res.status(404).json({
+        success: false,
+        message: 'Match not found'
       });
     }
 
-    // Check if current round is in progress
-    const currentRound = match.rounds.find(
-      r => r.roundNumber === match.currentRound && r.status === 'in_progress'
-    );
-
-    if (!currentRound) {
-      console.log('❌ No active round for match:', matchId);
-      return res.status(404).json({ 
-        success: false, 
-        message: 'No active round found' 
-      });
-    }
-
-    console.log('✅ Match found, round active:', match.currentRound);
+    // ⚠️ REMOVED ROUND STATUS CHECK FOR TESTING
+    // This allows telemetry even if round is not "in_progress"
 
     // Create telemetry log entry
     const telemetryData = {
@@ -57,44 +42,16 @@ router.post('/', async (req, res) => {
       battery: battery || 100
     };
 
-      console.log('✅ Match found, round active:', match.currentRound);
-
-      // ADD THIS DEBUG:
-      console.log('🔍 Searching telemetry for:', {
-        matchId: matchId,
-        droneId: droneId,
-        roundNumber: match.currentRound
-      });
-
-      // Find existing telemetry document or create new one
-      let telemetry = await DroneTelemetry.findOne({
-        matchId,
-        droneId,
-        roundNumber: match.currentRound
-      });
-
-      // ADD THIS DEBUG:
-      if (telemetry) {
-        console.log('📦 Found existing telemetry - Round:', telemetry.roundNumber, 'Logs:', telemetry.logs.length);
-      } else {
-        console.log('🆕 No existing telemetry found - will create new');
-      }
-
-      console.log('📊 Found telemetry:', telemetry ? 'YES' : 'NO');
-
-
-
     // Find existing telemetry document or create new one
-    // let telemetry = await DroneTelemetry.findOne({
-    //   matchId,
-    //   droneId,
-    //   roundNumber: match.currentRound
-    // });
+    let telemetry = await DroneTelemetry.findOne({
+      matchId,
+      droneId,
+      roundNumber: match.currentRound
+    });
 
     if (telemetry) {
       telemetry.logs.push(telemetryData);
-      const saved = await telemetry.save();
-      console.log('💾 Data appended - Document ID:', saved._id);
+      await telemetry.save();
     } else {
       telemetry = new DroneTelemetry({
         matchId,
@@ -103,9 +60,23 @@ router.post('/', async (req, res) => {
         roundNumber: match.currentRound,
         logs: [telemetryData]
       });
-      const saved = await telemetry.save();
-      console.log('💾 New document created - ID:', saved._id);
-      console.log('💾 Match:', saved.matchId, 'Round:', saved.roundNumber, 'Drone:', saved.droneId);
+      await telemetry.save();
+    }
+
+    // ✅ CRITICAL: Emit to Socket.IO for real-time updates
+    const io = req.app.get('io');
+    if (io) {
+      const realtimeData = {
+        droneId,
+        matchId,
+        roundNumber: match.currentRound,
+        position: { x, y, z },
+        orientation: { pitch, roll, yaw },
+        battery,
+        timestamp: telemetryData.timestamp
+      };
+
+      io.to(`match_${matchId}`).emit('telemetry_update', realtimeData);
     }
 
     res.status(200).json({ 
@@ -115,11 +86,86 @@ router.post('/', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error in telemetry endpoint:', error);
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       message: 'Server error',
-      error: error.message 
+      error: error.message
+    });
+  }
+});
+
+// GET - Fetch telemetry for a match (for 3D visualization)
+router.get('/match/:matchId', async (req, res) => {
+  try {
+    const { matchId } = req.params;
+    console.log('📊 Fetching telemetry for match:', matchId);
+
+    const telemetryData = await DroneTelemetry.find({ matchId })
+      .sort({ roundNumber: -1, 'logs.timestamp': -1 })
+      .limit(100);
+
+    console.log('📦 Found telemetry documents:', telemetryData.length);
+
+    res.json({
+      success: true,
+      count: telemetryData.length,
+      data: telemetryData
+    });
+
+  } catch (error) {
+    console.error('❌ Error fetching telemetry:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
+// GET - Fetch latest telemetry for active round (optimized for 3D view)
+router.get('/match/:matchId/latest', async (req, res) => {
+  try {
+    const { matchId } = req.params;
+    console.log('🔍 Fetching latest telemetry for match:', matchId);
+
+    // Get current round from match
+    const match = await Match.findById(matchId);
+    if (!match) {
+      return res.status(404).json({
+        success: false,
+        message: 'Match not found'
+      });
+    }
+
+    // Get telemetry for current round only
+    const telemetryData = await DroneTelemetry.find({ 
+      matchId,
+      roundNumber: match.currentRound 
+    });
+
+    // Format data for 3D view
+    const formattedData = telemetryData.map(doc => {
+      const latestLog = doc.logs[doc.logs.length - 1]; // Get last log
+      return {
+        droneId: doc.droneId,
+        teamId: doc.teamId,
+        roundNumber: doc.roundNumber,
+        logs: [latestLog] // Only send latest position
+      };
+    });
+
+    console.log('📦 Formatted data for', formattedData.length, 'drones');
+
+    res.json({
+      success: true,
+      currentRound: match.currentRound,
+      data: formattedData
+    });
+
+  } catch (error) {
+    console.error('❌ Error fetching latest telemetry:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message
     });
   }
 });

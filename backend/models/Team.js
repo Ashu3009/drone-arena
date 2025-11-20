@@ -8,6 +8,32 @@ const teamSchema = new mongoose.Schema({
     trim: true,
     unique: true
   },
+  school: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'School',
+    default: null // OPTIONAL: null = independent/corporate team
+  },
+  teamType: {
+    type: String,
+    enum: ['School', 'Corporate', 'Independent'],
+    default: 'School'
+  },
+  location: {
+    city: {
+      type: String,
+      required: [true, 'City is required'],
+      trim: true
+    },
+    state: {
+      type: String,
+      trim: true
+    },
+    country: {
+      type: String,
+      default: 'India',
+      trim: true
+    }
+  },
   color: {
     type: String,
     required: [true, 'Please provide team color'],

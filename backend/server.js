@@ -4,6 +4,7 @@ const http = require('http');
 const socketIo = require('socket.io');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const path = require('path');
 const connectDB = require('./config/database');
 
 // Load environment variables
@@ -23,6 +24,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Serve static files from uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Import Routes
 const authRoutes = require('./routes/authRoutes');
 const tournamentRoutes = require('./routes/tournamentRoutes');
@@ -33,6 +37,7 @@ const leaderboardRoutes = require('./routes/leaderboardRoutes');
 const droneLogRoutes = require('./routes/droneLogRoutes');
 const droneReportRoutes = require('./routes/droneReportRoutes');
 const droneRoutes = require('./routes/droneRoutes');
+const schoolRoutes = require('./routes/schoolRoutes');
 
 // Mount Routes
 app.use('/api/auth', authRoutes);
@@ -44,6 +49,7 @@ app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/drone-logs', droneLogRoutes);
 app.use('/api/reports', droneReportRoutes);
 app.use('/api/drones', droneRoutes);
+app.use('/api/schools', schoolRoutes);
 
 // Basic test route
 app.get('/', (req, res) => {
@@ -99,19 +105,20 @@ const io = socketIo(server, {
 });
 
 // Socket.io connection handler
+// Socket.io connection handler
 io.on('connection', (socket) => {
   console.log('✅ Client connected:', socket.id);
 
   // Join match room
-  socket.on('join-match', (matchId) => {
-    socket.join(`match-${matchId}`);
-    console.log(`📍 Socket ${socket.id} joined match-${matchId}`);
+  socket.on('join_match', (matchId) => {
+    socket.join(`match_${matchId}`);
+    console.log(`📍 Socket ${socket.id} joined match_${matchId}`);
   });
 
   // Leave match room
-  socket.on('leave-match', (matchId) => {
-    socket.leave(`match-${matchId}`);
-    console.log(`📍 Socket ${socket.id} left match-${matchId}`);
+  socket.on('leave_match', (matchId) => {
+    socket.leave(`match_${matchId}`);
+    console.log(`📍 Socket ${socket.id} left match_${matchId}`);
   });
 
   // Disconnect handler
@@ -120,8 +127,8 @@ io.on('connection', (socket) => {
   });
 });
 
-// Export io globally for use in controllers
-global.io = io;
+// Make io available to routes via app
+app.set('io', io);
 
 // Start server
 const PORT = process.env.PORT || 5000;

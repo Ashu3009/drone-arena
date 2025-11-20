@@ -1,47 +1,174 @@
-import React from 'react';
+// frontend/src/components/Public/DroneView3D.js
+import React, { useState, useEffect, useRef } from 'react';
+import io from 'socket.io-client';
 
-const DroneView3D = ({ telemetryData }) => {
-  if (!telemetryData || telemetryData.length === 0) {
+const DroneView3D = ({ matchId }) => {
+  const [dronePositions, setDronePositions] = useState({});
+  const [connected, setConnected] = useState(false);
+  const socketRef = useRef(null);
+
+  // ✅ Socket.IO Connection
+  useEffect(() => {
+    if (!matchId) {
+      console.warn('⚠️ No matchId provided to DroneView3D');
+      return;
+    }
+
+    console.log('🔌 Initializing Socket.IO for match:', matchId);
+
+    const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+    
+    const socket = io(BACKEND_URL, {
+      transports: ['websocket', 'polling'],
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000
+    });
+
+    socketRef.current = socket;
+
+    socket.on('connect', () => {
+      console.log('✅ Socket connected:', socket.id);
+      setConnected(true);
+      
+      // Join match room
+      socket.emit('join_match', matchId);
+      console.log(`📍 Joined match room: match_${matchId}`);
+    });
+
+    socket.on('disconnect', () => {
+      console.log('🔌 Socket disconnected');
+      setConnected(false);
+    });
+
+    socket.on('connect_error', (error) => {
+      console.error('❌ Socket connection error:', error);
+      setConnected(false);
+    });
+
+    // ✅ Listen for real-time telemetry updates
+    socket.on('telemetry_update', (data) => {
+      console.log('📡 Telemetry received:', data);
+      
+      setDronePositions(prev => ({
+        ...prev,
+        [data.droneId]: {
+          x: data.position.x,
+          y: data.position.y,
+          z: data.position.z,
+          battery: data.battery,
+          droneId: data.droneId,
+          timestamp: data.timestamp
+        }
+      }));
+    });
+
+    // Cleanup on unmount
+    return () => {
+      console.log('🧹 Cleaning up socket connection');
+      socket.disconnect();
+    };
+  }, [matchId]);
+
+  // ✅ Fetch initial telemetry data on mount
+  useEffect(() => {
+    if (!matchId) return;
+
+    const fetchInitialData = async () => {
+      try {
+        console.log('📥 Fetching initial telemetry for match:', matchId);
+        
+        const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+        const response = await fetch(`${BACKEND_URL}/api/telemetry/match/${matchId}/latest`);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const result = await response.json();
+        
+        if (result.success && result.data) {
+          console.log('📊 Initial data loaded:', result.data.length, 'drones');
+          
+          // Convert to dronePositions format
+          const positions = {};
+          result.data.forEach(drone => {
+            if (drone.logs && drone.logs.length > 0) {
+              const latest = drone.logs[drone.logs.length - 1];
+              positions[drone.droneId] = {
+                x: latest.x,
+                y: latest.y,
+                z: latest.z,
+                battery: latest.battery,
+                droneId: drone.droneId,
+                timestamp: latest.timestamp
+              };
+            }
+          });
+          
+          setDronePositions(positions);
+        }
+      } catch (error) {
+        console.error('❌ Failed to fetch initial telemetry:', error);
+      }
+    };
+
+    fetchInitialData();
+  }, [matchId]);
+
+  // No matchId provided
+  if (!matchId) {
     return (
       <div style={styles.noData}>
-        <p>⚽ No drone data available</p>
+        <p>⚠️ No match selected</p>
       </div>
     );
   }
 
-  // Get latest position for each drone
-  const dronePositions = {};
-  
-  telemetryData.forEach(data => {
-    if (data.logs && data.logs.length > 0) {
-      const latestLog = data.logs[data.logs.length - 1];
-      dronePositions[data.droneId] = {
-        x: latestLog.x,
-        y: latestLog.y,
-        z: latestLog.z,
-        battery: latestLog.battery,
-        droneId: data.droneId
-      };
-    }
-  });
+  // No data state
+  if (Object.keys(dronePositions).length === 0) {
+    return (
+      <div style={styles.noData}>
+        <p>⚽ No drone data available</p>
+        <p style={{ fontSize: '12px', color: '#666', marginTop: '10px' }}>
+          {connected ? '🟢 Connected - Waiting for telemetry...' : '🔴 Connecting...'}
+        </p>
+        <p style={{ fontSize: '10px', color: '#444', marginTop: '5px' }}>
+          Match ID: {matchId}
+        </p>
+      </div>
+    );
+  }
 
-  // Arena size (in meters)
+  // Arena configuration
   const ARENA_WIDTH = 6.1;   // 20 feet = 6.1 meters
   const ARENA_HEIGHT = 3.05;  // 10 feet = 3.05 meters
   const DRONE_RADIUS = 0.15;  // 6 inches = 0.15 meters
   
-  // Display size (in pixels)
   const DISPLAY_WIDTH = 800;
   const DISPLAY_HEIGHT = 400;
   
-  // Scale: pixels per meter
-  const SCALE_X = DISPLAY_WIDTH / ARENA_WIDTH;   // ~131 px/m
-  const SCALE_Y = DISPLAY_HEIGHT / ARENA_HEIGHT; // ~131 px/m
-  const DRONE_SIZE = DRONE_RADIUS * SCALE_X * 2; // Drone diameter in pixels
+  const SCALE_X = DISPLAY_WIDTH / ARENA_WIDTH;
+  const SCALE_Y = DISPLAY_HEIGHT / ARENA_HEIGHT;
+  const DRONE_SIZE = DRONE_RADIUS * SCALE_X * 2;
 
   return (
     <div style={styles.container}>
-      <h3>⚽ Drone Football Arena (20ft × 10ft)</h3>
+      <div style={styles.header}>
+        <h3 style={styles.title}>Drone Soccer Arena (20ft × 10ft)</h3>
+        <div style={styles.statusBar}>
+          <span style={{
+            color: connected ? '#4CAF50' : '#f44336',
+            fontSize: '12px',
+            fontWeight: 'bold'
+          }}>
+            {connected ? '🟢 LIVE' : '🔴 OFFLINE'}
+          </span>
+          <span style={{ fontSize: '12px', color: '#888', marginLeft: '15px' }}>
+            {Object.keys(dronePositions).length} drones active
+          </span>
+        </div>
+      </div>
       
       <div style={{...styles.arena, width: `${DISPLAY_WIDTH}px`, height: `${DISPLAY_HEIGHT}px`}}>
         {/* Field markings */}
@@ -69,8 +196,7 @@ const DroneView3D = ({ telemetryData }) => {
             strokeWidth="2" 
           />
           
-          {/* Goal areas */}
-          {/* Left goal */}
+          {/* Left goal (Blue) */}
           <rect 
             x="0" 
             y={DISPLAY_HEIGHT / 2 - DISPLAY_HEIGHT / 4} 
@@ -81,7 +207,7 @@ const DroneView3D = ({ telemetryData }) => {
             strokeWidth="2" 
           />
           
-          {/* Right goal */}
+          {/* Right goal (Red) */}
           <rect 
             x={DISPLAY_WIDTH - DISPLAY_WIDTH / 8} 
             y={DISPLAY_HEIGHT / 2 - DISPLAY_HEIGHT / 4} 
@@ -197,10 +323,26 @@ const styles = {
     color: 'white',
     margin: '20px 0'
   },
+  header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '15px'
+  },
+  title: {
+    margin: 0,
+    fontSize: '18px'
+  },
+  statusBar: {
+    display: 'flex',
+    alignItems: 'center'
+  },
   noData: {
     padding: '40px',
     textAlign: 'center',
-    color: '#888'
+    color: '#888',
+    backgroundColor: '#1e1e1e',
+    borderRadius: '10px'
   },
   arena: {
     position: 'relative',
@@ -226,7 +368,7 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     cursor: 'pointer',
-    transition: 'all 0.2s',
+    transition: 'all 0.3s ease',
     border: '2px solid white',
     zIndex: 10
   },

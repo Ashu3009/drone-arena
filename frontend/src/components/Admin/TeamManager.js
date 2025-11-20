@@ -1,13 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { getTeams, createTeam, updateTeam, deleteTeam } from '../../services/api';
+import { getTeams, createTeam, updateTeam, deleteTeam, getAllSchools } from '../../services/api';
 
 const TeamManager = () => {
   const [teams, setTeams] = useState([]);
+  const [schools, setSchools] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingTeam, setEditingTeam] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
+    school: '', // Optional
+    teamType: 'School',
+    location: {
+      city: '',
+      state: '',
+      country: 'India'
+    },
     captain: '',
     color: '#3B82F6',
     members: [
@@ -20,6 +28,7 @@ const TeamManager = () => {
 
   useEffect(() => {
     loadTeams();
+    loadSchools();
   }, []);
 
   const loadTeams = async () => {
@@ -34,6 +43,17 @@ const TeamManager = () => {
       alert('Failed to load teams');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadSchools = async () => {
+    try {
+      const response = await getAllSchools();
+      if (response.success) {
+        setSchools(response.data);
+      }
+    } catch (error) {
+      console.error('Error loading schools:', error);
     }
   };
 
@@ -65,7 +85,24 @@ const TeamManager = () => {
     // Validate: At least 4 primary members with names
     const primaryMembers = formData.members.slice(0, 4);
     if (primaryMembers.some(m => !m.name || !m.name.trim())) {
-      alert('Please fill names for all 4 primary members (Forward, Center, Defender, Keeper)');
+      alert('Please fill names for all 4 primary members');
+      return;
+    }
+
+    // Validate: Check that all 4 core roles are present (Forward, Center, Defender, Keeper)
+    const allMembers = formData.members.filter(m => m.name && m.name.trim());
+    const roles = allMembers.map(m => m.role);
+    const requiredRoles = ['Forward', 'Center', 'Defender', 'Keeper'];
+    const missingRoles = requiredRoles.filter(role => !roles.includes(role));
+
+    if (missingRoles.length > 0) {
+      alert(`Missing required roles: ${missingRoles.join(', ')}. Each team must have at least one member for each role.`);
+      return;
+    }
+
+    // Validate location
+    if (!formData.location.city || !formData.location.city.trim()) {
+      alert('Please provide team location (city is required)');
       return;
     }
 
@@ -74,6 +111,9 @@ const TeamManager = () => {
 
     const teamData = {
       name: formData.name,
+      school: formData.school || null, // Optional
+      teamType: formData.teamType,
+      location: formData.location,
       captain: formData.captain,
       color: formData.color,
       members: validMembers
@@ -136,6 +176,9 @@ const TeamManager = () => {
 
     setFormData({
       name: team.name,
+      school: team.school?._id || '',
+      teamType: team.teamType || 'School',
+      location: team.location || { city: '', state: '', country: 'India' },
       captain: team.captain || '',
       color: team.color || '#3B82F6',
       members
@@ -148,6 +191,13 @@ const TeamManager = () => {
     setEditingTeam(null);
     setFormData({
       name: '',
+      school: '',
+      teamType: 'School',
+      location: {
+        city: '',
+        state: '',
+        country: 'India'
+      },
       captain: '',
       color: '#3B82F6',
       members: [
@@ -160,14 +210,7 @@ const TeamManager = () => {
   };
 
   const getRoleEmoji = (role) => {
-    const emojis = {
-      Forward: '⚡',
-      Center: '⚖️',
-      Defender: '🛡️',
-      Keeper: '🔋',
-      'All-rounder': '🌟'
-    };
-    return emojis[role] || '👤';
+    return '';
   };
 
   return (
@@ -203,6 +246,74 @@ const TeamManager = () => {
           </div>
 
           <div style={styles.formGroup}>
+            <label style={styles.label}>Team Type *</label>
+            <select
+              value={formData.teamType}
+              onChange={(e) => setFormData({ ...formData, teamType: e.target.value })}
+              style={styles.input}
+            >
+              <option value="School">School</option>
+              <option value="Corporate">Corporate</option>
+              <option value="Independent">Independent</option>
+            </select>
+          </div>
+
+          {formData.teamType === 'School' && (
+            <div style={styles.formGroup}>
+              <label style={styles.label}>School (Optional)</label>
+              <select
+                value={formData.school}
+                onChange={(e) => setFormData({ ...formData, school: e.target.value })}
+                style={styles.input}
+              >
+                <option value="">-- Select School (Optional) --</option>
+                {schools.map(school => (
+                  <option key={school._id} value={school._id}>
+                    {school.name} - {school.location.city}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Location *</label>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <input
+                type="text"
+                value={formData.location.city}
+                onChange={(e) => setFormData({
+                  ...formData,
+                  location: { ...formData.location, city: e.target.value }
+                })}
+                style={styles.input}
+                placeholder="City *"
+                required
+              />
+              <input
+                type="text"
+                value={formData.location.state}
+                onChange={(e) => setFormData({
+                  ...formData,
+                  location: { ...formData.location, state: e.target.value }
+                })}
+                style={styles.input}
+                placeholder="State"
+              />
+            </div>
+            <input
+              type="text"
+              value={formData.location.country}
+              onChange={(e) => setFormData({
+                ...formData,
+                location: { ...formData.location, country: e.target.value }
+              })}
+              style={{...styles.input, marginTop: '10px'}}
+              placeholder="Country"
+            />
+          </div>
+
+          <div style={styles.formGroup}>
             <label style={styles.label}>Captain Name</label>
             <input
               type="text"
@@ -224,19 +335,30 @@ const TeamManager = () => {
           </div>
 
           <div style={styles.membersSection}>
-            <h4 style={styles.sectionTitle}>Core Members (Required)</h4>
+            <h4 style={styles.sectionTitle}>Core Members (Minimum 4 Required)</h4>
+            <p style={styles.helperText}>Select role for each member. Must have at least one: Forward, Center, Defender, Keeper</p>
 
             {formData.members.slice(0, 4).map((member, index) => (
               <div key={index} style={styles.memberRow}>
-                <div style={styles.memberNumber}>
-                  {getRoleEmoji(member.role)} {member.role}
-                </div>
+                <div style={styles.memberNumber}>#{index + 1}</div>
+                <select
+                  value={member.role}
+                  onChange={(e) => handleMemberChange(index, 'role', e.target.value)}
+                  style={styles.memberSelect}
+                  required
+                >
+                  <option value="Forward">Forward</option>
+                  <option value="Center">Center</option>
+                  <option value="Defender">Defender</option>
+                  <option value="Keeper">Keeper</option>
+                  <option value="All-rounder">All-rounder</option>
+                </select>
                 <input
                   type="text"
                   value={member.name}
                   onChange={(e) => handleMemberChange(index, 'name', e.target.value)}
                   style={styles.memberInput}
-                  placeholder={`${member.role} player name`}
+                  placeholder="Player name"
                   required
                 />
                 <input
@@ -261,11 +383,11 @@ const TeamManager = () => {
                     onChange={(e) => handleMemberChange(index + 4, 'role', e.target.value)}
                     style={styles.memberSelect}
                   >
-                    <option value="Forward">⚡ Forward</option>
-                    <option value="Center">⚖️ Center</option>
-                    <option value="Defender">🛡️ Defender</option>
-                    <option value="Keeper">🔋 Keeper</option>
-                    <option value="All-rounder">🌟 All-rounder</option>
+                    <option value="Forward">Forward</option>
+                    <option value="Center">Center</option>
+                    <option value="Defender">Defender</option>
+                    <option value="Keeper">Keeper</option>
+                    <option value="All-rounder">All-rounder</option>
                   </select>
                   <input
                     type="text"
@@ -445,9 +567,15 @@ const styles = {
     borderRadius: '6px'
   },
   sectionTitle: {
-    margin: '0 0 16px 0',
+    margin: '0 0 8px 0',
     fontSize: '16px',
     fontWeight: 'bold'
+  },
+  helperText: {
+    margin: '0 0 16px 0',
+    fontSize: '13px',
+    color: '#888',
+    fontStyle: 'italic'
   },
   memberRow: {
     display: 'flex',

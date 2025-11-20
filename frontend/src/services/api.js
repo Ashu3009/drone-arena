@@ -49,6 +49,83 @@ export const deleteTournament = async (tournamentId) => {
   return response.data;
 };
 
+// Upload tournament banner (ADMIN ONLY)
+export const uploadTournamentBanner = async (tournamentId, formData) => {
+  const response = await axios.post(
+    `${API_BASE_URL}/tournaments/${tournamentId}/upload-banner`,
+    formData,
+    {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }
+  );
+  return response.data;
+};
+
+// Upload tournament gallery images (ADMIN ONLY)
+export const uploadTournamentGallery = async (tournamentId, formData) => {
+  const response = await axios.post(
+    `${API_BASE_URL}/tournaments/${tournamentId}/upload-gallery`,
+    formData,
+    {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }
+  );
+  return response.data;
+};
+
+// Delete gallery image (ADMIN ONLY)
+export const deleteTournamentGalleryImage = async (tournamentId, imageIndex) => {
+  const response = await axios.delete(
+    `${API_BASE_URL}/tournaments/${tournamentId}/gallery/${imageIndex}`
+  );
+  return response.data;
+};
+
+// Set Man of Tournament (ADMIN ONLY)
+export const setManOfTournament = async (tournamentId, formData) => {
+  const response = await axios.put(
+    `${API_BASE_URL}/tournaments/${tournamentId}/man-of-tournament`,
+    formData,
+    {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }
+  );
+  return response.data;
+};
+
+// Add teams to tournament (ADMIN ONLY)
+export const addTeamsToTournament = async (tournamentId, teamIds) => {
+  const response = await axios.post(
+    `${API_BASE_URL}/tournaments/${tournamentId}/add-teams`,
+    { teamIds }
+  );
+  return response.data;
+};
+
+// Remove team from tournament (ADMIN ONLY)
+export const removeTeamFromTournament = async (tournamentId, teamId) => {
+  const response = await axios.delete(
+    `${API_BASE_URL}/tournaments/${tournamentId}/remove-team/${teamId}`
+  );
+  return response.data;
+};
+
+// Filter tournaments
+export const filterTournaments = async (filters) => {
+  const params = new URLSearchParams(filters).toString();
+  const response = await axios.get(`${API_BASE_URL}/tournaments/filter?${params}`);
+  return response.data;
+};
+
+// Set tournament winners (ADMIN ONLY)
+export const setTournamentWinners = async (tournamentId, winners) => {
+  const response = await axios.put(
+    `${API_BASE_URL}/tournaments/${tournamentId}/winners`,
+    winners
+  );
+  return response.data;
+};
+
 // ==================== TEAMS ====================
 
 // Get all teams
@@ -302,7 +379,54 @@ export const deleteDrone = async (droneId) => {
   return response.data;
 };
 
-export default {
+// ==================== SCHOOLS ====================
+
+// Get all schools
+export const getAllSchools = async () => {
+  const response = await axios.get(`${API_BASE_URL}/schools`);
+  return response.data;
+};
+
+// Get school by ID
+export const getSchoolById = async (schoolId) => {
+  const response = await axios.get(`${API_BASE_URL}/schools/${schoolId}`);
+  return response.data;
+};
+
+// Filter schools by city/state
+export const filterSchools = async (city, state) => {
+  const params = {};
+  if (city) params.city = city;
+  if (state) params.state = state;
+  const response = await axios.get(`${API_BASE_URL}/schools/filter`, { params });
+  return response.data;
+};
+
+// Get school statistics
+export const getSchoolStats = async (schoolId) => {
+  const response = await axios.get(`${API_BASE_URL}/schools/${schoolId}/stats`);
+  return response.data;
+};
+
+// Create school (ADMIN ONLY)
+export const createSchool = async (schoolData) => {
+  const response = await axios.post(`${API_BASE_URL}/schools`, schoolData);
+  return response.data;
+};
+
+// Update school (ADMIN ONLY)
+export const updateSchool = async (schoolId, schoolData) => {
+  const response = await axios.put(`${API_BASE_URL}/schools/${schoolId}`, schoolData);
+  return response.data;
+};
+
+// Delete school (ADMIN ONLY)
+export const deleteSchool = async (schoolId) => {
+  const response = await axios.delete(`${API_BASE_URL}/schools/${schoolId}`);
+  return response.data;
+};
+
+const apiService = {
   // Tournaments
   getTournaments,
   getTournamentById,
@@ -351,5 +475,16 @@ export default {
   getDroneById,
   createDrone,
   updateDrone,
-  deleteDrone
+  deleteDrone,
+
+  // Schools
+  getAllSchools,
+  getSchoolById,
+  filterSchools,
+  getSchoolStats,
+  createSchool,
+  updateSchool,
+  deleteSchool
 };
+
+export default apiService;

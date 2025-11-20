@@ -1,4 +1,5 @@
-import React, { useRef } from 'react';
+// Arena3D
+import React from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Box, Sphere, Text } from '@react-three/drei';
 

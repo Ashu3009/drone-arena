@@ -144,7 +144,7 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
     y = 25.0;
     z = 2.0;
     battery = 100;
-    
+    9
     Serial.println("\n🔄 DRONE RESET - All data cleared\n");
     blinkLED(2, 500);
   }
