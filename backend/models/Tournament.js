@@ -13,6 +13,11 @@ const tournamentSchema = new mongoose.Schema({
     default: '',
     maxlength: [500, 'Description cannot exceed 500 characters']
   },
+  url: {
+    type: String,
+    trim: true,
+    default: ''
+  },
   startDate: {
     type: Date,
     required: [true, 'Start date is required']
@@ -89,6 +94,28 @@ const tournamentSchema = new mongoose.Schema({
       goals: { type: Number, default: 0 },
       assists: { type: Number, default: 0 },
       matchesPlayed: { type: Number, default: 0 }
+    }
+  },
+
+  // Tournament Awards (Auto-calculated from match data)
+  awards: {
+    bestStriker: {
+      playerName: { type: String, trim: true },
+      team: { type: mongoose.Schema.Types.ObjectId, ref: 'Team' },
+      photo: { type: String },
+      goals: { type: Number, default: 0 }
+    },
+    bestForward: {
+      playerName: { type: String, trim: true },
+      team: { type: mongoose.Schema.Types.ObjectId, ref: 'Team' },
+      photo: { type: String },
+      assists: { type: Number, default: 0 }
+    },
+    bestDefender: {
+      playerName: { type: String, trim: true },
+      team: { type: mongoose.Schema.Types.ObjectId, ref: 'Team' },
+      photo: { type: String },
+      saves: { type: Number, default: 0 }
     }
   },
 

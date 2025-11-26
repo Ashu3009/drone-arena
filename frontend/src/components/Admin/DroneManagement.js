@@ -186,7 +186,7 @@ const DroneManagement = () => {
       <div style={styles.filterSection}>
         <label style={styles.filterLabel}>Filter by Role:</label>
         <div style={styles.filterButtons}>
-          {['All', 'Forward', 'Center', 'Defender', 'Keeper'].map(role => (
+          {['All', 'Forward', 'Striker', 'Defender', 'Central'].map(role => (
             <button
               key={role}
               onClick={() => setRoleFilter(role)}
@@ -292,9 +292,9 @@ const DroneManagement = () => {
                   style={styles.select}
                 >
                   <option value="Forward">Forward</option>
-                  <option value="Center">Center</option>
+                  <option value="Striker">Striker</option>
                   <option value="Defender">Defender</option>
-                  <option value="Keeper">Keeper</option>
+                  <option value="Central">Central</option>
                 </select>
               </div>
 

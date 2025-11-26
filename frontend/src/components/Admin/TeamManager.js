@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getTeams, createTeam, updateTeam, deleteTeam, getAllSchools } from '../../services/api';
+import { getTeams, createTeam, updateTeam, deleteTeam, getAllSchools, uploadMemberPhoto } from '../../services/api';
 
 const TeamManager = () => {
   const [teams, setTeams] = useState([]);
@@ -19,10 +19,10 @@ const TeamManager = () => {
     captain: '',
     color: '#3B82F6',
     members: [
-      { name: '', role: 'Forward', contactEmail: '', isPrimary: true },
-      { name: '', role: 'Center', contactEmail: '', isPrimary: true },
-      { name: '', role: 'Defender', contactEmail: '', isPrimary: true },
-      { name: '', role: 'Keeper', contactEmail: '', isPrimary: true }
+      { name: '', role: 'Forward', photo: null, photoFile: null, jerseyNumber: '' },
+      { name: '', role: 'Defender', photo: null, photoFile: null, jerseyNumber: '' },
+      { name: '', role: 'Striker', photo: null, photoFile: null, jerseyNumber: '' },
+      { name: '', role: 'Central', photo: null, photoFile: null, jerseyNumber: '' }
     ]
   });
 
@@ -66,37 +66,40 @@ const TeamManager = () => {
   const addExtraMember = () => {
     setFormData({
       ...formData,
-      members: [...formData.members, { name: '', role: 'All-rounder', contactEmail: '', isPrimary: false }]
+      members: [...formData.members, { name: '', role: 'Substitute', photo: null, photoFile: null, jerseyNumber: '' }]
     });
   };
 
   const removeMember = (index) => {
     if (index < 4) {
-      alert('Cannot remove primary members (Forward, Center, Defender, Keeper)');
+      alert('Cannot remove first 4 members');
       return;
     }
     const newMembers = formData.members.filter((_, i) => i !== index);
     setFormData({ ...formData, members: newMembers });
   };
 
+  const handlePhotoChange = (index, file) => {
+    if (file && file.size > 2 * 1024 * 1024) { // 2MB limit
+      alert('Photo size should be less than 2MB');
+      return;
+    }
+    const newMembers = [...formData.members];
+    newMembers[index] = {
+      ...newMembers[index],
+      photoFile: file,
+      photo: file ? URL.createObjectURL(file) : null
+    };
+    setFormData({ ...formData, members: newMembers });
+  };
+
   const handleCreateOrUpdate = async (e) => {
     e.preventDefault();
 
-    // Validate: At least 4 primary members with names
-    const primaryMembers = formData.members.slice(0, 4);
-    if (primaryMembers.some(m => !m.name || !m.name.trim())) {
-      alert('Please fill names for all 4 primary members');
-      return;
-    }
-
-    // Validate: Check that all 4 core roles are present (Forward, Center, Defender, Keeper)
-    const allMembers = formData.members.filter(m => m.name && m.name.trim());
-    const roles = allMembers.map(m => m.role);
-    const requiredRoles = ['Forward', 'Center', 'Defender', 'Keeper'];
-    const missingRoles = requiredRoles.filter(role => !roles.includes(role));
-
-    if (missingRoles.length > 0) {
-      alert(`Missing required roles: ${missingRoles.join(', ')}. Each team must have at least one member for each role.`);
+    // Validate: At least 1 member with name
+    const validMembers = formData.members.filter(m => m.name && m.name.trim());
+    if (validMembers.length === 0) {
+      alert('Please add at least one team member');
       return;
     }
 
@@ -106,17 +109,21 @@ const TeamManager = () => {
       return;
     }
 
-    // Filter out empty extra members
-    const validMembers = formData.members.filter(m => m.name && m.name.trim());
+    // Prepare member data (remove photoFile and photo URL - these are for preview only)
+    const membersData = validMembers.map(m => ({
+      name: m.name,
+      role: m.role,
+      jerseyNumber: m.jerseyNumber || undefined
+    }));
 
     const teamData = {
       name: formData.name,
-      school: formData.school || null, // Optional
+      school: formData.school || null,
       teamType: formData.teamType,
       location: formData.location,
       captain: formData.captain,
       color: formData.color,
-      members: validMembers
+      members: membersData
     };
 
     setLoading(true);
@@ -129,6 +136,19 @@ const TeamManager = () => {
       }
 
       if (response.success) {
+        const teamId = response.data._id;
+
+        // Upload member photos
+        for (let i = 0; i < validMembers.length; i++) {
+          if (validMembers[i].photoFile) {
+            try {
+              await uploadMemberPhoto(teamId, i, validMembers[i].photoFile);
+            } catch (photoError) {
+              console.error(`Error uploading photo for member ${i}:`, photoError);
+            }
+          }
+        }
+
         alert(editingTeam ? 'Team updated!' : 'Team created!');
         handleCancelEdit();
         loadTeams();
@@ -335,24 +355,29 @@ const TeamManager = () => {
           </div>
 
           <div style={styles.membersSection}>
-            <h4 style={styles.sectionTitle}>Core Members (Minimum 4 Required)</h4>
-            <p style={styles.helperText}>Select role for each member. Must have at least one: Forward, Center, Defender, Keeper</p>
+            <h4 style={styles.sectionTitle}>Team Members</h4>
+            <p style={styles.helperText}>Upload photo (optional), enter name, select role, and add jersey number (optional) for each member</p>
 
             {formData.members.slice(0, 4).map((member, index) => (
               <div key={index} style={styles.memberRow}>
                 <div style={styles.memberNumber}>#{index + 1}</div>
-                <select
-                  value={member.role}
-                  onChange={(e) => handleMemberChange(index, 'role', e.target.value)}
-                  style={styles.memberSelect}
-                  required
-                >
-                  <option value="Forward">Forward</option>
-                  <option value="Center">Center</option>
-                  <option value="Defender">Defender</option>
-                  <option value="Keeper">Keeper</option>
-                  <option value="All-rounder">All-rounder</option>
-                </select>
+
+                {/* Photo Upload */}
+                <div style={styles.photoUpload}>
+                  {member.photo ? (
+                    <img src={member.photo} alt="Member" style={styles.memberPhoto} />
+                  ) : (
+                    <div style={styles.noPhoto}>No Photo</div>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handlePhotoChange(index, e.target.files[0])}
+                    style={styles.fileInput}
+                  />
+                </div>
+
+                {/* Name */}
                 <input
                   type="text"
                   value={member.name}
@@ -361,12 +386,30 @@ const TeamManager = () => {
                   placeholder="Player name"
                   required
                 />
+
+                {/* Role */}
+                <select
+                  value={member.role}
+                  onChange={(e) => handleMemberChange(index, 'role', e.target.value)}
+                  style={styles.memberSelect}
+                  required
+                >
+                  <option value="Forward">Forward</option>
+                  <option value="Defender">Defender</option>
+                  <option value="Striker">Striker</option>
+                  <option value="Central">Central</option>
+                  <option value="Substitute">Substitute</option>
+                </select>
+
+                {/* Jersey Number */}
                 <input
-                  type="email"
-                  value={member.contactEmail}
-                  onChange={(e) => handleMemberChange(index, 'contactEmail', e.target.value)}
-                  style={styles.memberInput}
-                  placeholder="Email (optional)"
+                  type="number"
+                  value={member.jerseyNumber}
+                  onChange={(e) => handleMemberChange(index, 'jerseyNumber', e.target.value)}
+                  style={{...styles.memberInput, width: '80px'}}
+                  placeholder="Jersey #"
+                  min="1"
+                  max="99"
                 />
               </div>
             ))}
@@ -378,17 +421,22 @@ const TeamManager = () => {
 
               {formData.members.slice(4).map((member, index) => (
                 <div key={index + 4} style={styles.memberRow}>
-                  <select
-                    value={member.role}
-                    onChange={(e) => handleMemberChange(index + 4, 'role', e.target.value)}
-                    style={styles.memberSelect}
-                  >
-                    <option value="Forward">Forward</option>
-                    <option value="Center">Center</option>
-                    <option value="Defender">Defender</option>
-                    <option value="Keeper">Keeper</option>
-                    <option value="All-rounder">All-rounder</option>
-                  </select>
+                  {/* Photo Upload */}
+                  <div style={styles.photoUpload}>
+                    {member.photo ? (
+                      <img src={member.photo} alt="Member" style={styles.memberPhoto} />
+                    ) : (
+                      <div style={styles.noPhoto}>No Photo</div>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handlePhotoChange(index + 4, e.target.files[0])}
+                      style={styles.fileInput}
+                    />
+                  </div>
+
+                  {/* Name */}
                   <input
                     type="text"
                     value={member.name}
@@ -396,13 +444,32 @@ const TeamManager = () => {
                     style={styles.memberInput}
                     placeholder="Player name"
                   />
+
+                  {/* Role */}
+                  <select
+                    value={member.role}
+                    onChange={(e) => handleMemberChange(index + 4, 'role', e.target.value)}
+                    style={styles.memberSelect}
+                  >
+                    <option value="Forward">Forward</option>
+                    <option value="Defender">Defender</option>
+                    <option value="Striker">Striker</option>
+                    <option value="Central">Central</option>
+                    <option value="Substitute">Substitute</option>
+                  </select>
+
+                  {/* Jersey Number */}
                   <input
-                    type="email"
-                    value={member.contactEmail}
-                    onChange={(e) => handleMemberChange(index + 4, 'contactEmail', e.target.value)}
-                    style={styles.memberInput}
-                    placeholder="Email (optional)"
+                    type="number"
+                    value={member.jerseyNumber}
+                    onChange={(e) => handleMemberChange(index + 4, 'jerseyNumber', e.target.value)}
+                    style={{...styles.memberInput, width: '80px'}}
+                    placeholder="Jersey #"
+                    min="1"
+                    max="99"
                   />
+
+                  {/* Remove Button */}
                   <button
                     type="button"
                     onClick={() => removeMember(index + 4)}
@@ -584,10 +651,40 @@ const styles = {
     alignItems: 'center'
   },
   memberNumber: {
-    minWidth: '120px',
+    minWidth: '50px',
     fontSize: '14px',
     fontWeight: 'bold',
     color: '#aaa'
+  },
+  photoUpload: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '5px'
+  },
+  memberPhoto: {
+    width: '60px',
+    height: '60px',
+    borderRadius: '50%',
+    objectFit: 'cover',
+    border: '2px solid #4CAF50'
+  },
+  noPhoto: {
+    width: '60px',
+    height: '60px',
+    borderRadius: '50%',
+    backgroundColor: '#333',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '10px',
+    color: '#666',
+    border: '2px solid #444'
+  },
+  fileInput: {
+    fontSize: '10px',
+    color: '#aaa',
+    width: '60px'
   },
   memberInput: {
     flex: 1,

@@ -203,6 +203,91 @@ exports.deleteTournament = async (req, res) => {
   }
 };
 
+// Helper function to calculate tournament awards from all matches
+const calculateTournamentAwards = async (tournamentId) => {
+  const Match = require('../models/Match');
+
+  try {
+    // Find all completed matches for this tournament
+    const matches = await Match.find({
+      tournament: tournamentId,
+      status: 'completed',
+      'manOfTheMatch.playerName': { $exists: true, $ne: null }
+    }).populate('manOfTheMatch.team', 'name');
+
+    if (matches.length === 0) {
+      return null; // No matches with Man of the Match data
+    }
+
+    // Aggregate player stats
+    const playerStats = {};
+
+    matches.forEach(match => {
+      if (match.manOfTheMatch && match.manOfTheMatch.playerName) {
+        const playerKey = `${match.manOfTheMatch.playerName}|${match.manOfTheMatch.team?._id || 'unknown'}`;
+
+        if (!playerStats[playerKey]) {
+          playerStats[playerKey] = {
+            playerName: match.manOfTheMatch.playerName,
+            team: match.manOfTheMatch.team?._id || null,
+            photo: match.manOfTheMatch.photo || null,
+            goals: 0,
+            assists: 0,
+            saves: 0
+          };
+        }
+
+        // Accumulate stats
+        playerStats[playerKey].goals += match.manOfTheMatch.stats?.goals || 0;
+        playerStats[playerKey].assists += match.manOfTheMatch.stats?.assists || 0;
+        playerStats[playerKey].saves += match.manOfTheMatch.stats?.saves || 0;
+      }
+    });
+
+    // Convert to array
+    const players = Object.values(playerStats);
+
+    // Find best striker (most goals)
+    const bestStriker = players.reduce((best, current) =>
+      (current.goals > (best?.goals || 0)) ? current : best
+    , null);
+
+    // Find best forward (most assists)
+    const bestForward = players.reduce((best, current) =>
+      (current.assists > (best?.assists || 0)) ? current : best
+    , null);
+
+    // Find best defender (most saves)
+    const bestDefender = players.reduce((best, current) =>
+      (current.saves > (best?.saves || 0)) ? current : best
+    , null);
+
+    return {
+      bestStriker: bestStriker ? {
+        playerName: bestStriker.playerName,
+        team: bestStriker.team,
+        photo: bestStriker.photo,
+        goals: bestStriker.goals
+      } : null,
+      bestForward: bestForward ? {
+        playerName: bestForward.playerName,
+        team: bestForward.team,
+        photo: bestForward.photo,
+        assists: bestForward.assists
+      } : null,
+      bestDefender: bestDefender ? {
+        playerName: bestDefender.playerName,
+        team: bestDefender.team,
+        photo: bestDefender.photo,
+        saves: bestDefender.saves
+      } : null
+    };
+  } catch (error) {
+    console.error('Error calculating tournament awards:', error);
+    return null;
+  }
+};
+
 // @desc    Set tournament winners
 // @route   PUT /api/tournaments/:id/winners
 exports.setWinners = async (req, res) => {
@@ -258,6 +343,12 @@ exports.setWinners = async (req, res) => {
 
     // Mark tournament as completed
     tournament.status = 'completed';
+
+    // Calculate and set tournament awards automatically
+    const awards = await calculateTournamentAwards(req.params.id);
+    if (awards) {
+      tournament.awards = awards;
+    }
 
     await tournament.save();
 

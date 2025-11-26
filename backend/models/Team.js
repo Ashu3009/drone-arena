@@ -49,18 +49,19 @@ const teamSchema = new mongoose.Schema({
       required: true,
       trim: true
     },
+    photo: {
+      type: String, // File path for member photo
+      default: null
+    },
     role: {
       type: String,
-      enum: ['Forward', 'Center', 'Defender', 'Keeper', 'All-rounder'],
+      enum: ['Forward', 'Defender', 'Striker', 'Central', 'Substitute'],
       required: true
     },
-    contactEmail: {
-      type: String,
-      trim: true
-    },
-    isPrimary: {
-      type: Boolean,
-      default: true
+    jerseyNumber: {
+      type: Number,
+      min: 1,
+      max: 99
     }
   }],
   wins: {

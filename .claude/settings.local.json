@@ -27,7 +27,9 @@
       "Bash(del \"\\?\\C:\\Users\\ADMIN\\Desktop\\drone-arena\\frontend\\nul\")",
       "Bash(git rm:*)",
       "Bash(.gitignore)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(git commit:*)",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": []

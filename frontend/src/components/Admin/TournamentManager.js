@@ -15,6 +15,7 @@ const TournamentManager = () => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
+    url: '',
     startDate: '',
     endDate: '',
     maxTeams: 16,
@@ -268,6 +269,17 @@ const TournamentManager = () => {
                   style={{...styles.input, minHeight: '60px', resize: 'vertical'}}
                   placeholder="Brief tournament description..."
                   rows="3"
+                />
+              </div>
+
+              <div style={styles.formGroup}>
+                <label style={styles.label}>URL (Optional)</label>
+                <input
+                  type="url"
+                  value={formData.url}
+                  onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+                  style={styles.input}
+                  placeholder="https://example.com/tournament"
                 />
               </div>
 

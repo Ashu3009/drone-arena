@@ -5,15 +5,15 @@ const DroneSelector = ({ matchId, roundNumber, teamA, teamB, onRegister }) => {
   const [allDrones, setAllDrones] = useState([]);
   const [teamALineup, setTeamALineup] = useState([
     { position: 'Forward', pilot: '', droneId: '', role: 'Forward' },
-    { position: 'Center', pilot: '', droneId: '', role: 'Center' },
+    { position: 'Striker', pilot: '', droneId: '', role: 'Striker' },
     { position: 'Defender', pilot: '', droneId: '', role: 'Defender' },
-    { position: 'Keeper', pilot: '', droneId: '', role: 'Keeper' }
+    { position: 'Central', pilot: '', droneId: '', role: 'Central' }
   ]);
   const [teamBLineup, setTeamBLineup] = useState([
     { position: 'Forward', pilot: '', droneId: '', role: 'Forward' },
-    { position: 'Center', pilot: '', droneId: '', role: 'Center' },
+    { position: 'Striker', pilot: '', droneId: '', role: 'Striker' },
     { position: 'Defender', pilot: '', droneId: '', role: 'Defender' },
-    { position: 'Keeper', pilot: '', droneId: '', role: 'Keeper' }
+    { position: 'Central', pilot: '', droneId: '', role: 'Central' }
   ]);
 
   useEffect(() => {
@@ -35,10 +35,10 @@ const DroneSelector = ({ matchId, roundNumber, teamA, teamB, onRegister }) => {
     return '';
   };
 
-  // Get team members filtered by role (including All-rounders)
+  // Get team members filtered by role (including Substitutes who can play any position)
   const getMembersByRole = (team, role) => {
     if (!team || !team.members) return [];
-    return team.members.filter(m => m.role === role || m.role === 'All-rounder');
+    return team.members.filter(m => m.role === role || m.role === 'Substitute');
   };
 
   // Get drones filtered by role and status

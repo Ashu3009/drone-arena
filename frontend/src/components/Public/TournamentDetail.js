@@ -10,6 +10,10 @@ const TournamentDetail = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [dateFilter, setDateFilter] = useState('');
 
+  // Team Detail Modal state
+  const [showTeamModal, setShowTeamModal] = useState(false);
+  const [selectedTeam, setSelectedTeam] = useState(null);
+
   useEffect(() => {
     loadTournamentData();
   }, [id]);
@@ -46,6 +50,19 @@ const TournamentDetail = () => {
         return matchDate === dateFilter;
       })
     : matches;
+
+  // Team modal handlers
+  const handleOpenTeamModal = (team) => {
+    if (team && team._id) {
+      setSelectedTeam(team);
+      setShowTeamModal(true);
+    }
+  };
+
+  const handleCloseTeamModal = () => {
+    setShowTeamModal(false);
+    setSelectedTeam(null);
+  };
 
   if (loading) {
     return (
@@ -136,30 +153,42 @@ const TournamentDetail = () => {
             {tournament.winners?.champion || tournament.winners?.runnerUp || tournament.winners?.thirdPlace ? (
               <div style={styles.winnersGrid}>
                 {tournament.winners.champion && (
-                  <div style={styles.winnerCard}>
+                  <div
+                    style={{...styles.winnerCard, cursor: 'pointer'}}
+                    onClick={() => handleOpenTeamModal(tournament.winners.champion)}
+                  >
                     <div style={styles.medal}>🥇</div>
                     <h3 style={styles.winnerTitle}>Champion</h3>
                     <p style={styles.winnerTeam}>
                       {tournament.winners.champion.name || 'TBD'}
                     </p>
+                    <p style={styles.clickHint}>Click to view team details</p>
                   </div>
                 )}
                 {tournament.winners.runnerUp && (
-                  <div style={styles.winnerCard}>
+                  <div
+                    style={{...styles.winnerCard, cursor: 'pointer'}}
+                    onClick={() => handleOpenTeamModal(tournament.winners.runnerUp)}
+                  >
                     <div style={styles.medal}>🥈</div>
                     <h3 style={styles.winnerTitle}>Runner Up</h3>
                     <p style={styles.winnerTeam}>
                       {tournament.winners.runnerUp.name || 'TBD'}
                     </p>
+                    <p style={styles.clickHint}>Click to view team details</p>
                   </div>
                 )}
                 {tournament.winners.thirdPlace && (
-                  <div style={styles.winnerCard}>
+                  <div
+                    style={{...styles.winnerCard, cursor: 'pointer'}}
+                    onClick={() => handleOpenTeamModal(tournament.winners.thirdPlace)}
+                  >
                     <div style={styles.medal}>🥉</div>
                     <h3 style={styles.winnerTitle}>Third Place</h3>
                     <p style={styles.winnerTeam}>
                       {tournament.winners.thirdPlace.name || 'TBD'}
                     </p>
+                    <p style={styles.clickHint}>Click to view team details</p>
                   </div>
                 )}
               </div>
@@ -270,6 +299,39 @@ const TournamentDetail = () => {
                         Winner: {match.winner.name}
                       </div>
                     )}
+
+                    {/* Man of the Match Display */}
+                    {match.status === 'completed' && match.manOfTheMatch?.playerName && (
+                      <div style={styles.momSection}>
+                        <div style={styles.momHeader}>⭐ Man of the Match</div>
+                        <div style={styles.momContent}>
+                          {match.manOfTheMatch.photo && (
+                            <img
+                              src={`http://localhost:5000${match.manOfTheMatch.photo}`}
+                              alt={match.manOfTheMatch.playerName}
+                              style={styles.momPhotoSmall}
+                            />
+                          )}
+                          <div style={styles.momDetails}>
+                            <div style={styles.momPlayerName}>{match.manOfTheMatch.playerName}</div>
+                            <div style={styles.momTeamName}>
+                              {match.manOfTheMatch.team?.name || 'N/A'}
+                            </div>
+                            <div style={styles.momStatsRow}>
+                              <span style={styles.momStat}>
+                                ⚽ {match.manOfTheMatch.stats?.goals || 0} Goals
+                              </span>
+                              <span style={styles.momStat}>
+                                🎯 {match.manOfTheMatch.stats?.assists || 0} Assists
+                              </span>
+                              <span style={styles.momStat}>
+                                🛡️ {match.manOfTheMatch.stats?.saves || 0} Saves
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -304,6 +366,80 @@ const TournamentDetail = () => {
         {/* AWARDS TAB */}
         {activeTab === 'awards' && (
           <div>
+            {/* Player Awards Section */}
+            {(tournament.awards?.bestStriker || tournament.awards?.bestForward || tournament.awards?.bestDefender) && (
+              <>
+                <h2 style={styles.sectionTitle}>Player Awards</h2>
+                <div style={styles.awardsGrid}>
+                  {/* Best Striker */}
+                  {tournament.awards.bestStriker && (
+                    <div style={styles.awardCard}>
+                      <div style={styles.awardIcon}>⚽</div>
+                      <h3 style={styles.awardTitle}>Best Striker</h3>
+                      {tournament.awards.bestStriker.photo && (
+                        <img
+                          src={`http://localhost:5000${tournament.awards.bestStriker.photo}`}
+                          alt={tournament.awards.bestStriker.playerName}
+                          style={styles.awardPhoto}
+                        />
+                      )}
+                      <div style={styles.awardPlayerName}>{tournament.awards.bestStriker.playerName}</div>
+                      <div style={styles.awardTeamName}>
+                        {tournament.awards.bestStriker.team?.name || 'N/A'}
+                      </div>
+                      <div style={styles.awardStat}>
+                        {tournament.awards.bestStriker.goals} Goals
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Best Forward */}
+                  {tournament.awards.bestForward && (
+                    <div style={styles.awardCard}>
+                      <div style={styles.awardIcon}>🎯</div>
+                      <h3 style={styles.awardTitle}>Best Forward</h3>
+                      {tournament.awards.bestForward.photo && (
+                        <img
+                          src={`http://localhost:5000${tournament.awards.bestForward.photo}`}
+                          alt={tournament.awards.bestForward.playerName}
+                          style={styles.awardPhoto}
+                        />
+                      )}
+                      <div style={styles.awardPlayerName}>{tournament.awards.bestForward.playerName}</div>
+                      <div style={styles.awardTeamName}>
+                        {tournament.awards.bestForward.team?.name || 'N/A'}
+                      </div>
+                      <div style={styles.awardStat}>
+                        {tournament.awards.bestForward.assists} Assists
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Best Defender */}
+                  {tournament.awards.bestDefender && (
+                    <div style={styles.awardCard}>
+                      <div style={styles.awardIcon}>🛡️</div>
+                      <h3 style={styles.awardTitle}>Best Defender</h3>
+                      {tournament.awards.bestDefender.photo && (
+                        <img
+                          src={`http://localhost:5000${tournament.awards.bestDefender.photo}`}
+                          alt={tournament.awards.bestDefender.playerName}
+                          style={styles.awardPhoto}
+                        />
+                      )}
+                      <div style={styles.awardPlayerName}>{tournament.awards.bestDefender.playerName}</div>
+                      <div style={styles.awardTeamName}>
+                        {tournament.awards.bestDefender.team?.name || 'N/A'}
+                      </div>
+                      <div style={styles.awardStat}>
+                        {tournament.awards.bestDefender.saves} Saves
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+
             <h2 style={styles.sectionTitle}>Prize Pool</h2>
             {tournament.prizePool?.totalAmount > 0 ? (
               <div>
@@ -374,6 +510,66 @@ const TournamentDetail = () => {
           </div>
         )}
       </div>
+
+      {/* Team Detail Modal */}
+      {showTeamModal && selectedTeam && (
+        <div style={styles.teamModalOverlay} onClick={handleCloseTeamModal}>
+          <div style={styles.teamModalContent} onClick={(e) => e.stopPropagation()}>
+            <button style={styles.closeButton} onClick={handleCloseTeamModal}>
+              ×
+            </button>
+
+            <h2 style={styles.teamModalTitle}>{selectedTeam.name}</h2>
+
+            <div style={styles.teamModalInfo}>
+              <div style={styles.teamInfoRow}>
+                <span style={styles.teamInfoLabel}>Location:</span>
+                <span style={styles.teamInfoValue}>
+                  {selectedTeam.location?.city}, {selectedTeam.location?.state || selectedTeam.location?.country}
+                </span>
+              </div>
+              <div style={styles.teamInfoRow}>
+                <span style={styles.teamInfoLabel}>Type:</span>
+                <span style={styles.teamInfoValue}>{selectedTeam.teamType || 'N/A'}</span>
+              </div>
+              {selectedTeam.captain && (
+                <div style={styles.teamInfoRow}>
+                  <span style={styles.teamInfoLabel}>Captain:</span>
+                  <span style={styles.teamInfoValue}>{selectedTeam.captain}</span>
+                </div>
+              )}
+            </div>
+
+            <h3 style={styles.membersTitle}>Team Members</h3>
+            {selectedTeam.members && selectedTeam.members.length > 0 ? (
+              <div style={styles.membersGrid}>
+                {selectedTeam.members.map((member, index) => (
+                  <div key={index} style={styles.memberCard}>
+                    {member.photo ? (
+                      <img
+                        src={`http://localhost:5000${member.photo}`}
+                        alt={member.name}
+                        style={styles.memberPhoto}
+                      />
+                    ) : (
+                      <div style={styles.memberPhotoPlaceholder}>
+                        {member.name.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div style={styles.memberName}>{member.name}</div>
+                    <div style={styles.memberRole}>{member.role}</div>
+                    {member.jerseyNumber && (
+                      <div style={styles.memberJersey}>#{member.jerseyNumber}</div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p style={styles.emptyText}>No team members available</p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -786,6 +982,251 @@ const styles = {
     padding: '60px',
     fontSize: '16px',
     color: '#888'
+  },
+  // Man of the Match styles
+  momSection: {
+    marginTop: '16px',
+    paddingTop: '16px',
+    borderTop: '2px solid #444'
+  },
+  momHeader: {
+    fontSize: '14px',
+    fontWeight: 'bold',
+    color: '#FFD700',
+    marginBottom: '12px',
+    textTransform: 'uppercase',
+    letterSpacing: '1px'
+  },
+  momContent: {
+    display: 'flex',
+    gap: '16px',
+    alignItems: 'center'
+  },
+  momPhotoSmall: {
+    width: '80px',
+    height: '80px',
+    borderRadius: '50%',
+    objectFit: 'cover',
+    border: '3px solid #FFD700'
+  },
+  momDetails: {
+    flex: 1
+  },
+  momPlayerName: {
+    fontSize: '18px',
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: '4px'
+  },
+  momTeamName: {
+    fontSize: '14px',
+    color: '#888',
+    marginBottom: '10px'
+  },
+  momStatsRow: {
+    display: 'flex',
+    gap: '16px',
+    flexWrap: 'wrap'
+  },
+  momStat: {
+    fontSize: '13px',
+    color: '#aaa',
+    backgroundColor: '#2a2a2a',
+    padding: '4px 12px',
+    borderRadius: '12px'
+  },
+  // Awards styles
+  awardsGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+    gap: '24px',
+    marginBottom: '40px'
+  },
+  awardCard: {
+    backgroundColor: '#1e1e1e',
+    borderRadius: '12px',
+    padding: '30px',
+    textAlign: 'center',
+    border: '2px solid #FFD700',
+    position: 'relative'
+  },
+  awardIcon: {
+    fontSize: '40px',
+    marginBottom: '12px'
+  },
+  awardTitle: {
+    fontSize: '18px',
+    color: '#FFD700',
+    margin: '0 0 20px 0',
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+    letterSpacing: '1px'
+  },
+  awardPhoto: {
+    width: '120px',
+    height: '120px',
+    borderRadius: '50%',
+    objectFit: 'cover',
+    margin: '0 auto 16px auto',
+    display: 'block',
+    border: '4px solid #FFD700'
+  },
+  awardPlayerName: {
+    fontSize: '20px',
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: '8px'
+  },
+  awardTeamName: {
+    fontSize: '14px',
+    color: '#888',
+    marginBottom: '16px'
+  },
+  awardStat: {
+    fontSize: '16px',
+    color: '#4CAF50',
+    fontWeight: 'bold',
+    backgroundColor: '#2a2a2a',
+    padding: '8px 16px',
+    borderRadius: '20px',
+    display: 'inline-block'
+  },
+  clickHint: {
+    fontSize: '12px',
+    color: '#4CAF50',
+    margin: '8px 0 0 0',
+    fontStyle: 'italic'
+  },
+  // Team Modal styles
+  teamModalOverlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 2000,
+    padding: '20px'
+  },
+  teamModalContent: {
+    backgroundColor: '#1e1e1e',
+    borderRadius: '16px',
+    padding: '40px',
+    maxWidth: '900px',
+    width: '100%',
+    maxHeight: '90vh',
+    overflow: 'auto',
+    border: '2px solid #4CAF50',
+    position: 'relative'
+  },
+  closeButton: {
+    position: 'absolute',
+    top: '16px',
+    right: '16px',
+    backgroundColor: 'transparent',
+    border: 'none',
+    color: '#fff',
+    fontSize: '36px',
+    cursor: 'pointer',
+    width: '40px',
+    height: '40px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: '50%',
+    transition: 'background-color 0.2s'
+  },
+  teamModalTitle: {
+    fontSize: '32px',
+    margin: '0 0 24px 0',
+    color: '#4CAF50',
+    textAlign: 'center'
+  },
+  teamModalInfo: {
+    backgroundColor: '#2a2a2a',
+    borderRadius: '8px',
+    padding: '20px',
+    marginBottom: '30px'
+  },
+  teamInfoRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginBottom: '12px',
+    fontSize: '16px'
+  },
+  teamInfoLabel: {
+    color: '#888',
+    fontWeight: 'bold'
+  },
+  teamInfoValue: {
+    color: '#fff'
+  },
+  membersTitle: {
+    fontSize: '24px',
+    margin: '0 0 20px 0',
+    color: '#fff',
+    borderBottom: '2px solid #333',
+    paddingBottom: '10px'
+  },
+  membersGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+    gap: '20px'
+  },
+  memberCard: {
+    backgroundColor: '#2a2a2a',
+    borderRadius: '12px',
+    padding: '20px',
+    textAlign: 'center',
+    border: '1px solid #444',
+    transition: 'transform 0.2s, border-color 0.2s'
+  },
+  memberPhoto: {
+    width: '100px',
+    height: '100px',
+    borderRadius: '50%',
+    objectFit: 'cover',
+    margin: '0 auto 12px auto',
+    display: 'block',
+    border: '3px solid #4CAF50'
+  },
+  memberPhotoPlaceholder: {
+    width: '100px',
+    height: '100px',
+    borderRadius: '50%',
+    margin: '0 auto 12px auto',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#444',
+    fontSize: '40px',
+    fontWeight: 'bold',
+    color: '#888',
+    border: '3px solid #666'
+  },
+  memberName: {
+    fontSize: '16px',
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: '6px'
+  },
+  memberRole: {
+    fontSize: '13px',
+    color: '#4CAF50',
+    marginBottom: '6px',
+    textTransform: 'uppercase',
+    fontWeight: 'bold'
+  },
+  memberJersey: {
+    fontSize: '12px',
+    color: '#888',
+    backgroundColor: '#1e1e1e',
+    padding: '4px 10px',
+    borderRadius: '12px',
+    display: 'inline-block'
   }
 };
 

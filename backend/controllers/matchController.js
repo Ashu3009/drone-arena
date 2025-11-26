@@ -8,6 +8,11 @@ const { updateStandings } = require('./leaderboardController');
 const DroneTelemetry = require('../models/DroneTelemetry');
 const DroneReport = require('../models/DroneReport');  // ✅ Individual reports
 const mqttService = require('../services/mqttService');  // ✅ MQTT for ESP32
+const { spawn } = require('child_process');  // ✅ For ESP simulator subprocess
+const path = require('path');
+
+// ✅ Global map to store running simulators (matchId -> process)
+const runningSimulators = new Map();
 
 // @desc    Get all matches
 // @route   GET /api/matches
@@ -155,6 +160,13 @@ const deleteMatch = async (req, res) => {
       });
     }
 
+    // ✅ Stop ESP simulator if running
+    if (runningSimulators.has(req.params.matchId)) {
+      console.log(`🛑 Stopping ESP Simulator for deleted match ${req.params.matchId}...`);
+      runningSimulators.get(req.params.matchId).kill();
+      runningSimulators.delete(req.params.matchId);
+    }
+
     // ✅ Delete all drone reports for this match
     await DroneReport.deleteMany({ match: req.params.matchId });
     console.log(`🗑️  Deleted all reports for match ${req.params.matchId}`);
@@ -266,6 +278,51 @@ const startRound = async (req, res) => {
         currentRound: match.currentRound
       });
       console.log(`📡 Socket event emitted: round-started (Round ${nextRound.roundNumber})`);
+    }
+
+    // ✅ AUTO-START ESP SIMULATOR
+    try {
+      // Stop any existing simulator for this match
+      if (runningSimulators.has(matchId)) {
+        console.log(`🛑 Stopping existing simulator for match ${matchId}...`);
+        runningSimulators.get(matchId).kill();
+        runningSimulators.delete(matchId);
+      }
+
+      // Get path to ESP simulator
+      const simulatorPath = path.join(__dirname, '..', '..', 'esp-simulator', 'virtual_drone.py');
+
+      // Spawn Python process with match details
+      const pythonProcess = spawn('python', [
+        simulatorPath,
+        matchId,
+        nextRound.roundNumber.toString(),
+        match.teamA._id.toString(),
+        match.teamB._id.toString()
+      ]);
+
+      // Store process reference
+      runningSimulators.set(matchId, pythonProcess);
+
+      // Log simulator output
+      pythonProcess.stdout.on('data', (data) => {
+        console.log(`[ESP Simulator]: ${data.toString().trim()}`);
+      });
+
+      pythonProcess.stderr.on('data', (data) => {
+        console.error(`[ESP Simulator Error]: ${data.toString().trim()}`);
+      });
+
+      pythonProcess.on('close', (code) => {
+        console.log(`🛑 ESP Simulator stopped (exit code ${code})`);
+        runningSimulators.delete(matchId);
+      });
+
+      console.log(`✅ ESP Simulator auto-started for Round ${nextRound.roundNumber}`);
+
+    } catch (simError) {
+      console.error('❌ Failed to start ESP simulator:', simError.message);
+      // Don't fail the round start if simulator fails
     }
 
     res.json({
@@ -471,13 +528,32 @@ const endRound = async (req, res) => {
     
     const roundNumber = activeRound.roundNumber;  // ✅ Defined here!
     console.log(`🏁 Ending Round ${roundNumber}...`);
-    
+
     activeRound.status = 'completed';
     activeRound.endTime = new Date();
-    
+
     const duration = Math.round((activeRound.endTime - activeRound.startTime) / 1000);
     console.log(`⏱️  Round duration: ${duration} seconds`);
-    
+
+    // ✅ AUTO-STOP ESP SIMULATOR
+    try {
+      if (runningSimulators.has(matchId)) {
+        console.log(`🛑 Stopping ESP Simulator for match ${matchId}...`);
+        const simulatorProcess = runningSimulators.get(matchId);
+        simulatorProcess.kill();
+        runningSimulators.delete(matchId);
+        console.log(`✅ ESP Simulator stopped`);
+
+        // Wait a moment for final telemetry to arrive
+        await new Promise(resolve => setTimeout(resolve, 500));
+      } else {
+        console.log(`⚠️  No running simulator found for match ${matchId}`);
+      }
+    } catch (simError) {
+      console.error('❌ Error stopping ESP simulator:', simError.message);
+      // Don't fail the round end if simulator stop fails
+    }
+
     try {
       console.log('🤖 Calling ML service for stability analysis...');
       
@@ -1171,15 +1247,69 @@ const resetAllDrones = async (req, res) => {
 };
 
 
+// @desc    Set Man of the Match (Hybrid: Auto-suggest or Manual)
+// @route   PUT /api/matches/:matchId/man-of-match
+const setManOfTheMatch = async (req, res) => {
+  try {
+    const { matchId } = req.params;
+    const { playerName, teamId, stats } = req.body;
+
+    const match = await Match.findById(matchId)
+      .populate('teamA', 'members')
+      .populate('teamB', 'members');
+
+    if (!match) {
+      return res.status(404).json({
+        success: false,
+        message: 'Match not found'
+      });
+    }
+
+    // Find player in team members to get photo
+    const team = teamId === match.teamA._id.toString() ? match.teamA : match.teamB;
+    const member = team.members.find(m => m.name === playerName);
+
+    match.manOfTheMatch = {
+      playerName,
+      team: teamId,
+      photo: member?.photo || null,
+      stats: stats || { goals: 0, assists: 0, saves: 0 }
+    };
+
+    await match.save();
+
+    // Emit Socket.io event
+    if (global.io) {
+      global.io.emit('man-of-match-set', {
+        matchId: match._id,
+        manOfTheMatch: match.manOfTheMatch
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Man of the Match set successfully',
+      data: match.manOfTheMatch
+    });
+
+  } catch (error) {
+    console.error('Error setting Man of the Match:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 module.exports = {
   getAllMatches,
   getMatchById,
   createMatch,
   deleteMatch,
   startRound,
-  pauseTimer,     // ✅ ADD
-  resumeTimer,    // ✅ ADD
-  resetTimer,     // ✅ ADD
+  pauseTimer,
+  resumeTimer,
+  resetTimer,
   updateScore,
   endRound,
   completeMatch,
@@ -1188,5 +1318,6 @@ module.exports = {
   getCurrentMatch,
   startAllDrones,
   stopAllDrones,
-  resetAllDrones
+  resetAllDrones,
+  setManOfTheMatch
 };

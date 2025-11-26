@@ -1,5 +1,7 @@
 // backend/controllers/teamController.js
 const Team = require('../models/Team');
+const path = require('path');
+const fs = require('fs');
 
 // @desc    Get all teams
 // @route   GET /api/teams
@@ -135,17 +137,85 @@ exports.updateTeam = async (req, res) => {
 exports.deleteTeam = async (req, res) => {
   try {
     const team = await Team.findByIdAndDelete(req.params.id);
-    
+
     if (!team) {
       return res.status(404).json({
         success: false,
         message: 'Team not found'
       });
     }
-    
+
+    // Delete all member photos
+    if (team.members && team.members.length > 0) {
+      team.members.forEach(member => {
+        if (member.photo) {
+          const photoPath = path.join(__dirname, '..', member.photo);
+          if (fs.existsSync(photoPath)) {
+            fs.unlinkSync(photoPath);
+          }
+        }
+      });
+    }
+
     res.json({
       success: true,
       message: 'Team deleted successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+// @desc    Upload member photo
+// @route   POST /api/teams/:id/members/:memberIndex/photo
+exports.uploadMemberPhoto = async (req, res) => {
+  try {
+    const { id, memberIndex } = req.params;
+    const team = await Team.findById(id);
+
+    if (!team) {
+      return res.status(404).json({
+        success: false,
+        message: 'Team not found'
+      });
+    }
+
+    const index = parseInt(memberIndex);
+    if (index < 0 || index >= team.members.length) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid member index'
+      });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No photo file uploaded'
+      });
+    }
+
+    // Delete old photo if exists
+    if (team.members[index].photo) {
+      const oldPhotoPath = path.join(__dirname, '..', team.members[index].photo);
+      if (fs.existsSync(oldPhotoPath)) {
+        fs.unlinkSync(oldPhotoPath);
+      }
+    }
+
+    // Update member photo path
+    team.members[index].photo = `/uploads/teams/members/${req.file.filename}`;
+    await team.save();
+
+    res.json({
+      success: true,
+      message: 'Member photo uploaded successfully',
+      data: {
+        photo: team.members[index].photo
+      }
     });
   } catch (error) {
     res.status(500).json({

@@ -6,8 +6,10 @@ const fs = require('fs');
 const uploadDir = path.join(__dirname, '../uploads');
 const tournamentsDir = path.join(uploadDir, 'tournaments');
 const galleryDir = path.join(tournamentsDir, 'gallery');
+const teamsDir = path.join(uploadDir, 'teams');
+const membersDir = path.join(teamsDir, 'members');
 
-[uploadDir, tournamentsDir, galleryDir].forEach(dir => {
+[uploadDir, tournamentsDir, galleryDir, teamsDir, membersDir].forEach(dir => {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
@@ -78,8 +80,26 @@ const uploadMOT = multer({
   fileFilter: imageFilter
 });
 
+// Configure storage for team member photos
+const memberPhotoStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, membersDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, 'member-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const uploadMemberPhoto = multer({
+  storage: memberPhotoStorage,
+  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB limit per member photo
+  fileFilter: imageFilter
+});
+
 module.exports = {
   uploadBanner,
   uploadGallery,
-  uploadMOT
+  uploadMOT,
+  uploadMemberPhoto
 };

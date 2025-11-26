@@ -1,31 +1,38 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-FAST MULTI-DRONE SIMULATOR - 50ms updates (20 Hz)
-Runs 8 drones (R1-R4, B1-B4) with smooth real-time telemetry
+SINGLE DRONE SIMULATOR - 200ms updates (5 Hz)
+Runs 1 drone (R1) for testing with ML analysis
+Reduced from 8 drones to prevent server overload
+Auto-started by backend when round begins
 """
 
 import requests
 import time
 import random
 import threading
+import sys
 
 # ==================== CONFIGURATION ====================
+# Accept command-line arguments for dynamic configuration
+# Usage: python virtual_drone.py <match_id> <round_number> <team_a_id> <team_b_id>
 BACKEND_URL = "http://localhost:5000/api/telemetry"
-MATCH_ID = "690f2d8cb9070cec601d059d"
-TEAM_A_ID = "690b445223fe5f7ff3108dcf"  # Red team
-TEAM_B_ID = "690b442323fe5f7ff3108dc0"  # Blue team
+MATCH_ID = sys.argv[1] if len(sys.argv) > 1 else "690f2d8cb9070cec601d059d"
+ROUND_NUMBER = int(sys.argv[2]) if len(sys.argv) > 2 else 1
+TEAM_A_ID = sys.argv[3] if len(sys.argv) > 3 else "690b445223fe5f7ff3108dcf"  # Red team
+TEAM_B_ID = sys.argv[4] if len(sys.argv) > 4 else "690b442323fe5f7ff3108dc0"  # Blue team
 
-# Drone starting positions
+# Drone starting position (Single drone for testing)
 DRONES = [
     {"id": "R1", "team": TEAM_A_ID, "x": 1.5, "y": 0.8, "z": 2.0},
-    {"id": "R2", "team": TEAM_A_ID, "x": 1.5, "y": 2.2, "z": 2.0},
-    {"id": "R3", "team": TEAM_A_ID, "x": 2.5, "y": 0.8, "z": 2.5},
-    {"id": "R4", "team": TEAM_A_ID, "x": 2.5, "y": 2.2, "z": 2.5},
-    {"id": "B1", "team": TEAM_B_ID, "x": 4.6, "y": 0.8, "z": 2.0},
-    {"id": "B2", "team": TEAM_B_ID, "x": 4.6, "y": 2.2, "z": 2.0},
-    {"id": "B3", "team": TEAM_B_ID, "x": 3.6, "y": 0.8, "z": 2.5},
-    {"id": "B4", "team": TEAM_B_ID, "x": 3.6, "y": 2.2, "z": 2.5},
+    # Commented out other drones to reduce server load during ML testing
+    # {"id": "R2", "team": TEAM_A_ID, "x": 1.5, "y": 2.2, "z": 2.0},
+    # {"id": "R3", "team": TEAM_A_ID, "x": 2.5, "y": 0.8, "z": 2.5},
+    # {"id": "R4", "team": TEAM_A_ID, "x": 2.5, "y": 2.2, "z": 2.5},
+    # {"id": "B1", "team": TEAM_B_ID, "x": 4.6, "y": 0.8, "z": 2.0},
+    # {"id": "B2", "team": TEAM_B_ID, "x": 4.6, "y": 2.2, "z": 2.0},
+    # {"id": "B3", "team": TEAM_B_ID, "x": 3.6, "y": 0.8, "z": 2.5},
+    # {"id": "B4", "team": TEAM_B_ID, "x": 3.6, "y": 2.2, "z": 2.5},
 ]
 
 running = True
@@ -69,6 +76,7 @@ def simulate_drone(drone_config):
         telemetry = {
             "droneId": drone_id,
             "matchId": MATCH_ID,
+            "roundNumber": ROUND_NUMBER,
             "teamId": team_id,
             "x": round(state["x"], 2),
             "y": round(state["y"], 2),
@@ -82,29 +90,32 @@ def simulate_drone(drone_config):
         try:
             response = requests.post(BACKEND_URL, json=telemetry, timeout=1)
             update_counts[drone_id] += 1
-            
-            # Print every 20th update per drone
-            if update_counts[drone_id] % 20 == 0:
+
+            # Print every 5th update (every second at 5 Hz)
+            if update_counts[drone_id] % 5 == 0:
                 if response.status_code == 200:
-                    print(f"📡 {drone_id}: X={telemetry['x']}, Y={telemetry['y']}, Z={telemetry['z']} [{update_counts[drone_id]}]")
+                    print(f"📡 {drone_id}: X={telemetry['x']}, Y={telemetry['y']}, Z={telemetry['z']}, Battery={telemetry['battery']}% [{update_counts[drone_id]} updates]")
         except:
             pass  # Silently ignore errors for smoother operation
-        
-        time.sleep(0.05)  # 50ms = 20 Hz
+
+        time.sleep(0.2)  # 200ms = 5 Hz (slower for ML processing)
 
 def main():
     global running
     
     print("=" * 70)
-    print("🚁 FAST MULTI-DRONE SIMULATOR")
+    print("🚁 SINGLE DRONE SIMULATOR (Auto-started by Backend)")
     print("=" * 70)
     print(f"Match ID: {MATCH_ID}")
+    print(f"Round Number: {ROUND_NUMBER}")
     print(f"Backend: {BACKEND_URL}")
-    print(f"Drones: {len(DRONES)} (Red: R1-R4, Blue: B1-B4)")
-    print(f"Update Rate: 20 Hz (50ms per drone)")
-    print(f"Total Updates/sec: {len(DRONES) * 20} Hz")
+    print(f"Team A ID: {TEAM_A_ID}")
+    print(f"Team B ID: {TEAM_B_ID}")
+    print(f"Drones: {len(DRONES)} (Only R1 for testing)")
+    print(f"Update Rate: 5 Hz (200ms interval)")
+    print(f"Total Updates/sec: {len(DRONES) * 5} Hz")
     print("=" * 70)
-    print("\n🚀 Starting all drones...\n")
+    print("\n🚀 Starting drone...\n")
     
     # Create threads for each drone
     threads = []
@@ -114,15 +125,15 @@ def main():
         threads.append(thread)
         time.sleep(0.01)  # Stagger starts
     
-    print("✅ All drones active! Press Ctrl+C to stop\n")
+    print("✅ Drone R1 is active! Press Ctrl+C to stop\n")
     
     try:
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
-        print("\n\n🛑 Stopping all drones...")
+        print("\n\n🛑 Stopping drone...")
         running = False
-        time.sleep(1)
+        time.sleep(0.5)
         
         total_updates = sum(update_counts.values())
         print(f"\n📊 Statistics:")

@@ -7,9 +7,9 @@ const {
   createMatch,
   deleteMatch,
   startRound,
-  pauseTimer,      // ✅ ADD
-  resumeTimer,     // ✅ ADD
-  resetTimer,      // ✅ ADD
+  pauseTimer,
+  resumeTimer,
+  resetTimer,
   updateScore,
   endRound,
   completeMatch,
@@ -18,7 +18,8 @@ const {
   getCurrentMatch,
   startAllDrones,
   stopAllDrones,
-  resetAllDrones
+  resetAllDrones,
+  setManOfTheMatch
 } = require('../controllers/matchController');
 const { protect } = require('../middleware/auth');
 
@@ -46,5 +47,8 @@ router.put('/:matchId/rounds/:roundNumber/reset', protect, resetTimer);
 router.post('/:matchId/start-all-drones', protect, startAllDrones);
 router.post('/:matchId/stop-all-drones', protect, stopAllDrones);
 router.post('/:matchId/reset-all-drones', protect, resetAllDrones);
+
+// Man of the Match (admin only)
+router.put('/:matchId/man-of-match', protect, setManOfTheMatch);
 
 module.exports = router;

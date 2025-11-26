@@ -120,6 +120,33 @@ const matchSchema = new mongoose.Schema({
   isCurrentMatch: {
     type: Boolean,
     default: false
+  },
+  manOfTheMatch: {
+    playerName: {
+      type: String,
+      trim: true
+    },
+    team: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Team'
+    },
+    photo: {
+      type: String // Path to member photo from team.members
+    },
+    stats: {
+      goals: {
+        type: Number,
+        default: 0
+      },
+      assists: {
+        type: Number,
+        default: 0
+      },
+      saves: {
+        type: Number,
+        default: 0
+      }
+    }
   }
 }, {
   timestamps: true

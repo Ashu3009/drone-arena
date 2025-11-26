@@ -17,7 +17,8 @@ import {
   resumeTimer,
   resetTimer,
   registerDronesForRound,
-  updateMatchScore
+  updateMatchScore,
+  setManOfTheMatch
 } from '../../services/api';
 import DroneSelector from './DroneSelector';
 import TimerDisplay from './TimerDisplay';
@@ -33,6 +34,17 @@ const MatchManager = () => {
     tournament: '',
     teamA: '',
     teamB: ''
+  });
+
+  // Man of the Match modal state
+  const [showMOMModal, setShowMOMModal] = useState(false);
+  const [selectedMatch, setSelectedMatch] = useState(null);
+  const [momData, setMomData] = useState({
+    selectedTeam: '',
+    playerName: '',
+    goals: 0,
+    assists: 0,
+    saves: 0
   });
 
   useEffect(() => {
@@ -306,6 +318,82 @@ const MatchManager = () => {
       console.error('Error updating score:', error);
       alert(error.response?.data?.message || 'Failed to update score');
     }
+  };
+
+  // Man of the Match handlers
+  const handleOpenMOMModal = (match) => {
+    setSelectedMatch(match);
+    setShowMOMModal(true);
+    setMomData({
+      selectedTeam: '',
+      playerName: '',
+      goals: 0,
+      assists: 0,
+      saves: 0
+    });
+  };
+
+  const handleCloseMOMModal = () => {
+    setShowMOMModal(false);
+    setSelectedMatch(null);
+    setMomData({
+      selectedTeam: '',
+      playerName: '',
+      goals: 0,
+      assists: 0,
+      saves: 0
+    });
+  };
+
+  const handleSetManOfMatch = async (e) => {
+    e.preventDefault();
+
+    if (!momData.selectedTeam || !momData.playerName) {
+      alert('Please select team and player');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await setManOfTheMatch(selectedMatch._id, {
+        playerName: momData.playerName,
+        teamId: momData.selectedTeam,
+        stats: {
+          goals: parseInt(momData.goals) || 0,
+          assists: parseInt(momData.assists) || 0,
+          saves: parseInt(momData.saves) || 0
+        }
+      });
+
+      if (response.success) {
+        alert('Man of the Match set successfully!');
+        handleCloseMOMModal();
+        loadData();
+      }
+    } catch (error) {
+      console.error('Error setting Man of the Match:', error);
+      alert(error.response?.data?.message || 'Failed to set Man of the Match');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Get available players for selected team
+  const getAvailablePlayers = () => {
+    if (!selectedMatch || !momData.selectedTeam) {
+      return [];
+    }
+
+    // Safely convert IDs to strings for comparison
+    const selectedTeamId = String(momData.selectedTeam);
+    const teamAId = String(selectedMatch.teamA?._id || '');
+    const teamBId = String(selectedMatch.teamB?._id || '');
+
+    const team = selectedTeamId === teamAId
+      ? selectedMatch.teamA
+      : selectedMatch.teamB;
+
+    return team?.members || [];
   };
 
   return (
@@ -627,6 +715,17 @@ const MatchManager = () => {
                     </button>
                   )}
 
+                  {/* Man of the Match Button (for completed matches) */}
+                  {match.status === 'completed' && (
+                    <button
+                      onClick={() => handleOpenMOMModal(match)}
+                      style={{...styles.controlButton, backgroundColor: '#9C27B0'}}
+                      disabled={loading}
+                    >
+                      {match.manOfTheMatch?.playerName ? '✓ Man of Match Set' : 'Set Man of Match'}
+                    </button>
+                  )}
+
                   {/* Delete Button */}
                   <button
                     onClick={() => handleDeleteMatch(match._id)}
@@ -641,6 +740,100 @@ const MatchManager = () => {
           })
         )}
       </div>
+
+      {/* Man of the Match Modal */}
+      {showMOMModal && selectedMatch && (
+        <div style={styles.modalOverlay}>
+          <div style={styles.modalContent}>
+            <h3 style={styles.modalTitle}>Set Man of the Match</h3>
+            <p style={styles.modalSubtitle}>
+              {selectedMatch.teamA?.name} vs {selectedMatch.teamB?.name}
+            </p>
+
+            <form onSubmit={handleSetManOfMatch}>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Select Team *</label>
+                <select
+                  value={momData.selectedTeam}
+                  onChange={(e) => setMomData({ ...momData, selectedTeam: e.target.value, playerName: '' })}
+                  style={styles.input}
+                  required
+                >
+                  <option value="">Choose Team</option>
+                  <option value={selectedMatch.teamA._id}>{selectedMatch.teamA.name}</option>
+                  <option value={selectedMatch.teamB._id}>{selectedMatch.teamB.name}</option>
+                </select>
+              </div>
+
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Select Player *</label>
+                <select
+                  value={momData.playerName}
+                  onChange={(e) => setMomData({ ...momData, playerName: e.target.value })}
+                  style={styles.input}
+                  disabled={!momData.selectedTeam}
+                  required
+                >
+                  <option value="">
+                    {!momData.selectedTeam ? 'Select Team First' :
+                     getAvailablePlayers().length === 0 ? 'No players found in this team' :
+                     'Choose Player'}
+                  </option>
+                  {getAvailablePlayers().map((member, idx) => (
+                    <option key={idx} value={member.name}>
+                      {member.name} - {member.role}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div style={styles.statsRow}>
+                <div style={styles.formGroup}>
+                  <label style={styles.label}>Goals</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={momData.goals}
+                    onChange={(e) => setMomData({ ...momData, goals: e.target.value })}
+                    style={styles.input}
+                  />
+                </div>
+
+                <div style={styles.formGroup}>
+                  <label style={styles.label}>Assists</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={momData.assists}
+                    onChange={(e) => setMomData({ ...momData, assists: e.target.value })}
+                    style={styles.input}
+                  />
+                </div>
+
+                <div style={styles.formGroup}>
+                  <label style={styles.label}>Saves</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={momData.saves}
+                    onChange={(e) => setMomData({ ...momData, saves: e.target.value })}
+                    style={styles.input}
+                  />
+                </div>
+              </div>
+
+              <div style={styles.modalActions}>
+                <button type="submit" style={styles.submitButton} disabled={loading}>
+                  {loading ? 'Setting...' : 'Set Man of the Match'}
+                </button>
+                <button type="button" onClick={handleCloseMOMModal} style={styles.cancelButton} disabled={loading}>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -970,6 +1163,48 @@ const styles = {
     cursor: 'pointer',
     minWidth: '50px',
     transition: 'transform 0.1s ease'
+  },
+  // Modal styles
+  modalOverlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000
+  },
+  modalContent: {
+    backgroundColor: '#1e1e1e',
+    borderRadius: '12px',
+    padding: '32px',
+    maxWidth: '600px',
+    width: '90%',
+    maxHeight: '90vh',
+    overflow: 'auto',
+    border: '1px solid #444'
+  },
+  modalTitle: {
+    margin: '0 0 8px 0',
+    fontSize: '22px',
+    color: '#fff'
+  },
+  modalSubtitle: {
+    margin: '0 0 24px 0',
+    fontSize: '14px',
+    color: '#888'
+  },
+  statsRow: {
+    display: 'flex',
+    gap: '16px'
+  },
+  modalActions: {
+    display: 'flex',
+    gap: '12px',
+    marginTop: '24px'
   }
 };
 

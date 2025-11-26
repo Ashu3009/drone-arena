@@ -158,6 +158,22 @@ export const deleteTeam = async (teamId) => {
   return response.data;
 };
 
+// Upload member photo (ADMIN ONLY)
+export const uploadMemberPhoto = async (teamId, memberIndex, photoFile) => {
+  const formData = new FormData();
+  formData.append('photo', photoFile);
+  const response = await axios.post(
+    `${API_BASE_URL}/teams/${teamId}/members/${memberIndex}/photo`,
+    formData,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    }
+  );
+  return response.data;
+};
+
 // ==================== MATCHES ====================
 
 // Get all matches
@@ -205,6 +221,12 @@ export const deleteMatch = async (matchId) => {
 // Complete match (ADMIN ONLY)
 export const completeMatch = async (matchId) => {
   const response = await axios.put(`${API_BASE_URL}/matches/${matchId}/complete`);
+  return response.data;
+};
+
+// Set Man of the Match (ADMIN ONLY)
+export const setManOfTheMatch = async (matchId, data) => {
+  const response = await axios.put(`${API_BASE_URL}/matches/${matchId}/man-of-match`, data);
   return response.data;
 };
 
