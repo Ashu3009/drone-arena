@@ -1,0 +1,53 @@
+/* Mobile Layout Styles */
+
+.mobile-layout {
+  min-height: 100vh;
+  background: #0f172a;
+  position: relative;
+}
+
+.mobile-main {
+  padding-top: calc(64px + env(safe-area-inset-top)); /* Header height + safe area */
+  min-height: 100vh;
+}
+
+/* Ensure smooth scrolling */
+html {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent horizontal scroll */
+body {
+  overflow-x: hidden;
+}
+
+/* Mobile-specific global styles */
+@media (max-width: 768px) {
+  /* Optimize touch targets */
+  button,
+  a,
+  .clickable {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Prevent text size adjustments */
+  html {
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  /* Optimize font rendering */
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Remove tap highlight */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
