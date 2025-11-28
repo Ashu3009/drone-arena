@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
+import useIsMobile from './hooks/useIsMobile';
 
 // Admin Components
 import Login from './components/Admin/Login';
@@ -25,24 +26,46 @@ import './App.css';
 import './styles/mobileResponsive.css';
 import './styles/indianTheme.css';
 
+// Responsive Home Component - Auto-detects mobile/desktop
+const ResponsiveHome = () => {
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    return <MobileLayout><MobileHome /></MobileLayout>;
+  }
+
+  return <><Navbar /><PublicViewer /></>;
+};
+
+// Responsive Tournaments List
+const ResponsiveTournaments = () => {
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    return <MobileLayout><MobileTournaments /></MobileLayout>;
+  }
+
+  return <><Navbar /><TournamentsList /></>;
+};
+
 function App() {
   return (
     <AuthProvider>
       <Router>
         <div className="App">
           <Routes>
-            {/* Mobile Routes */}
+            {/* Responsive Routes - Auto-detect Mobile/Desktop */}
+            <Route path="/" element={<ResponsiveHome />} />
+            <Route path="/tournaments" element={<ResponsiveTournaments />} />
+            <Route path="/tournament/:id" element={<><Navbar /><TournamentDetail /></>} />
+
+            {/* Mobile Routes (for testing/force mobile view) */}
             <Route path="/mobile" element={<MobileLayout />}>
               <Route index element={<MobileHome />} />
               <Route path="tournaments" element={<MobileTournaments />} />
               <Route path="leaderboard" element={<MobileLeaderboard />} />
               <Route path="profile" element={<div style={{padding: '20px', textAlign: 'center', color: '#94a3b8'}}>Profile Coming Soon</div>} />
             </Route>
-
-            {/* Public Routes with Navbar */}
-            <Route path="/" element={<><Navbar /><PublicViewer /></>} />
-            <Route path="/tournaments" element={<><Navbar /><TournamentsList /></>} />
-            <Route path="/tournament/:id" element={<><Navbar /><TournamentDetail /></>} />
 
             {/* Admin Routes */}
             <Route path="/admin/login" element={<Login />} />
