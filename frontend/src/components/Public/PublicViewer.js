@@ -6,6 +6,7 @@ import { initSocket, joinMatch, leaveMatch, onRoundStarted, onScoreUpdated, onRo
 import DroneView3D from '../DroneView3D';
 import Leaderboard from './Leaderboard';
 import TimerDisplayPublic from './TimerDisplayPublic';
+import './PublicViewer.css';
 
 const PublicViewer = () => {
   const [currentMatch, setCurrentMatch] = useState(null);
@@ -94,7 +95,7 @@ const PublicViewer = () => {
 
   if (loading) {
     return (
-      <div style={styles.loading}>
+      <div className="loading-public">
         <h2>Loading...</h2>
       </div>
     );
@@ -102,7 +103,7 @@ const PublicViewer = () => {
 
   if (!currentMatch) {
     return (
-      <div style={styles.noMatch}>
+      <div className="no-match-public">
         <h1>No Live Match</h1>
         <p>There is no match currently in progress.</p>
         <p>Check back later!</p>
@@ -113,217 +114,69 @@ const PublicViewer = () => {
   const activeRound = currentMatch.rounds?.find(r => r.status === 'in_progress');
 
   return (
-    <div style={styles.container}>
+    <div className="public-viewer-container">
       {/* Live Update Banner */}
       {liveUpdate && (
-        <div style={styles.liveUpdateBanner}>
+        <div className="live-update-banner">
           {liveUpdate}
         </div>
       )}
 
       {/* Header */}
-      <header style={styles.header}>
-        <div style={styles.headerContent}>
-          <h1 style={styles.title}>Drone Arena - Live Match</h1>
-          <div style={styles.liveBadge}>LIVE</div>
+      <header className="header-public">
+        <div className="header-content-public">
+          <h1 className="title-public">DroneNova - Live Match</h1>
+          <div className="live-badge-public">LIVE</div>
         </div>
-        <p style={styles.tournament}>{currentMatch.tournament?.name || 'Tournament'}</p>
+        <p className="tournament-public">{currentMatch.tournament?.name || 'Tournament'}</p>
       </header>
 
       {/* Match Info */}
-      <div style={styles.matchInfo}>
-        <div style={styles.team}>
-          <h2 style={styles.teamName}>{currentMatch.teamA?.name || 'Team A'}</h2>
-          <div style={styles.scoreDisplay}>{currentMatch.finalScoreA || 0}</div>
+      <div className="match-info-public">
+        <div className="team-public">
+          <h2 className="team-name-public">{currentMatch.teamA?.name || 'Team A'}</h2>
+          <div className="score-display-public">{currentMatch.finalScoreA || 0}</div>
         </div>
 
-        <div style={styles.vsSection}>
-          <span style={styles.vs}>VS</span>
-          <div style={styles.roundInfo}>
+        <div className="vs-section-public">
+          <span className="vs-public">VS</span>
+          <div className="round-info-public">
             <span>Round {currentMatch.currentRound || 1} / 3</span>
-            {activeRound && <span style={styles.roundStatus}>IN PROGRESS</span>}
+            {activeRound && <span className="round-status-public">IN PROGRESS</span>}
           </div>
         </div>
 
-        <div style={styles.team}>
-          <h2 style={styles.teamName}>{currentMatch.teamB?.name || 'Team B'}</h2>
-          <div style={styles.scoreDisplay}>{currentMatch.finalScoreB || 0}</div>
+        <div className="team-public">
+          <h2 className="team-name-public">{currentMatch.teamB?.name || 'Team B'}</h2>
+          <div className="score-display-public">{currentMatch.finalScoreB || 0}</div>
         </div>
       </div>
 
       {/* Timer Display - Visible to Viewers (No Controls) */}
       {activeRound && activeRound.timerStatus && (
-        <div style={styles.timerSection}>
-          <h3 style={styles.sectionTitle}>Round Timer</h3>
+        <div className="timer-section-public">
+          <h3 className="section-title-public">Round Timer</h3>
           <TimerDisplayPublic round={activeRound} />
         </div>
       )}
 
       {/* 3D Arena View */}
-      <div style={styles.arenaSection}>
-        <h3 style={styles.sectionTitle}>3D Arena View</h3>
+      <div className="arena-section-public">
+        <h3 className="section-title-public">3D Arena View</h3>
         <DroneView3D matchId={currentMatch?._id} />
       </div>
 
       {/* Leaderboard */}
-      <div style={styles.leaderboardSection}>
+      <div className="leaderboard-section-public">
         <Leaderboard tournamentId={currentMatch.tournament?._id} />
       </div>
 
       {/* Admin Link */}
-      <div style={styles.footer}>
-        <a href="/admin/login" style={styles.adminLink}>Admin Login</a>
+      <div className="footer-public">
+        <a href="/admin/login" className="admin-link-public">Admin Login</a>
       </div>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    minHeight: '100vh',
-    backgroundColor: '#0a0a0a',
-    color: 'white',
-    paddingBottom: '40px'
-  },
-  loading: {
-    minHeight: '100vh',
-    backgroundColor: '#0a0a0a',
-    color: 'white',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  noMatch: {
-    minHeight: '100vh',
-    backgroundColor: '#0a0a0a',
-    color: 'white',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    textAlign: 'center'
-  },
-  liveUpdateBanner: {
-    backgroundColor: '#4CAF50',
-    color: 'white',
-    padding: '16px',
-    textAlign: 'center',
-    fontWeight: 'bold',
-    fontSize: '16px',
-    position: 'sticky',
-    top: 0,
-    zIndex: 1000,
-    animation: 'slideDown 0.3s ease'
-  },
-  header: {
-    backgroundColor: '#1e1e1e',
-    padding: '30px 40px',
-    borderBottom: '2px solid #333'
-  },
-  headerContent: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '20px',
-    marginBottom: '8px'
-  },
-  title: {
-    margin: 0,
-    fontSize: '32px',
-    fontWeight: 'bold'
-  },
-  liveBadge: {
-    backgroundColor: '#ff0000',
-    color: 'white',
-    padding: '6px 16px',
-    borderRadius: '20px',
-    fontSize: '14px',
-    fontWeight: 'bold',
-    animation: 'pulse 2s infinite'
-  },
-  tournament: {
-    margin: 0,
-    color: '#888',
-    fontSize: '16px'
-  },
-  matchInfo: {
-    display: 'flex',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    padding: '40px',
-    backgroundColor: '#1e1e1e',
-    marginBottom: '30px'
-  },
-  team: {
-    textAlign: 'center',
-    flex: 1
-  },
-  teamName: {
-    fontSize: '28px',
-    margin: '0 0 20px 0',
-    fontWeight: 'bold'
-  },
-  scoreDisplay: {
-    fontSize: '72px',
-    fontWeight: 'bold',
-    color: '#4CAF50'
-  },
-  vsSection: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '16px',
-    padding: '0 40px'
-  },
-  vs: {
-    fontSize: '32px',
-    fontWeight: 'bold',
-    color: '#666'
-  },
-  roundInfo: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '8px',
-    fontSize: '16px',
-    color: '#aaa'
-  },
-  roundStatus: {
-    backgroundColor: '#4CAF50',
-    color: 'white',
-    padding: '6px 16px',
-    borderRadius: '16px',
-    fontSize: '13px',
-    fontWeight: 'bold'
-  },
-  timerSection: {
-    padding: '0 40px',
-    marginBottom: '30px'
-  },
-  arenaSection: {
-    padding: '0 40px',
-    marginBottom: '30px'
-  },
-  sectionTitle: {
-    fontSize: '24px',
-    marginBottom: '20px',
-    paddingBottom: '12px',
-    borderBottom: '2px solid #333'
-  },
-  leaderboardSection: {
-    padding: '0 40px'
-  },
-  footer: {
-    textAlign: 'center',
-    padding: '40px',
-    marginTop: '40px',
-    borderTop: '1px solid #333'
-  },
-  adminLink: {
-    color: '#4CAF50',
-    textDecoration: 'none',
-    fontSize: '14px',
-    fontWeight: 'bold'
-  }
 };
 
 export default PublicViewer;

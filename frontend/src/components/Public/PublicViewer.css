@@ -1,0 +1,221 @@
+/* Public Viewer - Indian Tricolor Theme */
+
+.public-viewer-container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #FFF9F0 0%, #F0F9F0 100%);
+  color: #222222;
+  padding-bottom: 40px;
+}
+
+.loading-public,
+.no-match-public {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #FFF9F0 0%, #F0F9F0 100%);
+  color: #222222;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.live-update-banner {
+  background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
+  color: white;
+  padding: 16px;
+  text-align: center;
+  fontWeight: bold;
+  font-size: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(255, 153, 51, 0.3);
+}
+
+.header-public {
+  background: linear-gradient(180deg,
+    #FF9933 0%, #FF9933 33%,
+    #FFFFFF 33%, #FFFFFF 66%,
+    #138808 66%, #138808 100%);
+  padding: 30px 40px;
+  border-bottom: 3px solid #FF9933;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.header-content-public {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 8px;
+}
+
+.title-public {
+  margin: 0;
+  font-size: 32px;
+  font-weight: bold;
+  background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.live-badge-public {
+  background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
+  color: white;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(255, 153, 51, 0.4);
+  animation: pulse-indian 2s infinite;
+}
+
+@keyframes pulse-indian {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 153, 51, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(255, 153, 51, 0);
+  }
+}
+
+.tournament-public {
+  margin: 0;
+  color: #000080;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.match-info-public {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 40px;
+  background: #FFFFFF;
+  margin-bottom: 30px;
+  border-radius: 16px;
+  margin: 30px 40px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  border: 2px solid #FF9933;
+  border-bottom: 4px solid #138808;
+}
+
+.team-public {
+  text-align: center;
+  flex: 1;
+}
+
+.team-name-public {
+  font-size: 28px;
+  margin: 0 0 20px 0;
+  font-weight: bold;
+  color: #222222;
+}
+
+.score-display-public {
+  font-size: 72px;
+  font-weight: bold;
+  background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.vs-section-public {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 0 40px;
+}
+
+.vs-public {
+  font-size: 32px;
+  font-weight: bold;
+  background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.round-info-public {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  color: #666666;
+}
+
+.round-status-public {
+  background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
+  color: white;
+  padding: 6px 16px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.timer-section-public,
+.arena-section-public {
+  padding: 0 40px;
+  margin-bottom: 30px;
+}
+
+.section-title-public {
+  font-size: 24px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 3px solid #FF9933;
+  color: #222222;
+  font-weight: 800;
+}
+
+.leaderboard-section-public {
+  padding: 0 40px;
+}
+
+.footer-public {
+  text-align: center;
+  padding: 40px;
+  margin-top: 40px;
+  border-top: 2px solid #FF9933;
+}
+
+.admin-link-public {
+  background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header-public {
+    padding: 20px;
+  }
+
+  .match-info-public {
+    flex-direction: column;
+    gap: 24px;
+    margin: 20px;
+    padding: 24px;
+  }
+
+  .title-public {
+    font-size: 24px;
+  }
+
+  .score-display-public {
+    font-size: 48px;
+  }
+
+  .timer-section-public,
+  .arena-section-public,
+  .leaderboard-section-public {
+    padding: 0 20px;
+  }
+}

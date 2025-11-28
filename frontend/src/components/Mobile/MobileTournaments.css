@@ -2,7 +2,7 @@
 
 .mobile-tournaments {
   min-height: 100vh;
-  background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+  background: linear-gradient(180deg, #FFF9F0 0%, #F0F9F0 100%);
   padding-bottom: 80px;
 }
 
@@ -29,10 +29,10 @@
 .filter-tab {
   flex-shrink: 0;
   padding: 8px 16px;
-  background: #1e293b;
-  border: 1px solid #334155;
+  background: #FFFFFF;
+  border: 2px solid #FF9933;
   border-radius: 20px;
-  color: #94a3b8;
+  color: #666666;
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
@@ -41,15 +41,15 @@
 }
 
 .filter-tab.active {
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
   border-color: transparent;
   color: white;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 2px 8px rgba(255, 153, 51, 0.4);
 }
 
 .filter-tab:hover:not(.active) {
-  background: #334155;
-  border-color: #475569;
+  background: #FFF9F0;
+  border-color: #FF9933;
 }
 
 /* Tournaments List */
@@ -62,11 +62,12 @@
 
 /* Tournament Card */
 .tournament-card {
-  background: #1e293b;
+  background: #FFFFFF;
   border-radius: 16px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border: 2px solid #FF9933;
+  border-bottom: 4px solid #138808;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
