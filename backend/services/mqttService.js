@@ -2,32 +2,61 @@
 const mqtt = require('mqtt');
 
 const MQTT_BROKER = process.env.MQTT_BROKER || 'mqtt://localhost:1883';
-const client = mqtt.connect(MQTT_BROKER);
+const MQTT_ENABLED = process.env.MQTT_ENABLED !== 'false'; // Enable by env variable
 
-client.on('connect', () => {
-  console.log('✅ MQTT Broker connected');
-  
-  // Subscribe to all drone status updates
-  client.subscribe('drone/+/status', (err) => {
-    if (!err) {
-      console.log('✅ Subscribed to drone status updates');
+let client = null;
+let isConnected = false;
+let connectionAttempted = false;
+
+// Only connect if MQTT is enabled
+if (MQTT_ENABLED) {
+  client = mqtt.connect(MQTT_BROKER, {
+    reconnectPeriod: 5000, // Try reconnect every 5 seconds
+    connectTimeout: 10000, // 10 second timeout
+  });
+
+  client.on('connect', () => {
+    isConnected = true;
+    connectionAttempted = true;
+    console.log('✅ MQTT Broker connected');
+
+    // Subscribe to all drone status updates
+    client.subscribe('drone/+/status', (err) => {
+      if (!err) {
+        console.log('✅ Subscribed to drone status updates');
+      }
+    });
+  });
+
+  client.on('message', (topic, message) => {
+    console.log(`📩 MQTT: ${topic} → ${message.toString()}`);
+  });
+
+  client.on('error', (error) => {
+    // Only log first error, then silence
+    if (!connectionAttempted) {
+      console.log('⚠️  MQTT Broker not available (ESP32 telemetry disabled)');
+      connectionAttempted = true;
     }
   });
-});
 
-client.on('message', (topic, message) => {
-  console.log(`📩 MQTT: ${topic} → ${message.toString()}`);
-});
-
-client.on('error', (error) => {
-  console.error('❌ MQTT Error:', error);
-});
+  client.on('offline', () => {
+    isConnected = false;
+  });
+} else {
+  console.log('ℹ️  MQTT disabled - ESP32 telemetry will not work');
+}
 
 // Send configuration to specific drone
 const configureDrone = (droneId, config) => {
+  if (!client || !isConnected) {
+    console.log(`⚠️  MQTT not connected - skipping config for ${droneId}`);
+    return;
+  }
+
   const topic = `drone/${droneId}/config`;
   const payload = JSON.stringify(config);
-  
+
   client.publish(topic, payload, { qos: 1 }, (err) => {
     if (err) {
       console.error(`❌ Failed to send config to ${droneId}:`, err);
@@ -39,9 +68,14 @@ const configureDrone = (droneId, config) => {
 
 // Send command to all drones
 const broadcastCommand = (command) => {
+  if (!client || !isConnected) {
+    console.log(`⚠️  MQTT not connected - skipping broadcast command`);
+    return;
+  }
+
   const topic = 'drone/all/command';
   const payload = JSON.stringify(command);
-  
+
   client.publish(topic, payload, { qos: 1 }, (err) => {
     if (err) {
       console.error('❌ Broadcast failed:', err);
