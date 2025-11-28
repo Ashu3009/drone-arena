@@ -1,34 +1,48 @@
 /**
- * Mobile Theme Configuration for DroneNova
- * Color palette, spacing, typography for mobile responsive design
+ * Mobile Theme Configuration for DroneNova 🇮🇳
+ * Indian Tricolor Inspired Theme
+ * Saffron (#FF9933) | White (#FFFFFF) | Green (#138808)
  */
 
 export const mobileTheme = {
-  // Primary brand colors
+  // Indian Flag Colors - Primary Brand 🇮🇳
   colors: {
-    primary: '#1e40af',        // Deep Blue
-    primaryLight: '#3b82f6',   // Light Blue
-    primaryDark: '#1e3a8a',    // Dark Blue
+    // Tricolor Theme
+    saffron: '#FF9933',        // Saffron - Courage & Sacrifice
+    saffronLight: '#FFB366',
+    saffronDark: '#E68A00',
 
-    secondary: '#f59e0b',      // Amber
-    secondaryLight: '#fbbf24', // Light Amber
-    secondaryDark: '#d97706',  // Dark Amber
+    white: '#FFFFFF',          // White - Peace & Truth
+    ashokChakra: '#000080',    // Ashok Chakra Blue
+
+    green: '#138808',          // Green - Growth & Prosperity
+    greenLight: '#16A30B',
+    greenDark: '#0F6B06',
+
+    // Primary (Saffron-based)
+    primary: '#FF9933',
+    primaryLight: '#FFB366',
+    primaryDark: '#E68A00',
+
+    // Secondary (Green-based)
+    secondary: '#138808',
+    secondaryLight: '#16A30B',
+    secondaryDark: '#0F6B06',
 
     // Status colors
-    success: '#10b981',        // Green
-    successLight: '#34d399',
-    warning: '#f59e0b',        // Amber
-    warningLight: '#fbbf24',
-    danger: '#ef4444',         // Red
-    dangerLight: '#f87171',
-    info: '#3b82f6',          // Blue
+    success: '#138808',        // Green
+    successLight: '#16A30B',
+    warning: '#FF9933',        // Saffron
+    warningLight: '#FFB366',
+    danger: '#DC143C',         // Crimson
+    dangerLight: '#F08080',
+    info: '#000080',          // Ashok Chakra Blue
 
     // Team colors
-    teamRed: '#dc2626',
-    teamBlue: '#2563eb',
+    teamRed: '#DC143C',
+    teamBlue: '#000080',
 
-    // Neutrals
-    white: '#ffffff',
+    // Neutrals (Light theme)
     black: '#000000',
     gray50: '#f9fafb',
     gray100: '#f3f4f6',
@@ -41,20 +55,22 @@ export const mobileTheme = {
     gray800: '#1f2937',
     gray900: '#111827',
 
-    // Background colors
-    background: '#0f172a',     // Dark Navy
-    backgroundLight: '#1e293b', // Lighter Navy
-    surface: '#1e293b',        // Card background
-    surfaceLight: '#334155',   // Lighter surface
+    // Background colors (Light theme for Android feel)
+    background: '#FFFFFF',     // Pure White
+    backgroundLight: '#FFF9F0', // Warm white
+    backgroundGreen: '#F0F9F0', // Cool white
+    surface: '#FFFFFF',        // Card background
+    surfaceLight: '#F5F5F5',   // Lighter surface
 
-    // Text colors
-    textPrimary: '#f1f5f9',    // Light text
-    textSecondary: '#cbd5e1',  // Medium text
-    textTertiary: '#94a3b8',   // Subtle text
+    // Text colors (Dark text on light bg)
+    textPrimary: '#222222',    // Dark text
+    textSecondary: '#666666',  // Medium text
+    textTertiary: '#999999',   // Light text
 
     // Border colors
-    border: '#334155',
-    borderLight: '#475569',
+    border: '#E5E7EB',
+    borderLight: '#F3F4F6',
+    borderDark: '#D1D5DB',
   },
 
   // Spacing scale (in pixels)
@@ -67,11 +83,11 @@ export const mobileTheme = {
     xxl: 48,
   },
 
-  // Typography
+  // Typography - Android Roboto style
   typography: {
     fontFamily: {
-      primary: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-      mono: 'Menlo, Monaco, Consolas, "Courier New", monospace',
+      primary: 'Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif',
+      mono: 'Roboto Mono, Menlo, Monaco, Consolas, "Courier New", monospace',
     },
     fontSize: {
       xs: '0.75rem',    // 12px
@@ -90,6 +106,7 @@ export const mobileTheme = {
       semibold: 600,
       bold: 700,
       extrabold: 800,
+      black: 900,
     },
     lineHeight: {
       tight: 1.2,
@@ -98,7 +115,7 @@ export const mobileTheme = {
     },
   },
 
-  // Border radius
+  // Border radius - Material Design style
   borderRadius: {
     none: '0',
     sm: '0.25rem',   // 4px
@@ -109,14 +126,25 @@ export const mobileTheme = {
     full: '9999px',  // Fully rounded
   },
 
-  // Shadows
+  // Shadows - Android Material Design Elevation
   shadows: {
-    sm: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-    base: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
-    md: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-    lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-    xl: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-    glow: '0 0 20px rgba(59, 130, 246, 0.5)',
+    // Standard shadows
+    sm: '0 2px 4px rgba(0, 0, 0, 0.1)',
+    base: '0 4px 8px rgba(0, 0, 0, 0.12)',
+    md: '0 4px 12px rgba(0, 0, 0, 0.15)',
+    lg: '0 8px 24px rgba(0, 0, 0, 0.2)',
+    xl: '0 12px 32px rgba(0, 0, 0, 0.25)',
+
+    // Material Elevation levels
+    elevation1: '0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)',
+    elevation2: '0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)',
+    elevation3: '0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23)',
+    elevation4: '0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22)',
+    elevation5: '0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22)',
+
+    // Tricolor glow
+    saffronGlow: '0 0 20px rgba(255, 153, 51, 0.5)',
+    greenGlow: '0 0 20px rgba(19, 136, 8, 0.5)',
   },
 
   // Z-index layers
@@ -130,11 +158,11 @@ export const mobileTheme = {
     toast: 600,
   },
 
-  // Transitions
+  // Transitions - Material Design timing
   transitions: {
-    fast: '150ms ease-in-out',
-    base: '200ms ease-in-out',
-    slow: '300ms ease-in-out',
+    fast: '150ms cubic-bezier(0.4, 0, 0.2, 1)',
+    base: '200ms cubic-bezier(0.4, 0, 0.2, 1)',
+    slow: '300ms cubic-bezier(0.4, 0, 0.2, 1)',
   },
 
   // Breakpoints
@@ -143,6 +171,14 @@ export const mobileTheme = {
     tablet: '768px',
     desktop: '1024px',
     wide: '1280px',
+  },
+
+  // Gradients - Indian Theme
+  gradients: {
+    tricolor: 'linear-gradient(135deg, #FF9933 0%, #FFFFFF 50%, #138808 100%)',
+    saffron: 'linear-gradient(135deg, #FF9933 0%, #FFB366 100%)',
+    green: 'linear-gradient(135deg, #0F6B06 0%, #138808 100%)',
+    saffronGreen: 'linear-gradient(135deg, #FF9933 0%, #138808 100%)',
   },
 };
 

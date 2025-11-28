@@ -23,6 +23,7 @@ import {
 
 import './App.css';
 import './styles/mobileResponsive.css';
+import './styles/indianTheme.css';
 
 function App() {
   return (

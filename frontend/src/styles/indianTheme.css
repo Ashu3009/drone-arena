@@ -1,0 +1,341 @@
+/**
+ * Indian Tricolor Theme for DroneNova 🇮🇳
+ * Saffron (#FF9933) | White (#FFFFFF) | Green (#138808)
+ */
+
+:root {
+  /* Indian Flag Colors */
+  --india-saffron: #FF9933;
+  --india-white: #FFFFFF;
+  --india-green: #138808;
+  --ashok-chakra: #000080;
+
+  /* Gradient Combinations */
+  --tricolor-gradient: linear-gradient(135deg, #FF9933 0%, #FFFFFF 50%, #138808 100%);
+  --saffron-gradient: linear-gradient(135deg, #FF9933 0%, #FFB366 100%);
+  --green-gradient: linear-gradient(135deg, #0F6B06 0%, #138808 100%);
+
+  /* Light Theme Background */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F5F5F5;
+  --bg-tertiary: #FFF9F0;
+
+  /* Text Colors */
+  --text-primary: #222222;
+  --text-secondary: #666666;
+  --text-tertiary: #999999;
+
+  /* Card Shadows - Material Design */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
+  --shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.25);
+
+  /* Elevation Shadows (Android Material) */
+  --elevation-1: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  --elevation-2: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  --elevation-3: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  --elevation-4: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+  --elevation-5: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
+}
+
+/* Global Light Theme Override */
+.mobile-home,
+.mobile-leaderboard,
+.mobile-tournaments {
+  background: linear-gradient(180deg, #FFF9F0 0%, #F0F9F0 100%) !important;
+  color: var(--text-primary);
+}
+
+/* Hero Section - Tricolor Header */
+.hero-section {
+  position: relative;
+  background: linear-gradient(180deg,
+    var(--india-saffron) 0%,
+    var(--india-saffron) 30%,
+    var(--india-white) 30%,
+    var(--india-white) 70%,
+    var(--india-green) 70%,
+    var(--india-green) 100%) !important;
+  padding: 48px 20px 32px;
+  text-align: center;
+  overflow: hidden;
+  box-shadow: var(--elevation-2);
+}
+
+.hero-pattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.92) !important;
+}
+
+.hero-title {
+  background: linear-gradient(135deg, var(--india-saffron) 0%, var(--india-green) 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  font-weight: 900 !important;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.hero-subtitle {
+  color: var(--ashok-chakra) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.15em !important;
+}
+
+/* Card Styles - Material Design */
+.match-card,
+.tournament-card,
+.ranking-card,
+.stat-card {
+  background: var(--bg-primary) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--elevation-2) !important;
+  border: 2px solid var(--india-saffron) !important;
+  border-bottom: 4px solid var(--india-green) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.match-card:active,
+.tournament-card:active,
+.ranking-card:active {
+  box-shadow: var(--elevation-4) !important;
+  transform: translateY(-2px);
+}
+
+/* Section Titles */
+.section-title {
+  color: var(--text-primary) !important;
+  font-weight: 800 !important;
+}
+
+/* Status Badges - Indian Theme */
+.status-badge,
+.live-badge,
+.round-info {
+  background: linear-gradient(135deg, var(--india-saffron) 0%, var(--india-green) 100%) !important;
+  color: white !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 8px rgba(255, 153, 51, 0.4) !important;
+  border: none !important;
+}
+
+.tournament-status-badge {
+  background: linear-gradient(135deg, var(--india-saffron) 0%, var(--india-green) 100%) !important;
+  border: 2px solid white !important;
+}
+
+/* Team Sections */
+.team-section {
+  background: #F8F9FA !important;
+  box-shadow: var(--elevation-1) !important;
+}
+
+.team-name {
+  color: var(--text-primary) !important;
+}
+
+.team-score {
+  background: linear-gradient(135deg, var(--india-saffron) 0%, var(--india-green) 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  filter: drop-shadow(0 2px 4px rgba(255, 153, 51, 0.3));
+}
+
+/* VS Circle - Tricolor */
+.vs-circle {
+  background: linear-gradient(135deg, var(--india-saffron) 0%, var(--india-green) 100%) !important;
+  border: 3px solid white !important;
+  box-shadow: var(--elevation-3) !important;
+  font-weight: 900 !important;
+}
+
+/* Bottom Navigation - Material Design */
+.bottom-nav {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, #FFFFFF 100%) !important;
+  border-top: 3px solid var(--india-saffron) !important;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1) !important;
+}
+
+.nav-item.active .nav-label {
+  color: var(--india-saffron) !important;
+}
+
+.nav-item.active .icon-emoji {
+  filter: drop-shadow(0 0 8px rgba(255, 153, 51, 0.6)) !important;
+}
+
+.active-dot {
+  background: var(--india-saffron) !important;
+  box-shadow: 0 0 8px rgba(255, 153, 51, 0.8) !important;
+}
+
+/* Header - Tricolor Top Bar */
+.mobile-header {
+  background: linear-gradient(180deg,
+    var(--india-saffron) 0%,
+    var(--india-saffron) 33%,
+    var(--india-white) 33%,
+    var(--india-white) 66%,
+    var(--india-green) 66%,
+    var(--india-green) 100%) !important;
+  border-bottom: 2px solid var(--india-saffron) !important;
+  box-shadow: var(--elevation-2) !important;
+}
+
+.mobile-header.scrolled {
+  background: rgba(255, 255, 255, 0.98) !important;
+  border-bottom: 3px solid var(--india-saffron) !important;
+  box-shadow: var(--elevation-3) !important;
+}
+
+.logo-icon {
+  background: linear-gradient(135deg, var(--india-saffron) 0%, var(--india-green) 100%) !important;
+  box-shadow: 0 4px 12px rgba(255, 153, 51, 0.5) !important;
+}
+
+.logo-brand {
+  background: linear-gradient(135deg, var(--india-saffron) 0%, var(--india-green) 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  font-weight: 900 !important;
+}
+
+.logo-tagline {
+  color: var(--ashok-chakra) !important;
+  font-weight: 700 !important;
+}
+
+/* Buttons - Indian Theme */
+button,
+.btn,
+.tournament-action-btn,
+.sort-btn.active,
+.filter-tab.active {
+  background: linear-gradient(135deg, var(--india-saffron) 0%, var(--india-green) 100%) !important;
+  color: white !important;
+  border: none !important;
+  box-shadow: var(--elevation-2) !important;
+  font-weight: 700 !important;
+}
+
+button:active,
+.btn:active,
+.tournament-action-btn:active {
+  box-shadow: var(--elevation-4) !important;
+  transform: translateY(-2px);
+}
+
+/* Stats Cards */
+.stat-value,
+.summary-value,
+.podium-stat-value {
+  background: linear-gradient(135deg, var(--india-saffron) 0%, var(--india-green) 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+/* Podium - Indian Colors */
+.podium-item.first::before {
+  background: linear-gradient(90deg, var(--india-saffron) 0%, var(--india-green) 100%) !important;
+}
+
+.podium-item.second::before {
+  background: var(--india-saffron) !important;
+}
+
+.podium-item.third::before {
+  background: var(--india-green) !important;
+}
+
+/* Loading Spinner */
+.spinner {
+  border-top-color: var(--india-saffron) !important;
+}
+
+/* No Match/Tournament Cards */
+.no-match-card,
+.no-tournaments-card {
+  background: var(--bg-primary) !important;
+  border: 2px dashed var(--india-saffron) !important;
+  box-shadow: var(--elevation-1) !important;
+}
+
+.no-match-title,
+.no-tournaments-title {
+  color: var(--text-primary) !important;
+}
+
+.no-match-text,
+.no-tournaments-text {
+  color: var(--text-secondary) !important;
+}
+
+/* Menu Content */
+.menu-content {
+  background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%) !important;
+}
+
+.user-avatar {
+  background: linear-gradient(135deg, var(--india-saffron) 0%, var(--india-green) 100%) !important;
+  box-shadow: var(--elevation-2) !important;
+}
+
+.user-name {
+  color: var(--text-primary) !important;
+}
+
+/* Tournament Tags */
+.tournament-tag {
+  background: linear-gradient(135deg, rgba(255, 153, 51, 0.1) 0%, rgba(19, 136, 8, 0.1) 100%) !important;
+  border: 2px solid var(--india-saffron) !important;
+  color: var(--india-green) !important;
+  font-weight: 700 !important;
+}
+
+/* Progress Bars */
+.progress-fill {
+  background: linear-gradient(90deg, var(--india-saffron) 0%, var(--india-green) 100%) !important;
+}
+
+/* Android Material Ripple Effect */
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.nav-ripple {
+  background: radial-gradient(circle, rgba(255, 153, 51, 0.4) 0%, transparent 70%) !important;
+}
+
+/* Feature Items */
+.feature-item {
+  background: var(--bg-primary) !important;
+  box-shadow: var(--elevation-1) !important;
+  border-left: 4px solid var(--india-saffron) !important;
+}
+
+.feature-title {
+  color: var(--text-primary) !important;
+}
+
+.feature-description {
+  color: var(--text-secondary) !important;
+}
+
+/* Responsive Text Colors */
+@media (max-width: 768px) {
+  body {
+    background: var(--bg-tertiary) !important;
+    color: var(--text-primary) !important;
+  }
+}
