@@ -8,6 +8,8 @@ import {
   getTournamentById
 } from '../../services/api';
 
+const BACKEND_URL = process.env.REACT_APP_API_URL || '${BACKEND_URL}';
+
 const TournamentManagement = ({ tournament: initialTournament, teams, onClose, onUpdate }) => {
   const [tournament, setTournament] = useState(initialTournament);
   const [loading, setLoading] = useState(false);
@@ -217,7 +219,7 @@ const TournamentManagement = ({ tournament: initialTournament, teams, onClose, o
                 <div style={styles.currentBanner}>
                   <p style={styles.label}>Current Banner:</p>
                   <img
-                    src={`http://localhost:5000${tournament.media.bannerImage}`}
+                    src={`${BACKEND_URL}${tournament.media.bannerImage}`}
                     alt="Current Banner"
                     style={styles.bannerPreview}
                   />
@@ -259,7 +261,7 @@ const TournamentManagement = ({ tournament: initialTournament, teams, onClose, o
                     {tournament.media.gallery.map((image, index) => (
                       <div key={index} style={styles.galleryItem}>
                         <img
-                          src={`http://localhost:5000${image}`}
+                          src={`${BACKEND_URL}${image}`}
                           alt={`Gallery ${index + 1}`}
                           style={styles.galleryImage}
                         />
@@ -370,7 +372,7 @@ const TournamentManagement = ({ tournament: initialTournament, teams, onClose, o
                   <div style={styles.motPreview}>
                     {tournament.manOfTheTournament.photo && (
                       <img
-                        src={`http://localhost:5000${tournament.manOfTheTournament.photo}`}
+                        src={`${BACKEND_URL}${tournament.manOfTheTournament.photo}`}
                         alt={tournament.manOfTheTournament.playerName}
                         style={styles.motPhotoPreview}
                       />

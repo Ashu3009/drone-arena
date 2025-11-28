@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import { getTournamentById, getMatches } from '../../services/api';
 import './TournamentDetail.css';
 
+const BACKEND_URL = process.env.REACT_APP_API_URL || '${BACKEND_URL}';
+
 const TournamentDetail = () => {
   const { id } = useParams();
   const [tournament, setTournament] = useState(null);
@@ -87,7 +89,7 @@ const TournamentDetail = () => {
       <div className="tournament-detail-header">
         {tournament.media?.bannerImage ? (
           <img
-            src={`http://localhost:5000${tournament.media.bannerImage}`}
+            src={`${BACKEND_URL}${tournament.media.bannerImage}`}
             alt={tournament.name}
             className="tournament-detail-banner"
           />
@@ -207,7 +209,7 @@ const TournamentDetail = () => {
               <div className="tournament-mot-card">
                 {tournament.manOfTheTournament.photo && (
                   <img
-                    src={`http://localhost:5000${tournament.manOfTheTournament.photo}`}
+                    src={`${BACKEND_URL}${tournament.manOfTheTournament.photo}`}
                     alt={tournament.manOfTheTournament.playerName}
                     className="tournament-mot-photo"
                   />
@@ -312,7 +314,7 @@ const TournamentDetail = () => {
                         <div className="tournament-mom-content">
                           {match.manOfTheMatch.photo && (
                             <img
-                              src={`http://localhost:5000${match.manOfTheMatch.photo}`}
+                              src={`${BACKEND_URL}${match.manOfTheMatch.photo}`}
                               alt={match.manOfTheMatch.playerName}
                               className="tournament-mom-photo-small"
                             />
@@ -383,7 +385,7 @@ const TournamentDetail = () => {
                       <h3 className="tournament-award-title">Best Forward</h3>
                       {tournament.awards.bestForward.photo ? (
                         <img
-                          src={`http://localhost:5000${tournament.awards.bestForward.photo}`}
+                          src={`${BACKEND_URL}${tournament.awards.bestForward.photo}`}
                           alt={tournament.awards.bestForward.playerName}
                           className="tournament-award-photo"
                         />
@@ -412,7 +414,7 @@ const TournamentDetail = () => {
                       <h3 className="tournament-award-title">Best Center</h3>
                       {tournament.awards.bestCenter.photo ? (
                         <img
-                          src={`http://localhost:5000${tournament.awards.bestCenter.photo}`}
+                          src={`${BACKEND_URL}${tournament.awards.bestCenter.photo}`}
                           alt={tournament.awards.bestCenter.playerName}
                           className="tournament-award-photo"
                         />
@@ -441,7 +443,7 @@ const TournamentDetail = () => {
                       <h3 className="tournament-award-title">Best Defender</h3>
                       {tournament.awards.bestDefender.photo ? (
                         <img
-                          src={`http://localhost:5000${tournament.awards.bestDefender.photo}`}
+                          src={`${BACKEND_URL}${tournament.awards.bestDefender.photo}`}
                           alt={tournament.awards.bestDefender.playerName}
                           className="tournament-award-photo"
                         />
@@ -470,7 +472,7 @@ const TournamentDetail = () => {
                       <h3 className="tournament-award-title">Best Keeper</h3>
                       {tournament.awards.bestKeeper.photo ? (
                         <img
-                          src={`http://localhost:5000${tournament.awards.bestKeeper.photo}`}
+                          src={`${BACKEND_URL}${tournament.awards.bestKeeper.photo}`}
                           alt={tournament.awards.bestKeeper.playerName}
                           className="tournament-award-photo"
                         />
@@ -554,7 +556,7 @@ const TournamentDetail = () => {
                 {tournament.media.gallery.map((image, index) => (
                   <div key={index} className="tournament-gallery-item">
                     <img
-                      src={`http://localhost:5000${image}`}
+                      src={`${BACKEND_URL}${image}`}
                       alt={`Gallery ${index + 1}`}
                       className="tournament-gallery-image"
                     />
@@ -602,7 +604,7 @@ const TournamentDetail = () => {
                   <div key={index} className="tournament-member-card">
                     {member.photo ? (
                       <img
-                        src={`http://localhost:5000${member.photo}`}
+                        src={`${BACKEND_URL}${member.photo}`}
                         alt={member.name}
                         className="tournament-member-photo"
                       />

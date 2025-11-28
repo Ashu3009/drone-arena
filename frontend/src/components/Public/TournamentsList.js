@@ -4,6 +4,8 @@ import { getTournaments } from '../../services/api';
 import indiaCitiesData from '../../data/india-cities.json';
 import './TournamentsList.css';
 
+const BACKEND_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
 const TournamentsList = () => {
   const navigate = useNavigate();
   const [tournaments, setTournaments] = useState([]);
@@ -251,7 +253,7 @@ const TournamentsList = () => {
             >
               {tournament.media?.bannerImage ? (
                 <img
-                  src={`http://localhost:5000${tournament.media.bannerImage}`}
+                  src={`${BACKEND_URL}${tournament.media.bannerImage}`}
                   alt={tournament.name}
                   className="tournament-card-banner"
                 />
