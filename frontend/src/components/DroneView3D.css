@@ -1,0 +1,528 @@
+/* DroneView3D - Indian Tricolor Theme - Drone Soccer Arena */
+
+.drone-view-container {
+  padding: 20px;
+  background: linear-gradient(135deg, #FFF9F0 0%, #F0F9F0 100%);
+  border-radius: 12px;
+  color: #222;
+  margin: 20px 0;
+  border: 2px solid #FF9933;
+  border-bottom: 4px solid #138808;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  position: relative;
+  overflow: hidden;
+}
+
+.drone-view-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #FF9933;
+}
+
+.drone-view-title {
+  margin: 0;
+  font-size: 20px;
+  color: #222;
+  font-weight: bold;
+  background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.drone-view-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.status-live {
+  color: #4CAF50;
+  font-size: 12px;
+  font-weight: bold;
+  animation: pulse 2s infinite;
+}
+
+.status-offline {
+  color: #f44336;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.status-drones {
+  font-size: 12px;
+  color: #666;
+  font-weight: 600;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.drone-view-no-data {
+  padding: 60px 40px;
+  text-align: center;
+  color: #666;
+  background: #FFFFFF;
+  border-radius: 12px;
+  border: 2px dashed #FF9933;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+
+.drone-view-no-data p {
+  margin: 10px 0;
+  font-size: 16px;
+}
+
+/* 3D Drone Soccer Arena Container */
+.arena-3d-wrapper {
+  perspective: 900px;
+  width: 100%;
+  max-width: 650px;
+  height: 420px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px auto;
+  position: relative;
+  background: linear-gradient(180deg,
+    rgba(255, 153, 51, 0.05) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(19, 136, 8, 0.05) 100%);
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 30px;
+}
+
+.arena-3d-scene {
+  width: 480px;
+  height: 240px;
+  position: relative;
+  transform-style: preserve-3d;
+  transform: rotateX(-25deg) rotateY(0deg);
+  margin: 0 auto;
+}
+
+/* Remove heavy animation */
+@keyframes slowSpin {
+  0% {
+    transform: rotateX(-25deg) rotateY(-15deg);
+  }
+  100% {
+    transform: rotateX(-25deg) rotateY(15deg);
+  }
+}
+
+/* Arena Floor - Seedha */
+.arena-floor {
+  position: absolute;
+  width: 480px;
+  height: 240px;
+  top: 0;
+  left: 0;
+  background: linear-gradient(135deg,
+    rgba(255, 153, 51, 0.1) 0%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(19, 136, 8, 0.1) 100%);
+  transform: rotateX(90deg) translateZ(-60px);
+  border: 4px solid #138808;
+  box-shadow:
+    inset 0 0 100px rgba(255, 153, 51, 0.2),
+    0 20px 60px rgba(0, 0, 0, 0.3);
+  background-image:
+    repeating-linear-gradient(0deg,
+      rgba(255, 153, 51, 0.3) 0px,
+      transparent 3px,
+      transparent 48px,
+      rgba(255, 153, 51, 0.3) 51px),
+    repeating-linear-gradient(90deg,
+      rgba(19, 136, 8, 0.3) 0px,
+      transparent 3px,
+      transparent 48px,
+      rgba(19, 136, 8, 0.3) 51px);
+}
+
+/* Scoring Rings - 2 Vertical Hoops (Standing upright) */
+.scoring-ring {
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  border: 7px solid;
+  border-radius: 50%;
+  transform-style: preserve-3d;
+}
+
+.scoring-ring-left {
+  left: 20%;
+  top: 50%;
+  /* Angled at 50deg for better visibility from camera */
+  transform: translate(-50%, -50%) rotateY(50deg) rotateX(0deg) translateZ(30px);
+  border-color: #FF9933;
+  box-shadow:
+    0 0 50px rgba(255, 153, 51, 1),
+    inset 0 0 35px rgba(255, 153, 51, 0.7);
+  animation: ringGlowLeft 3s ease-in-out infinite;
+  z-index: 10;
+}
+
+.scoring-ring-right {
+  right: 20%;
+  top: 50%;
+  /* Angled at -50deg for better visibility from camera */
+  transform: translate(50%, -50%) rotateY(-50deg) rotateX(0deg) translateZ(30px);
+  border-color: #138808;
+  box-shadow:
+    0 0 50px rgba(19, 136, 8, 1),
+    inset 0 0 35px rgba(19, 136, 8, 0.7);
+  animation: ringGlowRight 3s ease-in-out infinite;
+  animation-delay: 1.5s;
+  z-index: 10;
+}
+
+@keyframes ringGlowLeft {
+  0%, 100% {
+    opacity: 0.75;
+    box-shadow:
+      0 0 30px rgba(255, 153, 51, 0.7),
+      inset 0 0 20px rgba(255, 153, 51, 0.4);
+  }
+  50% {
+    opacity: 1;
+    box-shadow:
+      0 0 50px rgba(255, 153, 51, 1),
+      inset 0 0 30px rgba(255, 153, 51, 0.6);
+  }
+}
+
+@keyframes ringGlowRight {
+  0%, 100% {
+    opacity: 0.75;
+    box-shadow:
+      0 0 30px rgba(19, 136, 8, 0.7),
+      inset 0 0 20px rgba(19, 136, 8, 0.4);
+  }
+  50% {
+    opacity: 1;
+    box-shadow:
+      0 0 50px rgba(19, 136, 8, 1),
+      inset 0 0 30px rgba(19, 136, 8, 0.6);
+  }
+}
+
+/* Arena Walls - Box */
+.arena-wall {
+  position: absolute;
+  background: linear-gradient(135deg,
+    rgba(255, 153, 51, 0.08) 0%,
+    rgba(19, 136, 8, 0.08) 100%);
+  border: 3px solid rgba(255, 153, 51, 0.5);
+  box-shadow: inset 0 0 30px rgba(255, 153, 51, 0.12);
+}
+
+.arena-wall-front {
+  width: 480px;
+  height: 80px;
+  bottom: 0;
+  transform: translateZ(120px) translateY(40px);
+  border-bottom: 3px solid #FF9933;
+}
+
+.arena-wall-back {
+  width: 480px;
+  height: 80px;
+  bottom: 0;
+  transform: translateZ(-120px) rotateY(180deg) translateY(40px);
+  border-bottom: 3px solid #138808;
+}
+
+.arena-wall-left {
+  width: 240px;
+  height: 80px;
+  bottom: 0;
+  left: 0;
+  transform: rotateY(-90deg) translateZ(240px) translateY(40px);
+  border-bottom: 3px solid #FF9933;
+}
+
+.arena-wall-right {
+  width: 240px;
+  height: 80px;
+  bottom: 0;
+  right: 0;
+  transform: rotateY(90deg) translateZ(240px) translateY(40px);
+  border-bottom: 3px solid #138808;
+}
+
+/* Lighting Effects - Simplified */
+.arena-light {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+.arena-light-1 {
+  top: 20%;
+  left: 20%;
+  background: radial-gradient(circle, rgba(255, 153, 51, 0.4) 0%, transparent 70%);
+}
+
+.arena-light-2 {
+  top: 20%;
+  right: 20%;
+  background: radial-gradient(circle, rgba(19, 136, 8, 0.4) 0%, transparent 70%);
+}
+
+.arena-light-3 {
+  bottom: 20%;
+  left: 25%;
+  background: radial-gradient(circle, rgba(255, 153, 51, 0.4) 0%, transparent 70%);
+}
+
+.arena-light-4 {
+  bottom: 20%;
+  right: 25%;
+  background: radial-gradient(circle, rgba(19, 136, 8, 0.4) 0%, transparent 70%);
+}
+
+/* Remove heavy float animation */
+@keyframes floatLight {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Info Panel */
+.drone-view-info-panel {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.drone-view-info-card {
+  padding: 10px 16px;
+  background: #FFFFFF;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #444;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  transition: all 0.3s ease;
+}
+
+.drone-view-info-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.16), 0 3px 8px rgba(0, 0, 0, 0.23);
+  border-color: #FF9933;
+}
+
+.drone-view-info-card strong {
+  color: #FF9933;
+  margin-right: 4px;
+}
+
+/* Legend */
+.drone-view-legend {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 2px solid #E5E7EB;
+}
+
+.drone-view-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #444;
+  font-weight: 600;
+}
+
+.drone-view-legend-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #333;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Ready Status Badge */
+.arena-ready-badge {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
+  color: white;
+  padding: 14px 28px;
+  border-radius: 50px;
+  font-size: 20px;
+  font-weight: bold;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  animation: badgePulse 2.5s ease-in-out infinite;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes badgePulse {
+  0%, 100% {
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    transform: translateX(-50%) scale(1.08);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .drone-view-container {
+    padding: 16px;
+    margin: 16px 0;
+  }
+
+  .drone-view-title {
+    font-size: 16px;
+  }
+
+  .arena-3d-wrapper {
+    height: 380px;
+    max-width: 550px;
+    padding: 25px;
+  }
+
+  .arena-3d-scene {
+    width: 400px;
+    height: 200px;
+  }
+
+  .arena-floor {
+    width: 400px;
+    height: 200px;
+  }
+
+  .arena-wall-front,
+  .arena-wall-back {
+    width: 400px;
+    height: 70px;
+    transform: translateZ(100px) translateY(35px);
+  }
+
+  .arena-wall-back {
+    transform: translateZ(-100px) rotateY(180deg) translateY(35px);
+  }
+
+  .arena-wall-left,
+  .arena-wall-right {
+    width: 200px;
+    height: 70px;
+  }
+
+  .arena-wall-left {
+    transform: rotateY(-90deg) translateZ(200px) translateY(35px);
+  }
+
+  .arena-wall-right {
+    transform: rotateY(90deg) translateZ(200px) translateY(35px);
+  }
+
+  .scoring-ring-left,
+  .scoring-ring-right {
+    width: 75px;
+    height: 75px;
+  }
+
+  .arena-ready-badge {
+    font-size: 16px;
+    padding: 10px 20px;
+  }
+
+  .drone-view-info-panel {
+    gap: 8px;
+  }
+
+  .drone-view-info-card {
+    font-size: 11px;
+    padding: 8px 12px;
+  }
+
+  .drone-view-legend {
+    gap: 16px;
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .arena-3d-wrapper {
+    height: 300px;
+    max-width: 400px;
+    padding: 20px;
+  }
+
+  .arena-3d-scene {
+    width: 300px;
+    height: 150px;
+  }
+
+  .arena-floor {
+    width: 300px;
+    height: 150px;
+  }
+
+  .arena-wall-front,
+  .arena-wall-back {
+    width: 300px;
+    height: 60px;
+  }
+
+  .arena-wall-front {
+    transform: translateZ(75px) translateY(30px);
+  }
+
+  .arena-wall-back {
+    transform: translateZ(-75px) rotateY(180deg) translateY(30px);
+  }
+
+  .arena-wall-left,
+  .arena-wall-right {
+    width: 150px;
+    height: 60px;
+  }
+
+  .arena-wall-left {
+    transform: rotateY(-90deg) translateZ(150px) translateY(30px);
+  }
+
+  .arena-wall-right {
+    transform: rotateY(90deg) translateZ(150px) translateY(30px);
+  }
+
+  .scoring-ring-left,
+  .scoring-ring-right {
+    width: 60px;
+    height: 60px;
+  }
+
+  .arena-ready-badge {
+    font-size: 14px;
+    padding: 8px 16px;
+    bottom: 20px;
+  }
+}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { getTournamentById, getMatches } from '../../services/api';
+import './TournamentDetail.css';
 
 const TournamentDetail = () => {
   const { id } = useParams();
@@ -66,190 +67,194 @@ const TournamentDetail = () => {
 
   if (loading) {
     return (
-      <div style={styles.container}>
-        <div style={styles.loading}>Loading tournament details...</div>
+      <div className="tournament-detail-container">
+        <div className="tournament-detail-loading">Loading tournament details...</div>
       </div>
     );
   }
 
   if (!tournament) {
     return (
-      <div style={styles.container}>
-        <div style={styles.error}>Tournament not found</div>
+      <div className="tournament-detail-container">
+        <div className="tournament-detail-error">Tournament not found</div>
       </div>
     );
   }
 
   return (
-    <div style={styles.container}>
+    <div className="tournament-detail-container">
       {/* Header */}
-      <div style={styles.header}>
-        {tournament.media?.bannerImage && (
+      <div className="tournament-detail-header">
+        {tournament.media?.bannerImage ? (
           <img
             src={`http://localhost:5000${tournament.media.bannerImage}`}
             alt={tournament.name}
-            style={styles.banner}
+            className="tournament-detail-banner"
           />
+        ) : (
+          <div className="tournament-detail-banner-placeholder">
+            🚁
+          </div>
         )}
-        <div style={styles.headerContent}>
-          <h1 style={styles.title}>{tournament.name}</h1>
-          <div style={styles.headerInfo}>
-            <span style={styles.location}>
-              Location: {tournament.location?.city}, {tournament.location?.state}
+        <div className="tournament-detail-header-content">
+          <h1 className="tournament-detail-title">{tournament.name}</h1>
+          <div className="tournament-detail-header-info">
+            <span className="tournament-detail-location">
+              📍 {tournament.location?.city}, {tournament.location?.state}
             </span>
-            <span style={styles.dates}>
-              {new Date(tournament.startDate).toLocaleDateString()} - {new Date(tournament.endDate).toLocaleDateString()}
+            <span className="tournament-detail-dates">
+              📅 {new Date(tournament.startDate).toLocaleDateString()} - {new Date(tournament.endDate).toLocaleDateString()}
             </span>
-            <span style={{...styles.status, backgroundColor: tournament.status === 'completed' ? '#4CAF50' : '#FF9800'}}>
+            <span className="tournament-detail-status" style={{backgroundColor: tournament.status === 'completed' ? '#4CAF50' : '#FF9800'}}>
               {tournament.status || 'Upcoming'}
             </span>
           </div>
           {tournament.description && (
-            <p style={styles.description}>{tournament.description}</p>
+            <p className="tournament-detail-description">{tournament.description}</p>
           )}
         </div>
       </div>
 
       {/* Tabs */}
-      <div style={styles.tabsContainer}>
+      <div className="tournament-detail-tabs-container">
         <button
           onClick={() => setActiveTab('overview')}
-          style={activeTab === 'overview' ? styles.tabActive : styles.tab}
+          className={activeTab === 'overview' ? 'tournament-detail-tab-active' : 'tournament-detail-tab'}
         >
           Overview
         </button>
         <button
           onClick={() => setActiveTab('matches')}
-          style={activeTab === 'matches' ? styles.tabActive : styles.tab}
+          className={activeTab === 'matches' ? 'tournament-detail-tab-active' : 'tournament-detail-tab'}
         >
           Matches ({matches.length})
         </button>
         <button
           onClick={() => setActiveTab('teams')}
-          style={activeTab === 'teams' ? styles.tabActive : styles.tab}
+          className={activeTab === 'teams' ? 'tournament-detail-tab-active' : 'tournament-detail-tab'}
         >
           Teams ({tournament.registeredTeams?.length || 0})
         </button>
         <button
           onClick={() => setActiveTab('awards')}
-          style={activeTab === 'awards' ? styles.tabActive : styles.tab}
+          className={activeTab === 'awards' ? 'tournament-detail-tab-active' : 'tournament-detail-tab'}
         >
           Awards
         </button>
         <button
           onClick={() => setActiveTab('gallery')}
-          style={activeTab === 'gallery' ? styles.tabActive : styles.tab}
+          className={activeTab === 'gallery' ? 'tournament-detail-tab-active' : 'tournament-detail-tab'}
         >
           Gallery ({tournament.media?.gallery?.length || 0})
         </button>
       </div>
 
       {/* Tab Content */}
-      <div style={styles.tabContent}>
+      <div className="tournament-detail-tab-content">
         {/* OVERVIEW TAB */}
         {activeTab === 'overview' && (
           <div>
-            <h2 style={styles.sectionTitle}>Champions</h2>
+            <h2 className="tournament-detail-section-title">🏆 Champions</h2>
             {tournament.winners?.champion || tournament.winners?.runnerUp || tournament.winners?.thirdPlace ? (
-              <div style={styles.winnersGrid}>
+              <div className="tournament-winners-grid">
                 {tournament.winners.champion && (
                   <div
-                    style={{...styles.winnerCard, cursor: 'pointer'}}
+                    className="tournament-winner-card"
                     onClick={() => handleOpenTeamModal(tournament.winners.champion)}
                   >
-                    <div style={styles.medal}>🥇</div>
-                    <h3 style={styles.winnerTitle}>Champion</h3>
-                    <p style={styles.winnerTeam}>
+                    <div className="tournament-winner-medal">🥇</div>
+                    <h3 className="tournament-winner-title">Champion</h3>
+                    <p className="tournament-winner-team">
                       {tournament.winners.champion.name || 'TBD'}
                     </p>
-                    <p style={styles.clickHint}>Click to view team details</p>
+                    <p className="tournament-winner-click-hint">Click to view team details</p>
                   </div>
                 )}
                 {tournament.winners.runnerUp && (
                   <div
-                    style={{...styles.winnerCard, cursor: 'pointer'}}
+                    className="tournament-winner-card"
                     onClick={() => handleOpenTeamModal(tournament.winners.runnerUp)}
                   >
-                    <div style={styles.medal}>🥈</div>
-                    <h3 style={styles.winnerTitle}>Runner Up</h3>
-                    <p style={styles.winnerTeam}>
+                    <div className="tournament-winner-medal">🥈</div>
+                    <h3 className="tournament-winner-title">Runner Up</h3>
+                    <p className="tournament-winner-team">
                       {tournament.winners.runnerUp.name || 'TBD'}
                     </p>
-                    <p style={styles.clickHint}>Click to view team details</p>
+                    <p className="tournament-winner-click-hint">Click to view team details</p>
                   </div>
                 )}
                 {tournament.winners.thirdPlace && (
                   <div
-                    style={{...styles.winnerCard, cursor: 'pointer'}}
+                    className="tournament-winner-card"
                     onClick={() => handleOpenTeamModal(tournament.winners.thirdPlace)}
                   >
-                    <div style={styles.medal}>🥉</div>
-                    <h3 style={styles.winnerTitle}>Third Place</h3>
-                    <p style={styles.winnerTeam}>
+                    <div className="tournament-winner-medal">🥉</div>
+                    <h3 className="tournament-winner-title">Third Place</h3>
+                    <p className="tournament-winner-team">
                       {tournament.winners.thirdPlace.name || 'TBD'}
                     </p>
-                    <p style={styles.clickHint}>Click to view team details</p>
+                    <p className="tournament-winner-click-hint">Click to view team details</p>
                   </div>
                 )}
               </div>
             ) : (
-              <p style={styles.emptyText}>Winners will be announced after tournament completion</p>
+              <p className="tournament-empty-text">Winners will be announced after tournament completion</p>
             )}
 
             {/* Man of the Tournament */}
-            <h2 style={styles.sectionTitle}>Man of the Tournament</h2>
+            <h2 className="tournament-detail-section-title">Man of the Tournament</h2>
             {tournament.manOfTheTournament?.playerName ? (
-              <div style={styles.motCard}>
+              <div className="tournament-mot-card">
                 {tournament.manOfTheTournament.photo && (
                   <img
                     src={`http://localhost:5000${tournament.manOfTheTournament.photo}`}
                     alt={tournament.manOfTheTournament.playerName}
-                    style={styles.motPhoto}
+                    className="tournament-mot-photo"
                   />
                 )}
-                <div style={styles.motInfo}>
-                  <h3 style={styles.motName}>{tournament.manOfTheTournament.playerName}</h3>
-                  <p style={styles.motTeam}>
+                <div className="tournament-mot-info">
+                  <h3 className="tournament-mot-name">{tournament.manOfTheTournament.playerName}</h3>
+                  <p className="tournament-mot-team">
                     Team: {tournament.manOfTheTournament.team?.name || 'N/A'}
                   </p>
-                  <div style={styles.motStats}>
-                    <div style={styles.statItem}>
-                      <span style={styles.statValue}>{tournament.manOfTheTournament.stats?.goals || 0}</span>
-                      <span style={styles.statLabel}>Goals</span>
+                  <div className="tournament-mot-stats">
+                    <div className="tournament-stat-item">
+                      <span className="tournament-stat-value">{tournament.manOfTheTournament.stats?.goals || 0}</span>
+                      <span className="tournament-stat-label">Goals</span>
                     </div>
-                    <div style={styles.statItem}>
-                      <span style={styles.statValue}>{tournament.manOfTheTournament.stats?.assists || 0}</span>
-                      <span style={styles.statLabel}>Assists</span>
+                    <div className="tournament-stat-item">
+                      <span className="tournament-stat-value">{tournament.manOfTheTournament.stats?.assists || 0}</span>
+                      <span className="tournament-stat-label">Assists</span>
                     </div>
-                    <div style={styles.statItem}>
-                      <span style={styles.statValue}>{tournament.manOfTheTournament.stats?.matchesPlayed || 0}</span>
-                      <span style={styles.statLabel}>Matches</span>
+                    <div className="tournament-stat-item">
+                      <span className="tournament-stat-value">{tournament.manOfTheTournament.stats?.matchesPlayed || 0}</span>
+                      <span className="tournament-stat-label">Matches</span>
                     </div>
                   </div>
                 </div>
               </div>
             ) : (
-              <p style={styles.emptyText}>Man of the Tournament will be announced soon</p>
+              <p className="tournament-empty-text">Man of the Tournament will be announced soon</p>
             )}
 
             {/* Tournament Info */}
-            <h2 style={styles.sectionTitle}>Tournament Information</h2>
-            <div style={styles.infoGrid}>
-              <div style={styles.infoCard}>
-                <p style={styles.infoLabel}>Venue</p>
-                <p style={styles.infoValue}>{tournament.location?.venue || 'TBD'}</p>
+            <h2 className="tournament-detail-section-title">Tournament Information</h2>
+            <div className="tournament-info-grid">
+              <div className="tournament-info-card">
+                <p className="tournament-info-label">Venue</p>
+                <p className="tournament-info-value">{tournament.location?.venue || 'TBD'}</p>
               </div>
-              <div style={styles.infoCard}>
-                <p style={styles.infoLabel}>Teams</p>
-                <p style={styles.infoValue}>{tournament.currentTeams || 0} / {tournament.maxTeams}</p>
+              <div className="tournament-info-card">
+                <p className="tournament-info-label">Teams</p>
+                <p className="tournament-info-value">{tournament.currentTeams || 0} / {tournament.maxTeams}</p>
               </div>
-              <div style={styles.infoCard}>
-                <p style={styles.infoLabel}>Match Type</p>
-                <p style={styles.infoValue}>{tournament.settings?.matchType || 'Best of 2'}</p>
+              <div className="tournament-info-card">
+                <p className="tournament-info-label">Match Type</p>
+                <p className="tournament-info-value">{tournament.settings?.matchType || 'Best of 2'}</p>
               </div>
-              <div style={styles.infoCard}>
-                <p style={styles.infoLabel}>Round Duration</p>
-                <p style={styles.infoValue}>{tournament.settings?.roundDuration || 3} minutes</p>
+              <div className="tournament-info-card">
+                <p className="tournament-info-label">Round Duration</p>
+                <p className="tournament-info-value">{tournament.settings?.roundDuration || 3} minutes</p>
               </div>
             </div>
           </div>
@@ -258,73 +263,73 @@ const TournamentDetail = () => {
         {/* MATCHES TAB */}
         {activeTab === 'matches' && (
           <div>
-            <div style={styles.filterRow}>
-              <h2 style={styles.sectionTitle}>All Matches</h2>
+            <div className="tournament-filter-row">
+              <h2 className="tournament-detail-section-title">All Matches</h2>
               <input
                 type="date"
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
-                style={styles.dateFilter}
+                className="tournament-date-filter"
                 placeholder="Filter by date"
               />
             </div>
 
             {filteredMatches.length === 0 ? (
-              <p style={styles.emptyText}>No matches scheduled yet</p>
+              <p className="tournament-empty-text">No matches scheduled yet</p>
             ) : (
-              <div style={styles.matchesList}>
+              <div className="tournament-matches-list">
                 {filteredMatches.map(match => (
-                  <div key={match._id} style={styles.matchCard}>
-                    <div style={styles.matchHeader}>
-                      <span style={styles.matchDate}>
+                  <div key={match._id} className="tournament-match-card">
+                    <div className="tournament-match-header">
+                      <span className="tournament-match-date">
                         {new Date(match.scheduledTime).toLocaleDateString()}
                       </span>
-                      <span style={{...styles.matchStatus, backgroundColor: getStatusColor(match.status)}}>
+                      <span className="tournament-match-status" style={{backgroundColor: getStatusColor(match.status)}}>
                         {match.status}
                       </span>
                     </div>
-                    <div style={styles.matchTeams}>
-                      <div style={styles.matchTeam}>
-                        <span style={styles.teamName}>{match.teamA?.name || 'Team A'}</span>
-                        <span style={styles.teamScore}>{match.finalScoreA || 0}</span>
+                    <div className="tournament-match-teams">
+                      <div className="tournament-match-team">
+                        <span className="tournament-team-name">{match.teamA?.name || 'Team A'}</span>
+                        <span className="tournament-team-score">{match.finalScoreA || 0}</span>
                       </div>
-                      <span style={styles.vs}>VS</span>
-                      <div style={styles.matchTeam}>
-                        <span style={styles.teamScore}>{match.finalScoreB || 0}</span>
-                        <span style={styles.teamName}>{match.teamB?.name || 'Team B'}</span>
+                      <span className="tournament-match-vs">VS</span>
+                      <div className="tournament-match-team">
+                        <span className="tournament-team-score">{match.finalScoreB || 0}</span>
+                        <span className="tournament-team-name">{match.teamB?.name || 'Team B'}</span>
                       </div>
                     </div>
                     {match.winner && (
-                      <div style={styles.matchWinner}>
+                      <div className="tournament-match-winner">
                         Winner: {match.winner.name}
                       </div>
                     )}
 
                     {/* Man of the Match Display */}
                     {match.status === 'completed' && match.manOfTheMatch?.playerName && (
-                      <div style={styles.momSection}>
-                        <div style={styles.momHeader}>⭐ Man of the Match</div>
-                        <div style={styles.momContent}>
+                      <div className="tournament-mom-section">
+                        <div className="tournament-mom-header">⭐ Man of the Match</div>
+                        <div className="tournament-mom-content">
                           {match.manOfTheMatch.photo && (
                             <img
                               src={`http://localhost:5000${match.manOfTheMatch.photo}`}
                               alt={match.manOfTheMatch.playerName}
-                              style={styles.momPhotoSmall}
+                              className="tournament-mom-photo-small"
                             />
                           )}
-                          <div style={styles.momDetails}>
-                            <div style={styles.momPlayerName}>{match.manOfTheMatch.playerName}</div>
-                            <div style={styles.momTeamName}>
+                          <div className="tournament-mom-details">
+                            <div className="tournament-mom-player-name">{match.manOfTheMatch.playerName}</div>
+                            <div className="tournament-mom-team-name">
                               {match.manOfTheMatch.team?.name || 'N/A'}
                             </div>
-                            <div style={styles.momStatsRow}>
-                              <span style={styles.momStat}>
+                            <div className="tournament-mom-stats-row">
+                              <span className="tournament-mom-stat">
                                 ⚽ {match.manOfTheMatch.stats?.goals || 0} Goals
                               </span>
-                              <span style={styles.momStat}>
+                              <span className="tournament-mom-stat">
                                 🎯 {match.manOfTheMatch.stats?.assists || 0} Assists
                               </span>
-                              <span style={styles.momStat}>
+                              <span className="tournament-mom-stat">
                                 🛡️ {match.manOfTheMatch.stats?.saves || 0} Saves
                               </span>
                             </div>
@@ -342,18 +347,18 @@ const TournamentDetail = () => {
         {/* TEAMS TAB */}
         {activeTab === 'teams' && (
           <div>
-            <h2 style={styles.sectionTitle}>Registered Teams</h2>
+            <h2 className="tournament-detail-section-title">Registered Teams</h2>
             {tournament.registeredTeams?.length === 0 ? (
-              <p style={styles.emptyText}>No teams registered yet</p>
+              <p className="tournament-empty-text">No teams registered yet</p>
             ) : (
-              <div style={styles.teamsGrid}>
+              <div className="tournament-teams-grid">
                 {tournament.registeredTeams.map(team => (
-                  <div key={team._id} style={styles.teamCard}>
-                    <h3 style={styles.teamCardName}>{team.name}</h3>
-                    <p style={styles.teamCardLocation}>
+                  <div key={team._id} className="tournament-team-card">
+                    <h3 className="tournament-team-card-name">{team.name}</h3>
+                    <p className="tournament-team-card-location">
                       📍 {team.location?.city}, {team.location?.state}
                     </p>
-                    <p style={styles.teamCardType}>
+                    <p className="tournament-team-card-type">
                       Type: {team.teamType || 'N/A'}
                     </p>
                   </div>
@@ -369,32 +374,32 @@ const TournamentDetail = () => {
             {/* Player Awards Section */}
             {(tournament.awards?.bestForward || tournament.awards?.bestCenter || tournament.awards?.bestDefender || tournament.awards?.bestKeeper) && (
               <>
-                <h2 style={styles.sectionTitle}>Player Awards (Role-Based)</h2>
-                <div style={styles.awardsGrid}>
+                <h2 className="tournament-detail-section-title">Player Awards (Role-Based)</h2>
+                <div className="tournament-awards-grid">
                   {/* Best Forward */}
                   {tournament.awards.bestForward && (
-                    <div style={styles.awardCard}>
-                      <div style={styles.awardIcon}>⚡</div>
-                      <h3 style={styles.awardTitle}>Best Forward</h3>
+                    <div className="tournament-award-card">
+                      <div className="tournament-award-icon">⚡</div>
+                      <h3 className="tournament-award-title">Best Forward</h3>
                       {tournament.awards.bestForward.photo ? (
                         <img
                           src={`http://localhost:5000${tournament.awards.bestForward.photo}`}
                           alt={tournament.awards.bestForward.playerName}
-                          style={styles.awardPhoto}
+                          className="tournament-award-photo"
                         />
                       ) : (
-                        <div style={styles.awardPhotoPlaceholder}>
+                        <div className="tournament-award-photo-placeholder">
                           {tournament.awards.bestForward.playerName?.charAt(0).toUpperCase()}
                         </div>
                       )}
-                      <div style={styles.awardPlayerName}>{tournament.awards.bestForward.playerName}</div>
-                      <div style={styles.awardTeamName}>
+                      <div className="tournament-award-player-name">{tournament.awards.bestForward.playerName}</div>
+                      <div className="tournament-award-team-name">
                         {tournament.awards.bestForward.team?.name || 'N/A'}
                       </div>
-                      <div style={styles.awardStat}>
+                      <div className="tournament-award-stat">
                         Avg: {tournament.awards.bestForward.stats?.avgPerformance || 0} pts
                       </div>
-                      <div style={styles.awardMatches}>
+                      <div className="tournament-award-matches">
                         {tournament.awards.bestForward.stats?.totalMatches || 0} matches
                       </div>
                     </div>
@@ -402,28 +407,28 @@ const TournamentDetail = () => {
 
                   {/* Best Center */}
                   {tournament.awards.bestCenter && (
-                    <div style={styles.awardCard}>
-                      <div style={styles.awardIcon}>🎯</div>
-                      <h3 style={styles.awardTitle}>Best Center</h3>
+                    <div className="tournament-award-card">
+                      <div className="tournament-award-icon">🎯</div>
+                      <h3 className="tournament-award-title">Best Center</h3>
                       {tournament.awards.bestCenter.photo ? (
                         <img
                           src={`http://localhost:5000${tournament.awards.bestCenter.photo}`}
                           alt={tournament.awards.bestCenter.playerName}
-                          style={styles.awardPhoto}
+                          className="tournament-award-photo"
                         />
                       ) : (
-                        <div style={styles.awardPhotoPlaceholder}>
+                        <div className="tournament-award-photo-placeholder">
                           {tournament.awards.bestCenter.playerName?.charAt(0).toUpperCase()}
                         </div>
                       )}
-                      <div style={styles.awardPlayerName}>{tournament.awards.bestCenter.playerName}</div>
-                      <div style={styles.awardTeamName}>
+                      <div className="tournament-award-player-name">{tournament.awards.bestCenter.playerName}</div>
+                      <div className="tournament-award-team-name">
                         {tournament.awards.bestCenter.team?.name || 'N/A'}
                       </div>
-                      <div style={styles.awardStat}>
+                      <div className="tournament-award-stat">
                         Avg: {tournament.awards.bestCenter.stats?.avgPerformance || 0} pts
                       </div>
-                      <div style={styles.awardMatches}>
+                      <div className="tournament-award-matches">
                         {tournament.awards.bestCenter.stats?.totalMatches || 0} matches
                       </div>
                     </div>
@@ -431,28 +436,28 @@ const TournamentDetail = () => {
 
                   {/* Best Defender */}
                   {tournament.awards.bestDefender && (
-                    <div style={styles.awardCard}>
-                      <div style={styles.awardIcon}>🛡️</div>
-                      <h3 style={styles.awardTitle}>Best Defender</h3>
+                    <div className="tournament-award-card">
+                      <div className="tournament-award-icon">🛡️</div>
+                      <h3 className="tournament-award-title">Best Defender</h3>
                       {tournament.awards.bestDefender.photo ? (
                         <img
                           src={`http://localhost:5000${tournament.awards.bestDefender.photo}`}
                           alt={tournament.awards.bestDefender.playerName}
-                          style={styles.awardPhoto}
+                          className="tournament-award-photo"
                         />
                       ) : (
-                        <div style={styles.awardPhotoPlaceholder}>
+                        <div className="tournament-award-photo-placeholder">
                           {tournament.awards.bestDefender.playerName?.charAt(0).toUpperCase()}
                         </div>
                       )}
-                      <div style={styles.awardPlayerName}>{tournament.awards.bestDefender.playerName}</div>
-                      <div style={styles.awardTeamName}>
+                      <div className="tournament-award-player-name">{tournament.awards.bestDefender.playerName}</div>
+                      <div className="tournament-award-team-name">
                         {tournament.awards.bestDefender.team?.name || 'N/A'}
                       </div>
-                      <div style={styles.awardStat}>
+                      <div className="tournament-award-stat">
                         Avg: {tournament.awards.bestDefender.stats?.avgPerformance || 0} pts
                       </div>
-                      <div style={styles.awardMatches}>
+                      <div className="tournament-award-matches">
                         {tournament.awards.bestDefender.stats?.totalMatches || 0} matches
                       </div>
                     </div>
@@ -460,28 +465,28 @@ const TournamentDetail = () => {
 
                   {/* Best Keeper */}
                   {tournament.awards.bestKeeper && (
-                    <div style={styles.awardCard}>
-                      <div style={styles.awardIcon}>🥅</div>
-                      <h3 style={styles.awardTitle}>Best Keeper</h3>
+                    <div className="tournament-award-card">
+                      <div className="tournament-award-icon">🥅</div>
+                      <h3 className="tournament-award-title">Best Keeper</h3>
                       {tournament.awards.bestKeeper.photo ? (
                         <img
                           src={`http://localhost:5000${tournament.awards.bestKeeper.photo}`}
                           alt={tournament.awards.bestKeeper.playerName}
-                          style={styles.awardPhoto}
+                          className="tournament-award-photo"
                         />
                       ) : (
-                        <div style={styles.awardPhotoPlaceholder}>
+                        <div className="tournament-award-photo-placeholder">
                           {tournament.awards.bestKeeper.playerName?.charAt(0).toUpperCase()}
                         </div>
                       )}
-                      <div style={styles.awardPlayerName}>{tournament.awards.bestKeeper.playerName}</div>
-                      <div style={styles.awardTeamName}>
+                      <div className="tournament-award-player-name">{tournament.awards.bestKeeper.playerName}</div>
+                      <div className="tournament-award-team-name">
                         {tournament.awards.bestKeeper.team?.name || 'N/A'}
                       </div>
-                      <div style={styles.awardStat}>
+                      <div className="tournament-award-stat">
                         Avg: {tournament.awards.bestKeeper.stats?.avgPerformance || 0} pts
                       </div>
-                      <div style={styles.awardMatches}>
+                      <div className="tournament-award-matches">
                         {tournament.awards.bestKeeper.stats?.totalMatches || 0} matches
                       </div>
                     </div>
@@ -490,26 +495,26 @@ const TournamentDetail = () => {
               </>
             )}
 
-            <h2 style={styles.sectionTitle}>Prize Pool</h2>
+            <h2 className="tournament-detail-section-title">Prize Pool</h2>
             {tournament.prizePool?.totalAmount > 0 ? (
               <div>
-                <div style={styles.totalPrize}>
-                  <span style={styles.totalPrizeLabel}>Total Prize Pool</span>
-                  <span style={styles.totalPrizeAmount}>
+                <div className="tournament-total-prize">
+                  <span className="tournament-total-prize-label">Total Prize Pool</span>
+                  <span className="tournament-total-prize-amount">
                     {tournament.prizePool.currency} {tournament.prizePool.totalAmount.toLocaleString()}
                   </span>
                 </div>
 
                 {tournament.prizePool.prizes?.length > 0 && (
-                  <div style={styles.prizesGrid}>
+                  <div className="tournament-prizes-grid">
                     {tournament.prizePool.prizes.map((prize, index) => (
-                      <div key={index} style={styles.prizeCard}>
-                        <div style={styles.prizePosition}>{prize.position}</div>
-                        <div style={styles.prizeAmount}>
+                      <div key={index} className="tournament-prize-card">
+                        <div className="tournament-prize-position">{prize.position}</div>
+                        <div className="tournament-prize-amount">
                           {tournament.prizePool.currency} {prize.amount?.toLocaleString() || '0'}
                         </div>
                         {prize.description && (
-                          <div style={styles.prizeDescription}>{prize.description}</div>
+                          <div className="tournament-prize-description">{prize.description}</div>
                         )}
                       </div>
                     ))}
@@ -517,20 +522,20 @@ const TournamentDetail = () => {
                 )}
               </div>
             ) : (
-              <p style={styles.emptyText}>Prize pool information not available</p>
+              <p className="tournament-empty-text">Prize pool information not available</p>
             )}
 
             {/* Organizer Info */}
             {tournament.organizer?.name && (
-              <div style={styles.organizerSection}>
-                <h2 style={styles.sectionTitle}>Organized By</h2>
-                <div style={styles.organizerCard}>
-                  <h3 style={styles.organizerName}>{tournament.organizer.name}</h3>
+              <div className="tournament-organizer-section">
+                <h2 className="tournament-detail-section-title">Organized By</h2>
+                <div className="tournament-organizer-card">
+                  <h3 className="tournament-organizer-name">{tournament.organizer.name}</h3>
                   {tournament.organizer.email && (
-                    <p style={styles.organizerContact}>📧 {tournament.organizer.email}</p>
+                    <p className="tournament-organizer-contact">📧 {tournament.organizer.email}</p>
                   )}
                   {tournament.organizer.phone && (
-                    <p style={styles.organizerContact}>📞 {tournament.organizer.phone}</p>
+                    <p className="tournament-organizer-contact">📞 {tournament.organizer.phone}</p>
                   )}
                 </div>
               </div>
@@ -541,17 +546,17 @@ const TournamentDetail = () => {
         {/* GALLERY TAB */}
         {activeTab === 'gallery' && (
           <div>
-            <h2 style={styles.sectionTitle}>Photo Gallery</h2>
+            <h2 className="tournament-detail-section-title">Photo Gallery</h2>
             {tournament.media?.gallery?.length === 0 || !tournament.media?.gallery ? (
-              <p style={styles.emptyText}>No photos available yet</p>
+              <p className="tournament-empty-text">No photos available yet</p>
             ) : (
-              <div style={styles.galleryGrid}>
+              <div className="tournament-gallery-grid">
                 {tournament.media.gallery.map((image, index) => (
-                  <div key={index} style={styles.galleryItem}>
+                  <div key={index} className="tournament-gallery-item">
                     <img
                       src={`http://localhost:5000${image}`}
                       alt={`Gallery ${index + 1}`}
-                      style={styles.galleryImage}
+                      className="tournament-gallery-image"
                     />
                   </div>
                 ))}
@@ -563,59 +568,59 @@ const TournamentDetail = () => {
 
       {/* Team Detail Modal */}
       {showTeamModal && selectedTeam && (
-        <div style={styles.teamModalOverlay} onClick={handleCloseTeamModal}>
-          <div style={styles.teamModalContent} onClick={(e) => e.stopPropagation()}>
-            <button style={styles.closeButton} onClick={handleCloseTeamModal}>
+        <div className="tournament-team-modal-overlay" onClick={handleCloseTeamModal}>
+          <div className="tournament-team-modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="tournament-team-modal-close-button" onClick={handleCloseTeamModal}>
               ×
             </button>
 
-            <h2 style={styles.teamModalTitle}>{selectedTeam.name}</h2>
+            <h2 className="tournament-team-modal-title">{selectedTeam.name}</h2>
 
-            <div style={styles.teamModalInfo}>
-              <div style={styles.teamInfoRow}>
-                <span style={styles.teamInfoLabel}>Location:</span>
-                <span style={styles.teamInfoValue}>
+            <div className="tournament-team-modal-info">
+              <div className="tournament-team-info-row">
+                <span className="tournament-team-info-label">Location:</span>
+                <span className="tournament-team-info-value">
                   {selectedTeam.location?.city}, {selectedTeam.location?.state || selectedTeam.location?.country}
                 </span>
               </div>
-              <div style={styles.teamInfoRow}>
-                <span style={styles.teamInfoLabel}>Type:</span>
-                <span style={styles.teamInfoValue}>{selectedTeam.teamType || 'N/A'}</span>
+              <div className="tournament-team-info-row">
+                <span className="tournament-team-info-label">Type:</span>
+                <span className="tournament-team-info-value">{selectedTeam.teamType || 'N/A'}</span>
               </div>
               {selectedTeam.captain && (
-                <div style={styles.teamInfoRow}>
-                  <span style={styles.teamInfoLabel}>Captain:</span>
-                  <span style={styles.teamInfoValue}>{selectedTeam.captain}</span>
+                <div className="tournament-team-info-row">
+                  <span className="tournament-team-info-label">Captain:</span>
+                  <span className="tournament-team-info-value">{selectedTeam.captain}</span>
                 </div>
               )}
             </div>
 
-            <h3 style={styles.membersTitle}>Team Members</h3>
+            <h3 className="tournament-members-title">Team Members</h3>
             {selectedTeam.members && selectedTeam.members.length > 0 ? (
-              <div style={styles.membersGrid}>
+              <div className="tournament-members-grid">
                 {selectedTeam.members.map((member, index) => (
-                  <div key={index} style={styles.memberCard}>
+                  <div key={index} className="tournament-member-card">
                     {member.photo ? (
                       <img
                         src={`http://localhost:5000${member.photo}`}
                         alt={member.name}
-                        style={styles.memberPhoto}
+                        className="tournament-member-photo"
                       />
                     ) : (
-                      <div style={styles.memberPhotoPlaceholder}>
+                      <div className="tournament-member-photo-placeholder">
                         {member.name.charAt(0).toUpperCase()}
                       </div>
                     )}
-                    <div style={styles.memberName}>{member.name}</div>
-                    <div style={styles.memberRole}>{member.role}</div>
+                    <div className="tournament-member-name">{member.name}</div>
+                    <div className="tournament-member-role">{member.role}</div>
                     {member.jerseyNumber && (
-                      <div style={styles.memberJersey}>#{member.jerseyNumber}</div>
+                      <div className="tournament-member-jersey">#{member.jerseyNumber}</div>
                     )}
                   </div>
                 ))}
               </div>
             ) : (
-              <p style={styles.emptyText}>No team members available</p>
+              <p className="tournament-empty-text">No team members available</p>
             )}
           </div>
         </div>
@@ -633,671 +638,5 @@ const getStatusColor = (status) => {
   }
 };
 
-const styles = {
-  container: {
-    maxWidth: '1200px',
-    margin: '0 auto',
-    padding: '20px'
-  },
-  loading: {
-    textAlign: 'center',
-    padding: '60px',
-    fontSize: '18px',
-    color: '#888'
-  },
-  error: {
-    textAlign: 'center',
-    padding: '60px',
-    fontSize: '18px',
-    color: '#ff4444'
-  },
-  header: {
-    marginBottom: '30px',
-    backgroundColor: '#1e1e1e',
-    borderRadius: '12px',
-    overflow: 'hidden'
-  },
-  banner: {
-    width: '100%',
-    height: '300px',
-    objectFit: 'cover'
-  },
-  headerContent: {
-    padding: '30px'
-  },
-  title: {
-    fontSize: '36px',
-    margin: '0 0 16px 0',
-    color: '#fff'
-  },
-  headerInfo: {
-    display: 'flex',
-    gap: '20px',
-    flexWrap: 'wrap',
-    marginBottom: '16px'
-  },
-  location: {
-    fontSize: '16px',
-    color: '#aaa'
-  },
-  dates: {
-    fontSize: '16px',
-    color: '#aaa'
-  },
-  status: {
-    padding: '4px 12px',
-    borderRadius: '12px',
-    fontSize: '14px',
-    fontWeight: 'bold',
-    color: 'white'
-  },
-  description: {
-    fontSize: '16px',
-    color: '#ccc',
-    lineHeight: '1.6',
-    margin: '16px 0 0 0'
-  },
-  tabsContainer: {
-    display: 'flex',
-    gap: '8px',
-    marginBottom: '30px',
-    borderBottom: '2px solid #333',
-    overflowX: 'auto'
-  },
-  tab: {
-    backgroundColor: 'transparent',
-    border: 'none',
-    borderBottom: '3px solid transparent',
-    padding: '12px 24px',
-    fontSize: '16px',
-    fontWeight: 'bold',
-    color: '#888',
-    cursor: 'pointer',
-    transition: 'all 0.3s',
-    whiteSpace: 'nowrap'
-  },
-  tabActive: {
-    backgroundColor: 'transparent',
-    border: 'none',
-    borderBottom: '3px solid #4CAF50',
-    padding: '12px 24px',
-    fontSize: '16px',
-    fontWeight: 'bold',
-    color: '#4CAF50',
-    cursor: 'pointer',
-    whiteSpace: 'nowrap'
-  },
-  tabContent: {
-    minHeight: '400px'
-  },
-  sectionTitle: {
-    fontSize: '24px',
-    marginBottom: '20px',
-    color: '#fff',
-    borderBottom: '2px solid #333',
-    paddingBottom: '10px'
-  },
-  winnersGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-    gap: '20px',
-    marginBottom: '40px'
-  },
-  winnerCard: {
-    backgroundColor: '#1e1e1e',
-    borderRadius: '12px',
-    padding: '30px',
-    textAlign: 'center',
-    border: '2px solid #333'
-  },
-  medal: {
-    fontSize: '48px',
-    marginBottom: '12px'
-  },
-  winnerTitle: {
-    fontSize: '18px',
-    color: '#888',
-    margin: '0 0 8px 0'
-  },
-  winnerTeam: {
-    fontSize: '24px',
-    color: '#fff',
-    fontWeight: 'bold',
-    margin: 0
-  },
-  motCard: {
-    backgroundColor: '#1e1e1e',
-    borderRadius: '12px',
-    padding: '30px',
-    display: 'flex',
-    gap: '30px',
-    alignItems: 'center',
-    marginBottom: '40px',
-    border: '2px solid #333'
-  },
-  motPhoto: {
-    width: '150px',
-    height: '150px',
-    borderRadius: '50%',
-    objectFit: 'cover',
-    border: '4px solid #4CAF50'
-  },
-  motInfo: {
-    flex: 1
-  },
-  motName: {
-    fontSize: '28px',
-    margin: '0 0 8px 0',
-    color: '#fff'
-  },
-  motTeam: {
-    fontSize: '18px',
-    color: '#888',
-    margin: '0 0 20px 0'
-  },
-  motStats: {
-    display: 'flex',
-    gap: '40px'
-  },
-  statItem: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center'
-  },
-  statValue: {
-    fontSize: '32px',
-    fontWeight: 'bold',
-    color: '#4CAF50'
-  },
-  statLabel: {
-    fontSize: '14px',
-    color: '#888',
-    marginTop: '4px'
-  },
-  infoGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-    gap: '20px',
-    marginBottom: '40px'
-  },
-  infoCard: {
-    backgroundColor: '#1e1e1e',
-    borderRadius: '8px',
-    padding: '20px',
-    border: '1px solid #333'
-  },
-  infoLabel: {
-    fontSize: '14px',
-    color: '#888',
-    margin: '0 0 8px 0'
-  },
-  infoValue: {
-    fontSize: '20px',
-    color: '#fff',
-    fontWeight: 'bold',
-    margin: 0
-  },
-  filterRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '20px',
-    flexWrap: 'wrap',
-    gap: '16px'
-  },
-  dateFilter: {
-    backgroundColor: '#2a2a2a',
-    border: '1px solid #444',
-    borderRadius: '6px',
-    padding: '10px',
-    color: '#fff',
-    fontSize: '14px'
-  },
-  matchesList: {
-    display: 'grid',
-    gap: '16px'
-  },
-  matchCard: {
-    backgroundColor: '#1e1e1e',
-    borderRadius: '8px',
-    padding: '20px',
-    border: '1px solid #333'
-  },
-  matchHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginBottom: '16px'
-  },
-  matchDate: {
-    fontSize: '14px',
-    color: '#888'
-  },
-  matchStatus: {
-    padding: '4px 12px',
-    borderRadius: '12px',
-    fontSize: '12px',
-    fontWeight: 'bold',
-    color: 'white'
-  },
-  matchTeams: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: '20px'
-  },
-  matchTeam: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    flex: 1
-  },
-  teamName: {
-    fontSize: '18px',
-    color: '#fff',
-    fontWeight: 'bold'
-  },
-  teamScore: {
-    fontSize: '24px',
-    color: '#4CAF50',
-    fontWeight: 'bold'
-  },
-  vs: {
-    fontSize: '16px',
-    color: '#888',
-    fontWeight: 'bold'
-  },
-  matchWinner: {
-    marginTop: '12px',
-    paddingTop: '12px',
-    borderTop: '1px solid #333',
-    color: '#4CAF50',
-    fontSize: '14px',
-    fontWeight: 'bold'
-  },
-  teamsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-    gap: '20px'
-  },
-  teamCard: {
-    backgroundColor: '#1e1e1e',
-    borderRadius: '8px',
-    padding: '24px',
-    border: '1px solid #333',
-    transition: 'transform 0.2s, border-color 0.2s'
-  },
-  teamCardName: {
-    fontSize: '20px',
-    margin: '0 0 12px 0',
-    color: '#fff'
-  },
-  teamCardLocation: {
-    fontSize: '14px',
-    color: '#888',
-    margin: '0 0 8px 0'
-  },
-  teamCardType: {
-    fontSize: '14px',
-    color: '#aaa',
-    margin: 0
-  },
-  totalPrize: {
-    backgroundColor: '#1e1e1e',
-    borderRadius: '12px',
-    padding: '30px',
-    textAlign: 'center',
-    marginBottom: '30px',
-    border: '2px solid #4CAF50'
-  },
-  totalPrizeLabel: {
-    display: 'block',
-    fontSize: '18px',
-    color: '#888',
-    marginBottom: '8px'
-  },
-  totalPrizeAmount: {
-    display: 'block',
-    fontSize: '42px',
-    color: '#4CAF50',
-    fontWeight: 'bold'
-  },
-  prizesGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-    gap: '20px',
-    marginBottom: '40px'
-  },
-  prizeCard: {
-    backgroundColor: '#1e1e1e',
-    borderRadius: '8px',
-    padding: '24px',
-    textAlign: 'center',
-    border: '1px solid #333'
-  },
-  prizePosition: {
-    fontSize: '16px',
-    color: '#888',
-    marginBottom: '12px',
-    fontWeight: 'bold'
-  },
-  prizeAmount: {
-    fontSize: '28px',
-    color: '#4CAF50',
-    fontWeight: 'bold',
-    marginBottom: '8px'
-  },
-  prizeDescription: {
-    fontSize: '14px',
-    color: '#aaa'
-  },
-  organizerSection: {
-    marginTop: '40px'
-  },
-  organizerCard: {
-    backgroundColor: '#1e1e1e',
-    borderRadius: '8px',
-    padding: '24px',
-    border: '1px solid #333'
-  },
-  organizerName: {
-    fontSize: '22px',
-    margin: '0 0 12px 0',
-    color: '#fff'
-  },
-  organizerContact: {
-    fontSize: '16px',
-    color: '#aaa',
-    margin: '8px 0'
-  },
-  galleryGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-    gap: '16px'
-  },
-  galleryItem: {
-    borderRadius: '8px',
-    overflow: 'hidden',
-    backgroundColor: '#1e1e1e',
-    border: '1px solid #333'
-  },
-  galleryImage: {
-    width: '100%',
-    height: '250px',
-    objectFit: 'cover',
-    display: 'block',
-    transition: 'transform 0.3s'
-  },
-  emptyText: {
-    textAlign: 'center',
-    padding: '60px',
-    fontSize: '16px',
-    color: '#888'
-  },
-  // Man of the Match styles
-  momSection: {
-    marginTop: '16px',
-    paddingTop: '16px',
-    borderTop: '2px solid #444'
-  },
-  momHeader: {
-    fontSize: '14px',
-    fontWeight: 'bold',
-    color: '#FFD700',
-    marginBottom: '12px',
-    textTransform: 'uppercase',
-    letterSpacing: '1px'
-  },
-  momContent: {
-    display: 'flex',
-    gap: '16px',
-    alignItems: 'center'
-  },
-  momPhotoSmall: {
-    width: '80px',
-    height: '80px',
-    borderRadius: '50%',
-    objectFit: 'cover',
-    border: '3px solid #FFD700'
-  },
-  momDetails: {
-    flex: 1
-  },
-  momPlayerName: {
-    fontSize: '18px',
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: '4px'
-  },
-  momTeamName: {
-    fontSize: '14px',
-    color: '#888',
-    marginBottom: '10px'
-  },
-  momStatsRow: {
-    display: 'flex',
-    gap: '16px',
-    flexWrap: 'wrap'
-  },
-  momStat: {
-    fontSize: '13px',
-    color: '#aaa',
-    backgroundColor: '#2a2a2a',
-    padding: '4px 12px',
-    borderRadius: '12px'
-  },
-  // Awards styles
-  awardsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-    gap: '24px',
-    marginBottom: '40px'
-  },
-  awardCard: {
-    backgroundColor: '#1e1e1e',
-    borderRadius: '12px',
-    padding: '30px',
-    textAlign: 'center',
-    border: '2px solid #FFD700',
-    position: 'relative'
-  },
-  awardIcon: {
-    fontSize: '40px',
-    marginBottom: '12px'
-  },
-  awardTitle: {
-    fontSize: '18px',
-    color: '#FFD700',
-    margin: '0 0 20px 0',
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
-    letterSpacing: '1px'
-  },
-  awardPhoto: {
-    width: '120px',
-    height: '120px',
-    borderRadius: '50%',
-    objectFit: 'cover',
-    margin: '0 auto 16px auto',
-    display: 'block',
-    border: '4px solid #FFD700'
-  },
-  awardPlayerName: {
-    fontSize: '20px',
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: '8px'
-  },
-  awardTeamName: {
-    fontSize: '14px',
-    color: '#888',
-    marginBottom: '16px'
-  },
-  awardStat: {
-    fontSize: '16px',
-    color: '#4CAF50',
-    fontWeight: 'bold',
-    backgroundColor: '#2a2a2a',
-    padding: '8px 16px',
-    borderRadius: '20px',
-    display: 'inline-block',
-    marginBottom: '8px'
-  },
-  awardMatches: {
-    fontSize: '13px',
-    color: '#999',
-    fontStyle: 'italic'
-  },
-  awardPhotoPlaceholder: {
-    width: '120px',
-    height: '120px',
-    borderRadius: '50%',
-    margin: '0 auto 16px auto',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#3a3a3a',
-    border: '4px solid #FFD700',
-    fontSize: '48px',
-    fontWeight: 'bold',
-    color: '#FFD700'
-  },
-  clickHint: {
-    fontSize: '12px',
-    color: '#4CAF50',
-    margin: '8px 0 0 0',
-    fontStyle: 'italic'
-  },
-  // Team Modal styles
-  teamModalOverlay: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.85)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 2000,
-    padding: '20px'
-  },
-  teamModalContent: {
-    backgroundColor: '#1e1e1e',
-    borderRadius: '16px',
-    padding: '40px',
-    maxWidth: '900px',
-    width: '100%',
-    maxHeight: '90vh',
-    overflow: 'auto',
-    border: '2px solid #4CAF50',
-    position: 'relative'
-  },
-  closeButton: {
-    position: 'absolute',
-    top: '16px',
-    right: '16px',
-    backgroundColor: 'transparent',
-    border: 'none',
-    color: '#fff',
-    fontSize: '36px',
-    cursor: 'pointer',
-    width: '40px',
-    height: '40px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: '50%',
-    transition: 'background-color 0.2s'
-  },
-  teamModalTitle: {
-    fontSize: '32px',
-    margin: '0 0 24px 0',
-    color: '#4CAF50',
-    textAlign: 'center'
-  },
-  teamModalInfo: {
-    backgroundColor: '#2a2a2a',
-    borderRadius: '8px',
-    padding: '20px',
-    marginBottom: '30px'
-  },
-  teamInfoRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginBottom: '12px',
-    fontSize: '16px'
-  },
-  teamInfoLabel: {
-    color: '#888',
-    fontWeight: 'bold'
-  },
-  teamInfoValue: {
-    color: '#fff'
-  },
-  membersTitle: {
-    fontSize: '24px',
-    margin: '0 0 20px 0',
-    color: '#fff',
-    borderBottom: '2px solid #333',
-    paddingBottom: '10px'
-  },
-  membersGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
-    gap: '20px'
-  },
-  memberCard: {
-    backgroundColor: '#2a2a2a',
-    borderRadius: '12px',
-    padding: '20px',
-    textAlign: 'center',
-    border: '1px solid #444',
-    transition: 'transform 0.2s, border-color 0.2s'
-  },
-  memberPhoto: {
-    width: '100px',
-    height: '100px',
-    borderRadius: '50%',
-    objectFit: 'cover',
-    margin: '0 auto 12px auto',
-    display: 'block',
-    border: '3px solid #4CAF50'
-  },
-  memberPhotoPlaceholder: {
-    width: '100px',
-    height: '100px',
-    borderRadius: '50%',
-    margin: '0 auto 12px auto',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#444',
-    fontSize: '40px',
-    fontWeight: 'bold',
-    color: '#888',
-    border: '3px solid #666'
-  },
-  memberName: {
-    fontSize: '16px',
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: '6px'
-  },
-  memberRole: {
-    fontSize: '13px',
-    color: '#4CAF50',
-    marginBottom: '6px',
-    textTransform: 'uppercase',
-    fontWeight: 'bold'
-  },
-  memberJersey: {
-    fontSize: '12px',
-    color: '#888',
-    backgroundColor: '#1e1e1e',
-    padding: '4px 10px',
-    borderRadius: '12px',
-    display: 'inline-block'
-  }
-};
 
 export default TournamentDetail;

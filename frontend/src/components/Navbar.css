@@ -146,8 +146,8 @@
 .nav-links-mobile {
   position: fixed;
   top: 70px;
-  right: -100%;
-  width: 280px;
+  right: -320px;
+  width: 320px;
   height: calc(100vh - 70px);
   background: #FFFFFF;
   box-shadow: -4px 0 20px rgba(0, 0, 0, 0.2);
@@ -225,6 +225,11 @@
 @media (min-width: 769px) {
   .nav-links-mobile {
     width: 320px;
+    right: -320px;
+  }
+
+  .nav-links-mobile.active {
+    right: 0;
   }
 }
 

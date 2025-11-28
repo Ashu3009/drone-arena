@@ -1,0 +1,288 @@
+/* Indian Tricolor Theme - Tournaments List */
+
+.tournaments-list-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.tournaments-list-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.tournaments-list-title {
+  font-size: 42px;
+  margin: 0 0 12px 0;
+  color: #FF9933;
+  font-weight: bold;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.tournaments-list-subtitle {
+  font-size: 18px;
+  color: #888;
+  margin: 0;
+}
+
+/* Filters Container - Indian Theme */
+.tournaments-filters-container {
+  background: linear-gradient(135deg,
+    rgba(255, 153, 51, 0.25) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(19, 136, 8, 0.25) 100%);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 40px;
+  border: 2px solid #FF9933;
+  border-bottom: 4px solid #138808;
+  box-shadow: 0 4px 12px rgba(255, 153, 51, 0.15);
+}
+
+.tournaments-filter-title {
+  font-size: 20px;
+  margin: 0 0 20px 0;
+  color: #FF9933;
+  font-weight: bold;
+}
+
+.tournaments-filter-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.tournaments-filter-group {
+  flex: 1 1 200px;
+  min-width: 150px;
+}
+
+.tournaments-filter-label {
+  display: block;
+  font-size: 14px;
+  color: #aaa;
+  margin-bottom: 6px;
+}
+
+.tournaments-filter-input {
+  width: 100%;
+  /* background-color: #2a2a2a !important; */
+  background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
+  border: 2px solid #FF9933;
+  border-radius: 6px;
+  padding: 10px;
+  color: #fff !important;
+  font-size: 14px;
+  box-sizing: border-box;
+  transition: border-color 0.3s;
+}
+
+.tournaments-filter-input:focus {
+  outline: none;
+  border-color: #138808;
+}
+
+.tournaments-filter-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Fix dropdown options visibility */
+.tournaments-filter-input option {
+  background-color: #2a2a2a;
+  color: #fff;
+}
+
+/* Fix date input selected value visibility */
+.tournaments-filter-input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+.tournaments-filter-input[type="date"]::-webkit-datetime-edit-text,
+.tournaments-filter-input[type="date"]::-webkit-datetime-edit-month-field,
+.tournaments-filter-input[type="date"]::-webkit-datetime-edit-day-field,
+.tournaments-filter-input[type="date"]::-webkit-datetime-edit-year-field {
+  color: #fff;
+}
+
+.tournaments-clear-button {
+  width: 100%;
+  background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.3s;
+}
+
+.tournaments-clear-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 153, 51, 0.4);
+}
+
+.tournaments-results-count {
+  font-size: 14px;
+  color: #888;
+  margin-top: 12px;
+}
+
+/* Tournaments Grid */
+.tournaments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 24px;
+}
+
+.tournaments-loading,
+.tournaments-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px;
+  font-size: 18px;
+  color: #888;
+}
+
+/* Tournament Card - Indian Tricolor Theme */
+.tournament-card {
+  background: linear-gradient(135deg,
+    rgba(40, 30, 20, 0.95) 0%,
+    rgba(30, 30, 30, 0.97) 50%,
+    rgba(20, 35, 20, 0.95) 100%) !important;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid #FF9933;
+  border-bottom: 4px solid #138808;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+}
+
+.tournament-card:hover {
+  transform: translateY(-8px);
+  border-color: #138808;
+  border-bottom-color: #FF9933;
+  box-shadow: 0 12px 30px rgba(255, 153, 51, 0.3),
+              0 6px 15px rgba(19, 136, 8, 0.2);
+}
+
+.tournament-card-banner {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-bottom: 3px solid #FF9933;
+}
+
+/* Default banner placeholder for cards without banner */
+.tournament-card-banner-placeholder {
+  width: 100%;
+  height: 200px;
+  background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
+  border-bottom: 3px solid #FF9933;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.tournament-card-content {
+  padding: 20px;
+}
+
+.tournament-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+
+.tournament-card-title {
+  font-size: 22px;
+  margin: 0;
+  color: #fff;
+  flex: 1;
+  font-weight: bold;
+}
+
+.tournament-card-status {
+  padding: 6px 14px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+  white-space: nowrap;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.tournament-card-description {
+  font-size: 14px;
+  color: #1c1c1c !important;
+  line-height: 1.6;
+  margin-bottom: 16px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.tournament-card-info {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.tournament-info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #1d1d1d;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.tournament-info-icon {
+  font-size: 16px;
+  color: #FF9933;
+}
+
+.tournament-view-button {
+  width: 100%;
+  background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
+  border: none;
+  border-radius: 8px;
+  padding: 14px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.3s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tournament-view-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 153, 51, 0.5),
+              0 3px 10px rgba(19, 136, 8, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tournaments-list-title {
+    font-size: 32px;
+  }
+
+  .tournaments-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tournaments-filter-row {
+    flex-direction: column;
+  }
+
+  .tournaments-filter-group {
+    flex: 1 1 100%;
+  }
+}

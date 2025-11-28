@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getTournaments } from '../../services/api';
 import indiaCitiesData from '../../data/india-cities.json';
+import './TournamentsList.css';
 
 const TournamentsList = () => {
   const navigate = useNavigate();
@@ -120,24 +121,24 @@ const TournamentsList = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <h1 style={styles.title}>All Tournaments</h1>
-        <p style={styles.subtitle}>Browse and explore drone soccer tournaments</p>
+    <div className="tournaments-list-container">
+      <div className="tournaments-list-header">
+        <h1 className="tournaments-list-title">All Tournaments</h1>
+        <p className="tournaments-list-subtitle">Browse and explore drone soccer tournaments</p>
       </div>
 
       {/* Filters */}
-      <div style={styles.filtersContainer}>
-        <h3 style={styles.filterTitle}>Filters</h3>
+      <div className="tournaments-filters-container">
+        <h3 className="tournaments-filter-title">Filters</h3>
 
-        <div style={styles.filterRow}>
+        <div className="tournaments-filter-row">
           {/* Time Filter */}
-          <div style={styles.filterGroup}>
-            <label style={styles.filterLabel}>Time Range</label>
+          <div className="tournaments-filter-group">
+            <label className="tournaments-filter-label">Time Range</label>
             <select
               value={timeFilter}
               onChange={(e) => setTimeFilter(e.target.value)}
-              style={styles.filterInput}
+              className="tournaments-filter-input"
             >
               <option value="all">All Time</option>
               <option value="last_month">Last Month</option>
@@ -149,34 +150,34 @@ const TournamentsList = () => {
           {/* Custom Date Range */}
           {timeFilter === 'custom' && (
             <>
-              <div style={styles.filterGroup}>
-                <label style={styles.filterLabel}>Start Date</label>
+              <div className="tournaments-filter-group">
+                <label className="tournaments-filter-label">Start Date</label>
                 <input
                   type="date"
                   value={customStartDate}
                   onChange={(e) => setCustomStartDate(e.target.value)}
-                  style={styles.filterInput}
+                  className="tournaments-filter-input"
                 />
               </div>
-              <div style={styles.filterGroup}>
-                <label style={styles.filterLabel}>End Date</label>
+              <div className="tournaments-filter-group">
+                <label className="tournaments-filter-label">End Date</label>
                 <input
                   type="date"
                   value={customEndDate}
                   onChange={(e) => setCustomEndDate(e.target.value)}
-                  style={styles.filterInput}
+                  className="tournaments-filter-input"
                 />
               </div>
             </>
           )}
 
           {/* State Filter */}
-          <div style={styles.filterGroup}>
-            <label style={styles.filterLabel}>State</label>
+          <div className="tournaments-filter-group">
+            <label className="tournaments-filter-label">State</label>
             <select
               value={stateFilter}
               onChange={(e) => setStateFilter(e.target.value)}
-              style={styles.filterInput}
+              className="tournaments-filter-input"
             >
               <option value="">All States</option>
               {Object.keys(indiaCitiesData).map(state => (
@@ -186,12 +187,12 @@ const TournamentsList = () => {
           </div>
 
           {/* City Filter */}
-          <div style={styles.filterGroup}>
-            <label style={styles.filterLabel}>City</label>
+          <div className="tournaments-filter-group">
+            <label className="tournaments-filter-label">City</label>
             <select
               value={cityFilter}
               onChange={(e) => setCityFilter(e.target.value)}
-              style={styles.filterInput}
+              className="tournaments-filter-input"
               disabled={!stateFilter}
             >
               <option value="">All Cities</option>
@@ -202,12 +203,12 @@ const TournamentsList = () => {
           </div>
 
           {/* Status Filter */}
-          <div style={styles.filterGroup}>
-            <label style={styles.filterLabel}>Status</label>
+          <div className="tournaments-filter-group">
+            <label className="tournaments-filter-label">Status</label>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              style={styles.filterInput}
+              className="tournaments-filter-input"
             >
               <option value="all">All Status</option>
               <option value="upcoming">Upcoming</option>
@@ -217,27 +218,27 @@ const TournamentsList = () => {
           </div>
 
           {/* Clear Filters */}
-          <div style={styles.filterGroup}>
-            <label style={{...styles.filterLabel, opacity: 0}}>Clear</label>
-            <button onClick={clearFilters} style={styles.clearButton}>
+          <div className="tournaments-filter-group">
+            <label className="tournaments-filter-label" style={{opacity: 0}}>Clear</label>
+            <button onClick={clearFilters} className="tournaments-clear-button">
               Clear Filters
             </button>
           </div>
         </div>
 
-        <div style={styles.resultsCount}>
+        <div className="tournaments-results-count">
           Showing {filteredTournaments.length} of {tournaments.length} tournaments
         </div>
       </div>
 
       {/* Tournaments Grid */}
-      <div style={styles.tournamentsGrid}>
+      <div className="tournaments-grid">
         {loading ? (
-          <div style={styles.loading}>Loading tournaments...</div>
+          <div className="tournaments-loading">Loading tournaments...</div>
         ) : filteredTournaments.length === 0 ? (
-          <div style={styles.empty}>
+          <div className="tournaments-empty">
             <p>No tournaments found matching your filters</p>
-            <button onClick={clearFilters} style={styles.clearButton}>
+            <button onClick={clearFilters} className="tournaments-clear-button">
               Clear Filters
             </button>
           </div>
@@ -245,54 +246,58 @@ const TournamentsList = () => {
           filteredTournaments.map(tournament => (
             <div
               key={tournament._id}
-              style={styles.tournamentCard}
+              className="tournament-card"
               onClick={() => handleTournamentClick(tournament._id)}
             >
-              {tournament.media?.bannerImage && (
+              {tournament.media?.bannerImage ? (
                 <img
                   src={`http://localhost:5000${tournament.media.bannerImage}`}
                   alt={tournament.name}
-                  style={styles.cardBanner}
+                  className="tournament-card-banner"
                 />
+              ) : (
+                <div className="tournament-card-banner-placeholder">
+                  🚁
+                </div>
               )}
-              <div style={styles.cardContent}>
-                <div style={styles.cardHeader}>
-                  <h3 style={styles.cardTitle}>{tournament.name}</h3>
-                  <span style={{...styles.cardStatus, backgroundColor: getStatusColor(tournament.status)}}>
+              <div className="tournament-card-content">
+                <div className="tournament-card-header">
+                  <h3 className="tournament-card-title">{tournament.name}</h3>
+                  <span className="tournament-card-status" style={{backgroundColor: getStatusColor(tournament.status)}}>
                     {tournament.status || 'Upcoming'}
                   </span>
                 </div>
 
                 {tournament.description && (
-                  <p style={styles.cardDescription}>
+                  <p className="tournament-card-description">
                     {tournament.description.length > 100
                       ? `${tournament.description.substring(0, 100)}...`
                       : tournament.description}
                   </p>
                 )}
 
-                <div style={styles.cardInfo}>
-                  <div style={styles.infoItem}>
-                    <span style={styles.infoIcon}>●</span>
+                <div className="tournament-card-info">
+                  <div className="tournament-info-item">
+                    <span className="tournament-info-icon">📍</span>
                     <span>{tournament.location?.city}, {tournament.location?.state}</span>
                   </div>
-                  <div style={styles.infoItem}>
-                    <span style={styles.infoIcon}>●</span>
+                  <div className="tournament-info-item">
+                    <span className="tournament-info-icon">📅</span>
                     <span>{new Date(tournament.startDate).toLocaleDateString()}</span>
                   </div>
-                  <div style={styles.infoItem}>
-                    <span style={styles.infoIcon}>●</span>
+                  <div className="tournament-info-item">
+                    <span className="tournament-info-icon">👥</span>
                     <span>{tournament.currentTeams || 0}/{tournament.maxTeams} Teams</span>
                   </div>
                   {tournament.prizePool?.totalAmount > 0 && (
-                    <div style={styles.infoItem}>
-                      <span style={styles.infoIcon}>●</span>
+                    <div className="tournament-info-item">
+                      <span className="tournament-info-icon">💰</span>
                       <span>{tournament.prizePool.currency} {tournament.prizePool.totalAmount.toLocaleString()}</span>
                     </div>
                   )}
                 </div>
 
-                <button style={styles.viewButton}>
+                <button className="tournament-view-button">
                   View Details →
                 </button>
               </div>
@@ -302,175 +307,6 @@ const TournamentsList = () => {
       </div>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    maxWidth: '1400px',
-    margin: '0 auto',
-    padding: '40px 20px'
-  },
-  header: {
-    textAlign: 'center',
-    marginBottom: '40px'
-  },
-  title: {
-    fontSize: '42px',
-    margin: '0 0 12px 0',
-    color: '#fff'
-  },
-  subtitle: {
-    fontSize: '18px',
-    color: '#888',
-    margin: 0
-  },
-  filtersContainer: {
-    backgroundColor: '#1e1e1e',
-    borderRadius: '12px',
-    padding: '24px',
-    marginBottom: '40px',
-    border: '1px solid #333'
-  },
-  filterTitle: {
-    fontSize: '20px',
-    margin: '0 0 20px 0',
-    color: '#fff'
-  },
-  filterRow: {
-    display: 'flex',
-    gap: '16px',
-    flexWrap: 'wrap',
-    marginBottom: '16px'
-  },
-  filterGroup: {
-    flex: '1 1 200px',
-    minWidth: '150px'
-  },
-  filterLabel: {
-    display: 'block',
-    fontSize: '14px',
-    color: '#aaa',
-    marginBottom: '6px'
-  },
-  filterInput: {
-    width: '100%',
-    backgroundColor: '#2a2a2a',
-    border: '1px solid #444',
-    borderRadius: '6px',
-    padding: '10px',
-    color: '#fff',
-    fontSize: '14px',
-    boxSizing: 'border-box'
-  },
-  clearButton: {
-    width: '100%',
-    backgroundColor: '#666',
-    border: 'none',
-    borderRadius: '6px',
-    padding: '10px 16px',
-    color: '#fff',
-    fontSize: '14px',
-    fontWeight: 'bold',
-    cursor: 'pointer',
-    transition: 'background-color 0.2s'
-  },
-  resultsCount: {
-    fontSize: '14px',
-    color: '#888',
-    marginTop: '12px'
-  },
-  tournamentsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
-    gap: '24px'
-  },
-  loading: {
-    gridColumn: '1 / -1',
-    textAlign: 'center',
-    padding: '60px',
-    fontSize: '18px',
-    color: '#888'
-  },
-  empty: {
-    gridColumn: '1 / -1',
-    textAlign: 'center',
-    padding: '60px'
-  },
-  tournamentCard: {
-    backgroundColor: '#1e1e1e',
-    borderRadius: '12px',
-    overflow: 'hidden',
-    border: '1px solid #333',
-    cursor: 'pointer',
-    transition: 'transform 0.2s, border-color 0.2s',
-    '&:hover': {
-      transform: 'translateY(-4px)',
-      borderColor: '#4CAF50'
-    }
-  },
-  cardBanner: {
-    width: '100%',
-    height: '200px',
-    objectFit: 'cover'
-  },
-  cardContent: {
-    padding: '20px'
-  },
-  cardHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'start',
-    marginBottom: '12px',
-    gap: '12px'
-  },
-  cardTitle: {
-    fontSize: '22px',
-    margin: 0,
-    color: '#fff',
-    flex: 1
-  },
-  cardStatus: {
-    padding: '4px 12px',
-    borderRadius: '12px',
-    fontSize: '12px',
-    fontWeight: 'bold',
-    color: 'white',
-    whiteSpace: 'nowrap'
-  },
-  cardDescription: {
-    fontSize: '14px',
-    color: '#aaa',
-    lineHeight: '1.5',
-    marginBottom: '16px'
-  },
-  cardInfo: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: '12px',
-    marginBottom: '16px'
-  },
-  infoItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    fontSize: '14px',
-    color: '#ccc'
-  },
-  infoIcon: {
-    fontSize: '16px'
-  },
-  viewButton: {
-    width: '100%',
-    backgroundColor: '#4CAF50',
-    border: 'none',
-    borderRadius: '6px',
-    padding: '12px',
-    color: '#fff',
-    fontSize: '14px',
-    fontWeight: 'bold',
-    cursor: 'pointer',
-    transition: 'background-color 0.2s'
-  }
 };
 
 export default TournamentsList;
