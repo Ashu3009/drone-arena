@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getAllTeams } from '../../services/api';
-import { mobileTheme } from '../../theme/mobileTheme';
+import { getTeams } from '../../services/api';
 import './MobileLeaderboard.css';
 
 const MobileLeaderboard = () => {
@@ -14,7 +13,7 @@ const MobileLeaderboard = () => {
 
   const fetchTeams = async () => {
     try {
-      const response = await getAllTeams();
+      const response = await getTeams();
       if (response.data) {
         setTeams(response.data);
       }

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { mobileTheme } from '../../theme/mobileTheme';
 import './MobileHeader.css';
 
 const MobileHeader = () => {

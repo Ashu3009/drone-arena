@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { getCurrentMatch } from '../../services/api';
-import { mobileTheme } from '../../theme/mobileTheme';
 import './MobileHome.css';
 
 const MobileHome = () => {
   const [currentMatch, setCurrentMatch] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchCurrentMatch();
@@ -25,8 +23,6 @@ const MobileHome = () => {
     } catch (err) {
       if (err.response?.status === 404) {
         setCurrentMatch(null);
-      } else {
-        setError('Failed to load match data');
       }
       setLoading(false);
     }
@@ -34,9 +30,9 @@ const MobileHome = () => {
 
   const getStatusBadge = (status) => {
     const badges = {
-      scheduled: { text: 'Upcoming', color: mobileTheme.colors.info },
-      in_progress: { text: 'Live', color: mobileTheme.colors.danger },
-      completed: { text: 'Completed', color: mobileTheme.colors.success },
+      scheduled: { text: 'Upcoming', color: '#3b82f6' },
+      in_progress: { text: 'Live', color: '#ef4444' },
+      completed: { text: 'Completed', color: '#10b981' },
     };
     return badges[status] || badges.scheduled;
   };
@@ -111,7 +107,7 @@ const MobileHome = () => {
               <div className="team-section">
                 <div
                   className="team-color-bar"
-                  style={{ backgroundColor: currentMatch.teamA?.color || mobileTheme.colors.teamRed }}
+                  style={{ backgroundColor: currentMatch.teamA?.color || '#dc2626' }}
                 ></div>
                 <div className="team-info">
                   <h3 className="team-name">{currentMatch.teamA?.name || 'Team A'}</h3>
@@ -146,7 +142,7 @@ const MobileHome = () => {
               <div className="team-section">
                 <div
                   className="team-color-bar"
-                  style={{ backgroundColor: currentMatch.teamB?.color || mobileTheme.colors.teamBlue }}
+                  style={{ backgroundColor: currentMatch.teamB?.color || '#2563eb' }}
                 ></div>
                 <div className="team-info">
                   <h3 className="team-name">{currentMatch.teamB?.name || 'Team B'}</h3>

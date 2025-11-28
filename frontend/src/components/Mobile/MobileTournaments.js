@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAllTournaments } from '../../services/api';
-import { mobileTheme } from '../../theme/mobileTheme';
+import { getTournaments } from '../../services/api';
 import './MobileTournaments.css';
 
 const MobileTournaments = () => {
@@ -16,7 +15,7 @@ const MobileTournaments = () => {
 
   const fetchTournaments = async () => {
     try {
-      const response = await getAllTournaments();
+      const response = await getTournaments();
       if (response.data) {
         setTournaments(response.data);
       }
