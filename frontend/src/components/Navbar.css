@@ -1,0 +1,240 @@
+/* Navbar - Indian Theme with Responsive Hamburger Menu */
+
+.navbar {
+  background: linear-gradient(180deg,
+    #FF9933 0%, #FF9933 33%,
+    #FFFFFF 33%, #FFFFFF 66%,
+    #138808 66%, #138808 100%);
+  border-bottom: 3px solid #FF9933;
+  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
+
+.navbar-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 70px;
+}
+
+/* Logo/Brand */
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: #222;
+  font-size: 24px;
+  font-weight: bold;
+  transition: opacity 0.2s;
+}
+
+.navbar-brand:hover {
+  opacity: 0.8;
+}
+
+.brand-icon {
+  font-size: 32px;
+}
+
+.brand-text {
+  background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Desktop Navigation Links */
+.nav-links-desktop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #666;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.nav-link:hover {
+  background: rgba(255, 153, 51, 0.1);
+  color: #FF9933;
+}
+
+.nav-link-active {
+  color: #FF9933;
+  background: rgba(255, 153, 51, 0.15);
+  border-bottom: 2px solid #138808;
+}
+
+.login-button,
+.logout-button {
+  font-size: 15px;
+  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-left: 8px;
+}
+
+.login-button {
+  background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
+  color: #fff;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.login-button:hover {
+  box-shadow: 0 4px 12px rgba(255, 153, 51, 0.4);
+  transform: translateY(-2px);
+}
+
+.logout-button {
+  background: #dc2626;
+  color: #fff;
+}
+
+.logout-button:hover {
+  background: #b91c1c;
+}
+
+/* Hamburger Menu Button */
+.hamburger-button {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  z-index: 1001;
+}
+
+.hamburger-line {
+  width: 28px;
+  height: 3px;
+  background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.hamburger-button.active .hamburger-line:nth-child(1) {
+  transform: rotate(45deg) translate(8px, 8px);
+}
+
+.hamburger-button.active .hamburger-line:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-button.active .hamburger-line:nth-child(3) {
+  transform: rotate(-45deg) translate(8px, -8px);
+}
+
+/* Mobile Menu */
+.nav-links-mobile {
+  position: fixed;
+  top: 70px;
+  right: -100%;
+  width: 280px;
+  height: calc(100vh - 70px);
+  background: #FFFFFF;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: right 0.3s ease;
+  z-index: 999;
+  overflow-y: auto;
+}
+
+.nav-links-mobile.active {
+  right: 0;
+}
+
+.nav-links-mobile .nav-link {
+  width: 100%;
+  text-align: left;
+  padding: 14px 20px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  font-size: 16px;
+}
+
+.nav-links-mobile .nav-link:hover {
+  border-color: #FF9933;
+  background: rgba(255, 153, 51, 0.1);
+}
+
+.nav-links-mobile .nav-link-active {
+  background: linear-gradient(135deg, rgba(255, 153, 51, 0.15) 0%, rgba(19, 136, 8, 0.15) 100%);
+  border-color: #FF9933;
+  border-left: 4px solid #138808;
+}
+
+.nav-links-mobile .login-button,
+.nav-links-mobile .logout-button {
+  width: 100%;
+  margin: 8px 0;
+  text-align: center;
+}
+
+/* Overlay */
+.menu-overlay {
+  position: fixed;
+  top: 70px;
+  left: 0;
+  width: 100%;
+  height: calc(100vh - 70px);
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 998;
+}
+
+.menu-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .nav-links-desktop {
+    display: none;
+  }
+
+  .hamburger-button {
+    display: flex;
+  }
+}
+
+/* Tablet */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .navbar-container {
+    padding: 0 16px;
+  }
+
+  .nav-link {
+    padding: 10px 12px;
+    font-size: 15px;
+  }
+
+  .brand-text {
+    font-size: 20px;
+  }
+}

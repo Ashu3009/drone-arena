@@ -1,19 +1,30 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import './Navbar.css';
 
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, logout } = useAuth();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate('/admin/login');
+    setMenuOpen(false);
   };
 
   const isActive = (path) => {
     return location.pathname === path;
+  };
+
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
+
+  const closeMenu = () => {
+    setMenuOpen(false);
   };
 
   // Don't show navbar on admin login page
@@ -22,32 +33,76 @@ const Navbar = () => {
   }
 
   return (
-    <nav style={styles.navbar}>
-      <div style={styles.container}>
-        {/* Logo/Brand */}
-        <Link to="/" style={styles.brand}>
-          <span style={styles.brandIcon}>▲</span>
-          <span style={styles.brandText}>Drone Arena</span>
-        </Link>
+    <>
+      <nav className="navbar">
+        <div className="navbar-container">
+          {/* Logo/Brand */}
+          <Link to="/" className="navbar-brand" onClick={closeMenu}>
+            <span className="brand-icon">🚁</span>
+            <span className="brand-text">DroneNova</span>
+          </Link>
 
-        {/* Navigation Links */}
-        <div style={styles.navLinks}>
+          {/* Desktop Navigation Links */}
+          <div className="nav-links-desktop">
+            <Link
+              to="/"
+              className={`nav-link ${isActive('/') ? 'nav-link-active' : ''}`}
+            >
+              Live Match
+            </Link>
+
+            <Link
+              to="/tournaments"
+              className={`nav-link ${isActive('/tournaments') || location.pathname.startsWith('/tournament/') ? 'nav-link-active' : ''}`}
+            >
+              Tournaments
+            </Link>
+
+            {isAuthenticated ? (
+              <>
+                <Link
+                  to="/admin/dashboard"
+                  className={`nav-link ${isActive('/admin/dashboard') ? 'nav-link-active' : ''}`}
+                >
+                  Admin Dashboard
+                </Link>
+                <button onClick={handleLogout} className="logout-button">
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link to="/admin/login" className="login-button">
+                Admin Login
+              </Link>
+            )}
+          </div>
+
+          {/* Hamburger Menu Button */}
+          <button
+            className={`hamburger-button ${menuOpen ? 'active' : ''}`}
+            onClick={toggleMenu}
+            aria-label="Toggle menu"
+          >
+            <div className="hamburger-line"></div>
+            <div className="hamburger-line"></div>
+            <div className="hamburger-line"></div>
+          </button>
+        </div>
+
+        {/* Mobile Navigation Menu */}
+        <div className={`nav-links-mobile ${menuOpen ? 'active' : ''}`}>
           <Link
             to="/"
-            style={{
-              ...styles.navLink,
-              ...(isActive('/') ? styles.navLinkActive : {})
-            }}
+            className={`nav-link ${isActive('/') ? 'nav-link-active' : ''}`}
+            onClick={closeMenu}
           >
             Live Match
           </Link>
 
           <Link
             to="/tournaments"
-            style={{
-              ...styles.navLink,
-              ...(isActive('/tournaments') || location.pathname.startsWith('/tournament/') ? styles.navLinkActive : {})
-            }}
+            className={`nav-link ${isActive('/tournaments') || location.pathname.startsWith('/tournament/') ? 'nav-link-active' : ''}`}
+            onClick={closeMenu}
           >
             Tournaments
           </Link>
@@ -56,113 +111,30 @@ const Navbar = () => {
             <>
               <Link
                 to="/admin/dashboard"
-                style={{
-                  ...styles.navLink,
-                  ...(isActive('/admin/dashboard') ? styles.navLinkActive : {})
-                }}
+                className={`nav-link ${isActive('/admin/dashboard') ? 'nav-link-active' : ''}`}
+                onClick={closeMenu}
               >
                 Admin Dashboard
               </Link>
-              <button onClick={handleLogout} style={styles.logoutButton}>
+              <button onClick={handleLogout} className="logout-button">
                 Logout
               </button>
             </>
           ) : (
-            <Link
-              to="/admin/login"
-              style={styles.loginButton}
-            >
+            <Link to="/admin/login" className="login-button" onClick={closeMenu}>
               Admin Login
             </Link>
           )}
         </div>
-      </div>
-    </nav>
-  );
-};
+      </nav>
 
-const styles = {
-  navbar: {
-    backgroundColor: '#1a1a1a',
-    borderBottom: '2px solid #333',
-    padding: '0',
-    position: 'sticky',
-    top: 0,
-    zIndex: 1000,
-    boxShadow: '0 2px 10px rgba(0,0,0,0.3)'
-  },
-  container: {
-    maxWidth: '1400px',
-    margin: '0 auto',
-    padding: '0 20px',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    height: '70px'
-  },
-  brand: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    textDecoration: 'none',
-    color: '#fff',
-    fontSize: '24px',
-    fontWeight: 'bold',
-    transition: 'opacity 0.2s'
-  },
-  brandIcon: {
-    fontSize: '32px'
-  },
-  brandText: {
-    background: 'linear-gradient(135deg, #4CAF50, #2196F3)',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    backgroundClip: 'text'
-  },
-  navLinks: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px'
-  },
-  navLink: {
-    textDecoration: 'none',
-    color: '#aaa',
-    fontSize: '16px',
-    fontWeight: '500',
-    padding: '10px 20px',
-    borderRadius: '6px',
-    transition: 'all 0.2s',
-    cursor: 'pointer'
-  },
-  navLinkActive: {
-    color: '#4CAF50',
-    backgroundColor: 'rgba(76, 175, 80, 0.1)'
-  },
-  loginButton: {
-    textDecoration: 'none',
-    backgroundColor: '#2196F3',
-    color: '#fff',
-    fontSize: '15px',
-    fontWeight: '600',
-    padding: '10px 24px',
-    borderRadius: '6px',
-    border: 'none',
-    cursor: 'pointer',
-    transition: 'background-color 0.2s',
-    marginLeft: '8px'
-  },
-  logoutButton: {
-    backgroundColor: '#f44336',
-    color: '#fff',
-    fontSize: '15px',
-    fontWeight: '600',
-    padding: '10px 24px',
-    borderRadius: '6px',
-    border: 'none',
-    cursor: 'pointer',
-    transition: 'background-color 0.2s',
-    marginLeft: '8px'
-  }
+      {/* Overlay */}
+      <div
+        className={`menu-overlay ${menuOpen ? 'active' : ''}`}
+        onClick={closeMenu}
+      ></div>
+    </>
+  );
 };
 
 export default Navbar;
