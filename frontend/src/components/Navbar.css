@@ -50,11 +50,9 @@
   background-clip: text;
 }
 
-/* Desktop Navigation Links */
+/* Desktop Navigation Links - Hidden (Always use hamburger) */
 .nav-links-desktop {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  display: none;
 }
 
 .nav-link {
@@ -112,9 +110,9 @@
   background: #b91c1c;
 }
 
-/* Hamburger Menu Button */
+/* Hamburger Menu Button - Always visible */
 .hamburger-button {
-  display: none;
+  display: flex;
   flex-direction: column;
   gap: 5px;
   background: transparent;
@@ -212,14 +210,21 @@
   visibility: visible;
 }
 
-/* Responsive */
+/* Responsive - Hamburger always visible */
 @media (max-width: 768px) {
-  .nav-links-desktop {
-    display: none;
+  .nav-links-mobile {
+    width: 100%;
+    right: -100%;
   }
 
-  .hamburger-button {
-    display: flex;
+  .nav-links-mobile.active {
+    right: 0;
+  }
+}
+
+@media (min-width: 769px) {
+  .nav-links-mobile {
+    width: 320px;
   }
 }
 
