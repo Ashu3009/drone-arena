@@ -1,378 +1,469 @@
 import React, { useState, useEffect } from 'react';
-import { getTournaments, getMatches, getMatchReports } from '../../services/api';
+import {
+  getReportTournaments,
+  getTournamentPilotAggregates,
+  getMatches,
+  getMatchReports,
+  downloadReportPDF
+} from '../../services/api';
 
 const ReportsManager = () => {
   const [tournaments, setTournaments] = useState([]);
   const [selectedTournament, setSelectedTournament] = useState(null);
+  const [activeTab, setActiveTab] = useState('matches'); // 'matches' | 'teams'
+
+  // Matches Tab State
   const [matches, setMatches] = useState([]);
   const [selectedMatch, setSelectedMatch] = useState(null);
-  const [reports, setReports] = useState([]);
-  const [groupedReports, setGroupedReports] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [selectedReport, setSelectedReport] = useState(null);
+  const [matchReports, setMatchReports] = useState(null);
 
+  // Teams Tab State
+  const [pilotAggregates, setPilotAggregates] = useState([]);
+
+  const [loading, setLoading] = useState(false);
+  const [filters, setFilters] = useState({ city: '', dateFrom: '', dateTo: '' });
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     loadTournaments();
   }, []);
 
   const loadTournaments = async () => {
+    setLoading(true);
     try {
-      const response = await getTournaments();
+      const response = await getReportTournaments(filters);
       if (response.success) {
         setTournaments(response.data);
       }
     } catch (error) {
       console.error('Error loading tournaments:', error);
       alert('Failed to load tournaments');
-    }
-  };
-
-  const loadMatchReports = async (matchId) => {
-    setLoading(true);
-    try {
-      const response = await getMatchReports(matchId);
-      if (response.success) {
-        setReports(response.data);
-        groupReportsByRound(response.data);
-      }
-    } catch (error) {
-      console.error('Error loading reports:', error);
-      alert('Failed to load reports');
     } finally {
       setLoading(false);
     }
   };
 
-  const groupReportsByRound = (reportsData) => {
-    const grouped = {};
-
-    reportsData.forEach(report => {
-      const roundNum = report.roundNumber;
-      if (!grouped[roundNum]) {
-        grouped[roundNum] = [];
-      }
-      grouped[roundNum].push(report);
-    });
-
-    setGroupedReports(grouped);
+  const handleFilterChange = (key, value) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
   };
 
-  const handleTournamentSelect = async (tournamentId) => {
-    setSelectedTournament(tournamentId);
+  const applyFilters = () => {
+    loadTournaments();
+  };
+
+  const clearFilters = () => {
+    setFilters({ city: '', dateFrom: '', dateTo: '' });
+    setTimeout(() => loadTournaments(), 100);
+  };
+
+  const handleTournamentSelect = async (tournament) => {
+    setSelectedTournament(tournament);
+    setActiveTab('matches');
     setSelectedMatch(null);
-    setReports([]);
-    setGroupedReports({});
-    
+    setMatchReports(null);
+    setPilotAggregates([]);
+    setMatches([]);
+
     // Load matches for this tournament
+    setLoading(true);
     try {
-      const response = await getMatches();
+      const response = await getMatches({ tournamentId: tournament._id });
       if (response.success) {
-        const filteredMatches = response.data.filter(m => m.tournament === tournamentId);
-        setMatches(filteredMatches);
+        const completedMatches = response.data.filter(m => m.status === 'completed');
+        setMatches(completedMatches);
       }
     } catch (error) {
       console.error('Error loading matches:', error);
+      alert('Failed to load matches');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleMatchSelect = (matchId) => {
-    setSelectedMatch(matchId);
-    loadMatchReports(matchId);
-    setSelectedReport(null);
+  const handleMatchSelect = async (match) => {
+    setSelectedMatch(match);
+    setLoading(true);
+    try {
+      const response = await getMatchReports(match._id);
+      if (response.success) {
+        setMatchReports(response.data);
+      }
+    } catch (error) {
+      console.error('Error loading match reports:', error);
+      alert('Failed to load match reports');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const viewReportDetails = (report) => {
-    setSelectedReport(report);
+  const handleTabSwitch = async (tab) => {
+    setActiveTab(tab);
+    setSelectedMatch(null);
+    setMatchReports(null);
+
+    if (tab === 'teams' && pilotAggregates.length === 0) {
+      // Load pilot aggregates for first time
+      setLoading(true);
+      try {
+        const response = await getTournamentPilotAggregates(selectedTournament._id);
+        if (response.success) {
+          setPilotAggregates(response.data);
+        }
+      } catch (error) {
+        console.error('Error loading pilot aggregates:', error);
+        alert('Failed to load pilot statistics');
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
-  const closeReportDetails = () => {
-    setSelectedReport(null);
+  const getPlayingStyleColor = (style) => {
+    switch (style) {
+      case 'Aggressive': return '#ff4444';
+      case 'Defensive': return '#4CAF50';
+      case 'Balanced': return '#2196F3';
+      case 'Offensive-minded': return '#FF9800';
+      case 'Defensive-minded': return '#00BCD4';
+      default: return '#888';
+    }
   };
 
-  const downloadReport = (report) => {
-    const reportData = {
-      droneId: report.droneId,
-      team: report.team?.name || 'Unknown',
-      round: report.roundNumber,
-      batteryUsed: report.batteryUsage?.consumed || 0,
-      totalDistance: report.totalDistance || 0,
-      avgSpeed: report.averageSpeed || 0,
-      maxSpeed: report.maxSpeed || 0,
-      performanceScore: report.performanceScore || 0,
-      generatedAt: new Date(report.generatedAt).toLocaleString()
-    };
-
-    const dataStr = JSON.stringify(reportData, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${report.droneId}_Round${report.roundNumber}_Report.json`;
-    link.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const downloadAllReports = () => {
-    if (reports.length === 0) return;
-
-    const allReportsData = reports.map(report => ({
-      droneId: report.droneId,
-      team: report.team?.name || 'Unknown',
-      round: report.roundNumber,
-      batteryUsed: report.batteryUsage?.consumed || 0,
-      totalDistance: report.totalDistance || 0,
-      avgSpeed: report.averageSpeed || 0,
-      maxSpeed: report.maxSpeed || 0,
-      performanceScore: report.performanceScore || 0,
-      generatedAt: new Date(report.generatedAt).toLocaleString()
-    }));
-
-    const dataStr = JSON.stringify(allReportsData, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `Match_Reports_${new Date().toISOString().slice(0,10)}.json`;
-    link.click();
-    URL.revokeObjectURL(url);
+  const handleDownloadPDF = async (report) => {
+    try {
+      setLoading(true);
+      await downloadReportPDF(report._id, report.pilotName, report.roundNumber);
+      console.log('PDF downloaded successfully');
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+      alert('Failed to download PDF report');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div style={styles.container}>
-      <h2 style={styles.title}>📊 Reports Management</h2>
+      <h2 style={styles.header}>Reports & Analytics</h2>
 
-      {/* Tournament Selection */}
-      <div style={styles.section}>
-        <h3 style={styles.sectionTitle}>🏆 Select Tournament</h3>
-        <div style={styles.tournamentGrid}>
-          {tournaments.map(tournament => (
-            <button
-              key={tournament._id}
-              onClick={() => handleTournamentSelect(tournament._id)}
-              style={{
-                ...styles.tournamentButton,
-                backgroundColor: selectedTournament === tournament._id ? '#4CAF50' : '#333'
-              }}
-            >
-              {tournament.name}
-            </button>
-          ))}
+      {/* Filters Section */}
+      {!selectedTournament && (
+        <div style={styles.filterSection}>
+          <h3 style={styles.filterTitle}>Tournament Filters</h3>
+          <div style={styles.filterGrid}>
+            <div style={styles.filterItem}>
+              <label style={styles.filterLabel}>City:</label>
+              <input
+                type="text"
+                value={filters.city}
+                onChange={(e) => handleFilterChange('city', e.target.value)}
+                placeholder="Enter city name"
+                style={styles.filterInput}
+              />
+            </div>
+            <div style={styles.filterItem}>
+              <label style={styles.filterLabel}>From Date:</label>
+              <input
+                type="date"
+                value={filters.dateFrom}
+                onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
+                style={styles.filterInput}
+              />
+            </div>
+            <div style={styles.filterItem}>
+              <label style={styles.filterLabel}>To Date:</label>
+              <input
+                type="date"
+                value={filters.dateTo}
+                onChange={(e) => handleFilterChange('dateTo', e.target.value)}
+                style={styles.filterInput}
+              />
+            </div>
+          </div>
+          <div style={styles.filterButtons}>
+            <button onClick={applyFilters} style={styles.btnApply}>Apply Filters</button>
+            <button onClick={clearFilters} style={styles.btnClear}>Clear Filters</button>
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Match Selection */}
-      {selectedTournament && matches.length > 0 && (
+      {/* Tournament List */}
+      {!selectedTournament && (
         <div style={styles.section}>
-          <h3 style={styles.sectionTitle}>⚽ Select Match</h3>
-          <div style={styles.matchGrid}>
-            {matches.map(match => (
-              <button
-                key={match._id}
-                onClick={() => handleMatchSelect(match._id)}
-                style={{
-                  ...styles.matchButton,
-                  backgroundColor: selectedMatch === match._id ? '#2196F3' : '#444'
-                }}
+          <h3 style={styles.sectionTitle}>Select Tournament</h3>
+          {loading && <p style={styles.loading}>Loading tournaments...</p>}
+          {!loading && tournaments.length === 0 && <p style={styles.noData}>No tournaments found</p>}
+          <div style={styles.tournamentGrid}>
+            {tournaments.map((tournament) => (
+              <div
+                key={tournament._id}
+                style={styles.tournamentCard}
+                onClick={() => handleTournamentSelect(tournament)}
               >
-                <div>{match.teamA?.name || 'Team A'} vs {match.teamB?.name || 'Team B'}</div>
-                <div style={styles.matchDate}>
-                  {new Date(match.createdAt).toLocaleDateString()}
+                <h4 style={styles.tournamentName}>{tournament.name}</h4>
+                <div style={styles.tournamentInfo}>
+                  <p>📍 {tournament.location?.city || 'N/A'}</p>
+                  <p>📅 {new Date(tournament.startDate).toLocaleDateString()}</p>
+                  <p>🏆 {tournament.matchCount} Matches</p>
+                  <p>📊 {tournament.reportCount} Reports</p>
                 </div>
-              </button>
+              </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* Loading State */}
-      {loading && <p style={styles.loading}>Loading reports...</p>}
+      {/* Tournament Selected View */}
+      {selectedTournament && (
+        <div>
+          {/* Breadcrumb */}
+          <div style={styles.breadcrumb}>
+            <button onClick={() => setSelectedTournament(null)} style={styles.backButton}>
+              ← Back to Tournaments
+            </button>
+            <h3 style={styles.breadcrumbText}>{selectedTournament.name}</h3>
+          </div>
 
-      {/* No Match Selected */}
-      {selectedTournament && matches.length > 0 && !selectedMatch && !loading && (
-        <p style={styles.noData}>👆 Select a match to view reports</p>
-      )}
-
-      {/* No Reports */}
-      {!loading && selectedMatch && reports.length === 0 && (
-        <p style={styles.noData}>No reports found for this match.</p>
-      )}
-
-      {/* Reports Display */}
-      {!loading && selectedMatch && reports.length > 0 && (
-        <div style={styles.section}>
-          <div style={styles.sectionHeader}>
-            <h3 style={styles.sectionTitle}>
-              📋 Reports ({reports.length} drones)
-            </h3>
-            <button style={styles.downloadAllButton} onClick={downloadAllReports}>
-              ⬇️ Download All Reports
+          {/* Tabs */}
+          <div style={styles.tabs}>
+            <button
+              style={activeTab === 'matches' ? {...styles.tab, ...styles.tabActive} : styles.tab}
+              onClick={() => handleTabSwitch('matches')}
+            >
+              📋 Matches
+            </button>
+            <button
+              style={activeTab === 'teams' ? {...styles.tab, ...styles.tabActive} : styles.tab}
+              onClick={() => handleTabSwitch('teams')}
+            >
+              👥 Teams (Pilot Stats)
             </button>
           </div>
 
-          {/* Grouped by Round */}
-          {Object.keys(groupedReports).sort((a, b) => Number(a) - Number(b)).map(roundNum => {
-            const roundReports = groupedReports[roundNum];
-
-            return (
-              <div key={roundNum} style={styles.roundGroup}>
-                <h4 style={styles.roundTitle}>Round {roundNum}</h4>
-
-                <div style={styles.reportsGrid}>
-                  {roundReports.map(report => (
-                    <div
-                      key={report._id}
-                      style={styles.reportCard}
-                    >
-                      <div style={styles.reportHeader}>
-                        <span style={styles.droneId}>{report.droneId}</span>
-                        <span style={{
-                          ...styles.teamBadge,
-                          backgroundColor: report.team?.color || '#888'
-                        }}>
-                          {report.team?.name || 'Team'}
+          {/* Matches Tab Content */}
+          {activeTab === 'matches' && !selectedMatch && (
+            <div style={styles.section}>
+              <h3 style={styles.sectionTitle}>Matches</h3>
+              {loading && <p style={styles.loading}>Loading matches...</p>}
+              {!loading && matches.length === 0 && <p style={styles.noData}>No completed matches found</p>}
+              <div style={styles.matchGrid}>
+                {matches.map((match) => (
+                  <div
+                    key={match._id}
+                    style={styles.matchCard}
+                    onClick={() => handleMatchSelect(match)}
+                  >
+                    <div style={styles.matchHeader}>
+                      <h4 style={styles.matchTitle}>Match {match.matchNumber}</h4>
+                      <span style={styles.matchDate}>
+                        {new Date(match.scheduledTime).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div style={styles.matchTeams}>
+                      <div style={styles.team}>
+                        <span style={{...styles.teamName, color: match.teamA?.color}}>
+                          {match.teamA?.name}
                         </span>
+                        <span style={styles.teamScore}>{match.finalScoreA}</span>
                       </div>
-
-                      <div style={styles.reportStats}>
-                        <div style={styles.stat}>
-                          <span style={styles.statLabel}>Battery Used:</span>
-                          <span style={styles.statValue}>{(report.batteryUsage?.consumed || 0).toFixed(1)}%</span>
-                        </div>
-                        <div style={styles.stat}>
-                          <span style={styles.statLabel}>Distance:</span>
-                          <span style={styles.statValue}>{(report.totalDistance || 0).toFixed(1)}m</span>
-                        </div>
-                        <div style={styles.stat}>
-                          <span style={styles.statLabel}>Avg Speed:</span>
-                          <span style={styles.statValue}>{(report.averageSpeed || 0).toFixed(2)} m/s</span>
-                        </div>
-                        <div style={styles.stat}>
-                          <span style={styles.statLabel}>Performance:</span>
-                          <span style={styles.statValue}>{(report.performanceScore || 0).toFixed(0)}</span>
-                        </div>
-                      </div>
-
-                      <div style={styles.buttonGroup}>
-                        <button 
-                          style={styles.viewButton}
-                          onClick={() => viewReportDetails(report)}
-                        >
-                          👁️ View Details
-                        </button>
-                        <button 
-                          style={styles.downloadButton}
-                          onClick={() => downloadReport(report)}
-                        >
-                          ⬇️ Download
-                        </button>
+                      <span style={styles.vs}>vs</span>
+                      <div style={styles.team}>
+                        <span style={{...styles.teamName, color: match.teamB?.color}}>
+                          {match.teamB?.name}
+                        </span>
+                        <span style={styles.teamScore}>{match.finalScoreB}</span>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Report Details Modal */}
-      {selectedReport && (
-        <div style={styles.modal} onClick={closeReportDetails}>
-          <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <button style={styles.closeButton} onClick={closeReportDetails}>×</button>
-
-            <h3 style={styles.modalTitle}>
-              🚁 Drone Report: {selectedReport.droneId}
-            </h3>
-
-            <div style={styles.modalSection}>
-              <h4 style={styles.modalSectionTitle}>Basic Info</h4>
-              <div style={styles.infoGrid}>
-                <div style={styles.infoItem}>
-                  <span style={styles.infoLabel}>Team:</span>
-                  <span style={styles.infoValue}>{selectedReport.team?.name || 'N/A'}</span>
-                </div>
-                <div style={styles.infoItem}>
-                  <span style={styles.infoLabel}>Round:</span>
-                  <span style={styles.infoValue}>{selectedReport.roundNumber}</span>
-                </div>
-                <div style={styles.infoItem}>
-                  <span style={styles.infoLabel}>Status:</span>
-                  <span style={styles.infoValue}>{selectedReport.status}</span>
-                </div>
-                <div style={styles.infoItem}>
-                  <span style={styles.infoLabel}>Generated At:</span>
-                  <span style={styles.infoValue}>
-                    {new Date(selectedReport.generatedAt).toLocaleString()}
-                  </span>
-                </div>
+                    {match.winner && (
+                      <div style={styles.matchWinner}>
+                        🏆 Winner: {match.winner.name}
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
+          )}
 
-            <div style={styles.modalSection}>
-              <h4 style={styles.modalSectionTitle}>Performance Metrics</h4>
-              <div style={styles.infoGrid}>
-                <div style={styles.infoItem}>
-                  <span style={styles.infoLabel}>Total Distance:</span>
-                  <span style={styles.infoValue}>{(selectedReport.totalDistance || 0).toFixed(2)}m</span>
-                </div>
-                <div style={styles.infoItem}>
-                  <span style={styles.infoLabel}>Avg Speed:</span>
-                  <span style={styles.infoValue}>{(selectedReport.averageSpeed || 0).toFixed(2)} m/s</span>
-                </div>
-                <div style={styles.infoItem}>
-                  <span style={styles.infoLabel}>Max Speed:</span>
-                  <span style={styles.infoValue}>{(selectedReport.maxSpeed || 0).toFixed(2)} m/s</span>
-                </div>
-                <div style={styles.infoItem}>
-                  <span style={styles.infoLabel}>Performance Score:</span>
-                  <span style={styles.infoValue}>{(selectedReport.performanceScore || 0).toFixed(0)}</span>
-                </div>
+          {/* Match Reports View */}
+          {activeTab === 'matches' && selectedMatch && matchReports && (
+            <div>
+              <div style={styles.breadcrumb}>
+                <button onClick={() => setSelectedMatch(null)} style={styles.backButton}>
+                  ← Back to Matches
+                </button>
+                <h3 style={styles.breadcrumbText}>Match {selectedMatch.matchNumber} - Reports</h3>
+              </div>
+
+              <div style={styles.section}>
+                {loading && <p style={styles.loading}>Loading reports...</p>}
+                {!loading && matchReports.byRound && Object.keys(matchReports.byRound).map((roundNum) => (
+                  <div key={roundNum} style={styles.roundSection}>
+                    <h4 style={styles.roundTitle}>Round {roundNum}</h4>
+                    <div style={styles.reportGrid}>
+                      {matchReports.byRound[roundNum].map((report) => (
+                        <div key={report._id} style={styles.reportCard}>
+                          <div style={styles.reportHeader}>
+                            <span style={{...styles.reportDrone, color: report.team?.color}}>
+                              {report.droneId}
+                            </span>
+                            <span style={styles.reportScore}>{report.performanceScore}/100</span>
+                          </div>
+
+                          <div style={styles.pilotInfo}>
+                            👤 {report.pilotName}
+                          </div>
+
+                          <div style={styles.reportStats}>
+                            <div style={styles.stat}>
+                              <span>Distance:</span>
+                              <span>{report.totalDistance?.toFixed(1) || 0}m</span>
+                            </div>
+                            <div style={styles.stat}>
+                              <span>Avg Speed:</span>
+                              <span>{report.averageSpeed?.toFixed(1) || 0} m/s</span>
+                            </div>
+                            <div style={styles.stat}>
+                              <span>Battery:</span>
+                              <span>{report.batteryUsage?.consumed?.toFixed(1) || 0}%</span>
+                            </div>
+                            <div style={styles.stat}>
+                              <span>Stability:</span>
+                              <span>{report.positionAccuracy || 0}%</span>
+                            </div>
+                          </div>
+
+                          {report.mlAnalysis && (
+                            <div style={styles.mlSummary}>
+                              <p style={styles.mlSummaryText}>{report.mlAnalysis.summary}</p>
+                              <div style={styles.mlMetricsSmall}>
+                                <span style={styles.mlBadge}>🔴 Agg: {report.mlAnalysis.aggressiveness}</span>
+                                <span style={styles.mlBadge}>🟢 Def: {report.mlAnalysis.defensiveness}</span>
+                                <span style={styles.mlBadge}>🔵 Eff: {report.mlAnalysis.efficiency}</span>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Download PDF Button */}
+                          <button
+                            style={styles.downloadButton}
+                            onClick={() => handleDownloadPDF(report)}
+                            disabled={loading}
+                          >
+                            📥 Download PDF
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
+          )}
 
-            <div style={styles.modalSection}>
-              <h4 style={styles.modalSectionTitle}>Battery Usage</h4>
-              <div style={styles.infoGrid}>
-                <div style={styles.infoItem}>
-                  <span style={styles.infoLabel}>Start:</span>
-                  <span style={styles.infoValue}>{(selectedReport.batteryUsage?.start || 100)}%</span>
-                </div>
-                <div style={styles.infoItem}>
-                  <span style={styles.infoLabel}>End:</span>
-                  <span style={styles.infoValue}>{(selectedReport.batteryUsage?.end || 100)}%</span>
-                </div>
-                <div style={styles.infoItem}>
-                  <span style={styles.infoLabel}>Consumed:</span>
-                  <span style={styles.infoValue}>{(selectedReport.batteryUsage?.consumed || 0).toFixed(1)}%</span>
-                </div>
+          {/* Teams Tab Content */}
+          {activeTab === 'teams' && (
+            <div style={styles.section}>
+              <h3 style={styles.sectionTitle}>Pilot Performance (Tournament-wide)</h3>
+              {loading && <p style={styles.loading}>Loading pilot statistics...</p>}
+              {!loading && pilotAggregates.length === 0 && <p style={styles.noData}>No pilot data found</p>}
+              <div style={styles.pilotGrid}>
+                {pilotAggregates.map((pilot, index) => (
+                  <div key={pilot.pilotId} style={styles.pilotCard}>
+                    <div style={styles.pilotRank}>#{index + 1}</div>
+                    <h4 style={styles.pilotName}>{pilot.pilotName}</h4>
+                    <div style={{...styles.pilotTeam, color: pilot.team?.color}}>
+                      {pilot.team?.name}
+                    </div>
+
+                    <div style={styles.pilotStatRow}>
+                      <span>Avg Performance:</span>
+                      <span style={styles.pilotStatValue}>{pilot.avgPerformanceScore}/100</span>
+                    </div>
+
+                    <div style={styles.pilotStatRow}>
+                      <span>Matches Played:</span>
+                      <span style={styles.pilotStatValue}>{pilot.totalMatches}</span>
+                    </div>
+
+                    <div style={styles.pilotStatRow}>
+                      <span>Total Rounds:</span>
+                      <span style={styles.pilotStatValue}>{pilot.totalRounds}</span>
+                    </div>
+
+                    <div style={styles.pilotStatRow}>
+                      <span>Drones Used:</span>
+                      <span style={styles.pilotStatValue}>{pilot.totalDrones}</span>
+                    </div>
+
+                    <div style={styles.pilotStatRow}>
+                      <span>Total Distance:</span>
+                      <span style={styles.pilotStatValue}>{pilot.totalDistance}m</span>
+                    </div>
+
+                    <div style={styles.pilotStatRow}>
+                      <span>Avg Speed:</span>
+                      <span style={styles.pilotStatValue}>{pilot.avgSpeed} m/s</span>
+                    </div>
+
+                    {/* Playing Style Badge */}
+                    <div style={{
+                      ...styles.playingStyleBadge,
+                      backgroundColor: getPlayingStyleColor(pilot.playingStyle)
+                    }}>
+                      {pilot.playingStyle}
+                    </div>
+
+                    {/* ML Metrics */}
+                    <div style={styles.mlMetrics}>
+                      <div style={styles.metricBar}>
+                        <span style={styles.metricLabel}>Aggressive</span>
+                        <div style={styles.barContainer}>
+                          <div style={{
+                            ...styles.barFill,
+                            width: `${pilot.avgAggressiveness}%`,
+                            backgroundColor: '#ff4444'
+                          }} />
+                        </div>
+                        <span style={styles.metricValue}>{pilot.avgAggressiveness}%</span>
+                      </div>
+
+                      <div style={styles.metricBar}>
+                        <span style={styles.metricLabel}>Defensive</span>
+                        <div style={styles.barContainer}>
+                          <div style={{
+                            ...styles.barFill,
+                            width: `${pilot.avgDefensiveness}%`,
+                            backgroundColor: '#4CAF50'
+                          }} />
+                        </div>
+                        <span style={styles.metricValue}>{pilot.avgDefensiveness}%</span>
+                      </div>
+
+                      <div style={styles.metricBar}>
+                        <span style={styles.metricLabel}>Efficiency</span>
+                        <div style={styles.barContainer}>
+                          <div style={{
+                            ...styles.barFill,
+                            width: `${pilot.avgEfficiency}%`,
+                            backgroundColor: '#2196F3'
+                          }} />
+                        </div>
+                        <span style={styles.metricValue}>{pilot.avgEfficiency}%</span>
+                      </div>
+                    </div>
+
+                    {/* Best Drone */}
+                    {pilot.bestDrone && (
+                      <div style={styles.bestDrone}>
+                        🏆 Best with: {pilot.bestDrone} ({pilot.bestPerformance}/100)
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
-
-            {selectedReport.mlAnalysis && Object.keys(selectedReport.mlAnalysis).some(k => selectedReport.mlAnalysis[k] !== 0) && (
-              <div style={styles.modalSection}>
-                <h4 style={styles.modalSectionTitle}>ML Analysis</h4>
-                <div style={styles.mlAnalysis}>
-                  <div style={styles.infoItem}>
-                    <span style={styles.infoLabel}>Aggressiveness:</span>
-                    <span style={styles.infoValue}>{selectedReport.mlAnalysis.aggressiveness || 0}</span>
-                  </div>
-                  <div style={styles.infoItem}>
-                    <span style={styles.infoLabel}>Defensiveness:</span>
-                    <span style={styles.infoValue}>{selectedReport.mlAnalysis.defensiveness || 0}</span>
-                  </div>
-                  <div style={styles.infoItem}>
-                    <span style={styles.infoLabel}>Teamwork:</span>
-                    <span style={styles.infoValue}>{selectedReport.mlAnalysis.teamwork || 0}</span>
-                  </div>
-                  <div style={styles.infoItem}>
-                    <span style={styles.infoLabel}>Efficiency:</span>
-                    <span style={styles.infoValue}>{selectedReport.mlAnalysis.efficiency || 0}</span>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+          )}
         </div>
       )}
     </div>
@@ -382,250 +473,430 @@ const ReportsManager = () => {
 const styles = {
   container: {
     padding: '20px',
-    color: 'white',
-    minHeight: '100vh'
+    maxWidth: '1400px',
+    margin: '0 auto'
   },
-  title: {
+  header: {
     fontSize: '28px',
-    marginBottom: '30px',
-    borderBottom: '2px solid #4CAF50',
-    paddingBottom: '15px'
+    fontWeight: 'bold',
+    marginBottom: '20px',
+    color: '#4CAF50'
   },
-  section: {
+
+  // Filters
+  filterSection: {
     backgroundColor: '#1e1e1e',
     padding: '20px',
     borderRadius: '8px',
-    marginBottom: '25px'
-  },
-  sectionHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     marginBottom: '20px'
+  },
+  filterTitle: {
+    fontSize: '18px',
+    marginBottom: '15px',
+    color: '#4CAF50'
+  },
+  filterGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+    gap: '15px',
+    marginBottom: '15px'
+  },
+  filterItem: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '5px'
+  },
+  filterLabel: {
+    fontSize: '14px',
+    color: '#888'
+  },
+  filterInput: {
+    padding: '8px',
+    borderRadius: '4px',
+    border: '1px solid #333',
+    backgroundColor: '#2a2a2a',
+    color: 'white',
+    fontSize: '14px'
+  },
+  filterButtons: {
+    display: 'flex',
+    gap: '10px'
+  },
+  btnApply: {
+    backgroundColor: '#4CAF50',
+    color: 'white',
+    border: 'none',
+    borderRadius: '6px',
+    padding: '10px 20px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: 'bold'
+  },
+  btnClear: {
+    backgroundColor: '#666',
+    color: 'white',
+    border: 'none',
+    borderRadius: '6px',
+    padding: '10px 20px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: 'bold'
+  },
+
+  // Common
+  section: {
+    marginTop: '20px'
   },
   sectionTitle: {
     fontSize: '20px',
-    margin: 0,
+    marginBottom: '15px',
     color: '#4CAF50'
   },
-  tournamentGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-    gap: '15px'
-  },
-  matchGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-    gap: '15px'
-  },
-  tournamentButton: {
-    padding: '15px',
-    borderRadius: '6px',
-    border: '1px solid #555',
-    color: 'white',
-    cursor: 'pointer',
-    fontWeight: 'bold',
-    fontSize: '16px',
-    transition: 'all 0.3s ease'
-  },
-  matchButton: {
-    padding: '15px',
-    borderRadius: '6px',
-    border: '1px solid #555',
-    color: 'white',
-    cursor: 'pointer',
-    fontWeight: 'bold',
-    fontSize: '14px',
-    transition: 'all 0.3s ease',
-    textAlign: 'left'
-  },
-  matchDate: {
-    fontSize: '12px',
-    color: '#aaa',
-    marginTop: '5px'
-  },
-  downloadAllButton: {
-    padding: '10px 20px',
-    backgroundColor: '#FF9800',
-    border: 'none',
-    borderRadius: '6px',
-    color: 'white',
-    fontWeight: 'bold',
-    cursor: 'pointer',
-    fontSize: '14px'
-  },
   loading: {
-    textAlign: 'center',
-    fontSize: '18px',
     color: '#888',
+    textAlign: 'center',
     padding: '40px'
   },
   noData: {
-    textAlign: 'center',
-    fontSize: '16px',
     color: '#888',
-    padding: '40px',
-    backgroundColor: '#1e1e1e',
-    borderRadius: '8px'
+    textAlign: 'center',
+    padding: '40px'
   },
-  roundGroup: {
-    marginBottom: '30px',
-    backgroundColor: '#2a2a2a',
+
+  // Breadcrumb
+  breadcrumb: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '15px',
+    marginBottom: '20px'
+  },
+  backButton: {
+    backgroundColor: '#444',
+    color: 'white',
+    border: 'none',
+    borderRadius: '6px',
+    padding: '8px 16px',
+    cursor: 'pointer',
+    fontSize: '14px'
+  },
+  breadcrumbText: {
+    fontSize: '20px',
+    color: 'white'
+  },
+
+  // Tabs
+  tabs: {
+    display: 'flex',
+    gap: '10px',
+    marginBottom: '20px',
+    borderBottom: '2px solid #333'
+  },
+  tab: {
+    backgroundColor: 'transparent',
+    color: '#888',
+    border: 'none',
+    borderBottom: '3px solid transparent',
+    padding: '12px 24px',
+    cursor: 'pointer',
+    fontSize: '16px',
+    fontWeight: '600',
+    transition: 'all 0.3s'
+  },
+  tabActive: {
+    color: '#4CAF50',
+    borderBottomColor: '#4CAF50'
+  },
+
+  // Tournament Grid
+  tournamentGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+    gap: '20px'
+  },
+  tournamentCard: {
+    backgroundColor: '#1e1e1e',
     padding: '20px',
-    borderRadius: '8px'
+    borderRadius: '8px',
+    cursor: 'pointer',
+    transition: 'all 0.3s',
+    border: '2px solid transparent'
+  },
+  tournamentName: {
+    fontSize: '18px',
+    marginBottom: '10px',
+    color: '#4CAF50'
+  },
+  tournamentInfo: {
+    fontSize: '14px',
+    color: '#888'
+  },
+
+  // Match Grid
+  matchGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+    gap: '20px'
+  },
+  matchCard: {
+    backgroundColor: '#1e1e1e',
+    padding: '20px',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    transition: 'all 0.3s',
+    border: '2px solid transparent'
+  },
+  matchHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '15px'
+  },
+  matchTitle: {
+    fontSize: '18px',
+    color: '#4CAF50'
+  },
+  matchDate: {
+    fontSize: '12px',
+    color: '#888'
+  },
+  matchTeams: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '10px'
+  },
+  team: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '5px'
+  },
+  teamName: {
+    fontSize: '16px',
+    fontWeight: 'bold'
+  },
+  teamScore: {
+    fontSize: '24px',
+    fontWeight: 'bold',
+    color: '#4CAF50'
+  },
+  vs: {
+    fontSize: '14px',
+    color: '#888',
+    fontWeight: 'bold'
+  },
+  matchWinner: {
+    marginTop: '10px',
+    padding: '8px',
+    backgroundColor: '#2a2a2a',
+    borderRadius: '4px',
+    textAlign: 'center',
+    fontSize: '14px',
+    color: '#FFD700'
+  },
+
+  // Round Section
+  roundSection: {
+    marginBottom: '30px'
   },
   roundTitle: {
     fontSize: '18px',
-    marginBottom: '20px',
+    marginBottom: '15px',
     color: '#4CAF50',
-    borderBottom: '1px solid #333',
-    paddingBottom: '10px'
+    borderBottom: '2px solid #333',
+    paddingBottom: '8px'
   },
-  reportsGrid: {
+
+  // Report Grid
+  reportGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
     gap: '15px'
   },
   reportCard: {
-    backgroundColor: '#333',
+    backgroundColor: '#1e1e1e',
     padding: '15px',
     borderRadius: '8px',
-    border: '2px solid transparent',
-    transition: 'all 0.3s ease'
+    border: '1px solid #333'
   },
   reportHeader: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '15px'
+    marginBottom: '10px'
   },
-  droneId: {
+  reportDrone: {
+    fontSize: '18px',
+    fontWeight: 'bold'
+  },
+  reportScore: {
     fontSize: '20px',
     fontWeight: 'bold',
     color: '#4CAF50'
   },
-  teamBadge: {
-    padding: '4px 12px',
-    borderRadius: '12px',
-    fontSize: '12px',
-    fontWeight: 'bold',
-    color: 'white'
+  pilotInfo: {
+    fontSize: '14px',
+    color: '#888',
+    marginBottom: '10px',
+    padding: '6px',
+    backgroundColor: '#2a2a2a',
+    borderRadius: '4px'
   },
   reportStats: {
-    marginBottom: '15px'
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '6px',
+    marginBottom: '10px'
   },
   stat: {
     display: 'flex',
     justifyContent: 'space-between',
+    fontSize: '13px',
+    color: '#ccc'
+  },
+  mlSummary: {
+    marginTop: '10px',
+    padding: '10px',
+    backgroundColor: '#2a2a2a',
+    borderRadius: '4px'
+  },
+  mlSummaryText: {
+    fontSize: '12px',
+    color: '#ccc',
     marginBottom: '8px'
   },
-  statLabel: {
-    color: '#aaa',
-    fontSize: '14px'
+  mlMetricsSmall: {
+    display: 'flex',
+    gap: '8px',
+    flexWrap: 'wrap'
   },
-  statValue: {
+  mlBadge: {
+    fontSize: '11px',
+    padding: '4px 8px',
+    backgroundColor: '#333',
+    borderRadius: '4px',
+    color: '#ccc'
+  },
+
+  // Pilot Grid
+  pilotGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+    gap: '20px'
+  },
+  pilotCard: {
+    backgroundColor: '#1e1e1e',
+    padding: '20px',
+    borderRadius: '8px',
+    border: '2px solid #333',
+    position: 'relative'
+  },
+  pilotRank: {
+    position: 'absolute',
+    top: '10px',
+    right: '10px',
+    backgroundColor: '#4CAF50',
     color: 'white',
+    padding: '6px 12px',
+    borderRadius: '20px',
     fontSize: '14px',
     fontWeight: 'bold'
   },
-  buttonGroup: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: '10px'
+  pilotName: {
+    fontSize: '20px',
+    marginBottom: '5px',
+    color: 'white'
   },
-  viewButton: {
-    padding: '10px',
-    backgroundColor: '#4CAF50',
-    border: 'none',
-    borderRadius: '6px',
-    color: 'white',
-    fontWeight: 'bold',
-    cursor: 'pointer',
-    fontSize: '14px'
-  },
-  downloadButton: {
-    padding: '10px',
-    backgroundColor: '#2196F3',
-    border: 'none',
-    borderRadius: '6px',
-    color: 'white',
-    fontWeight: 'bold',
-    cursor: 'pointer',
-    fontSize: '14px'
-  },
-  modal: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.85)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1000
-  },
-  modalContent: {
-    backgroundColor: '#1e1e1e',
-    padding: '30px',
-    borderRadius: '12px',
-    maxWidth: '700px',
-    width: '90%',
-    maxHeight: '80vh',
-    overflow: 'auto',
-    position: 'relative',
-    border: '2px solid #4CAF50'
-  },
-  closeButton: {
-    position: 'absolute',
-    top: '15px',
-    right: '15px',
-    backgroundColor: 'transparent',
-    border: 'none',
-    color: 'white',
-    fontSize: '36px',
-    cursor: 'pointer',
-    lineHeight: '1'
-  },
-  modalTitle: {
-    fontSize: '24px',
-    marginBottom: '25px',
-    color: '#4CAF50',
-    borderBottom: '2px solid #4CAF50',
-    paddingBottom: '15px'
-  },
-  modalSection: {
-    marginBottom: '25px'
-  },
-  modalSectionTitle: {
-    fontSize: '18px',
+  pilotTeam: {
+    fontSize: '14px',
     marginBottom: '15px',
-    color: '#fff'
+    fontWeight: 'bold'
   },
-  infoGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: '15px'
+  pilotStatRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    padding: '8px 0',
+    borderBottom: '1px solid #333',
+    fontSize: '14px',
+    color: '#ccc'
   },
-  infoItem: {
+  pilotStatValue: {
+    fontWeight: 'bold',
+    color: '#4CAF50'
+  },
+  playingStyleBadge: {
+    marginTop: '15px',
+    padding: '8px',
+    borderRadius: '6px',
+    textAlign: 'center',
+    fontSize: '14px',
+    fontWeight: 'bold',
+    color: 'white'
+  },
+  mlMetrics: {
+    marginTop: '15px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '5px'
+    gap: '10px'
   },
-  infoLabel: {
-    color: '#aaa',
+  metricBar: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    fontSize: '12px'
+  },
+  metricLabel: {
+    width: '70px',
+    color: '#888'
+  },
+  barContainer: {
+    flex: 1,
+    height: '8px',
+    backgroundColor: '#333',
+    borderRadius: '4px',
+    overflow: 'hidden'
+  },
+  barFill: {
+    height: '100%',
+    transition: 'width 0.3s'
+  },
+  metricValue: {
+    width: '40px',
+    textAlign: 'right',
+    color: '#ccc',
+    fontWeight: 'bold'
+  },
+  bestDrone: {
+    marginTop: '15px',
+    padding: '10px',
+    backgroundColor: '#2a2a2a',
+    borderRadius: '6px',
     fontSize: '13px',
-    fontWeight: 'bold'
+    textAlign: 'center',
+    color: '#FFD700'
   },
-  infoValue: {
+
+  // Download Button
+  downloadButton: {
+    marginTop: '12px',
+    width: '100%',
+    padding: '10px',
+    backgroundColor: '#4CAF50',
     color: 'white',
-    fontSize: '16px',
-    fontWeight: 'bold'
-  },
-  mlAnalysis: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: '15px'
+    border: 'none',
+    borderRadius: '6px',
+    fontSize: '14px',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    transition: 'all 0.3s',
+    ':hover': {
+      backgroundColor: '#45a049'
+    },
+    ':disabled': {
+      backgroundColor: '#666',
+      cursor: 'not-allowed'
+    }
   }
 };
 

@@ -29,6 +29,22 @@ const droneReportSchema = new mongoose.Schema({
     ref: 'Team',
     required: true
   },
+  pilotId: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  pilotName: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  role: {
+    type: String,
+    required: true,
+    enum: ['Forward', 'Center', 'Defender', 'Keeper'],
+    trim: true
+  },
 
   // Performance Metrics
   flightPath: [{

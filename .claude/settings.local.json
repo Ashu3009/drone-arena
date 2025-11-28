@@ -29,7 +29,10 @@
       "Bash(.gitignore)",
       "Bash(git reset:*)",
       "Bash(git commit:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(dir c:UsersADMINDesktopdrone-arena *.py /s /b)",
+      "Bash(node seedTestData.js:*)",
+      "Bash(node configureMatches.js:*)"
     ],
     "deny": [],
     "ask": []

@@ -97,25 +97,43 @@ const tournamentSchema = new mongoose.Schema({
     }
   },
 
-  // Tournament Awards (Auto-calculated from match data)
+  // Tournament Awards (Auto-calculated from match data - Role-based)
   awards: {
-    bestStriker: {
-      playerName: { type: String, trim: true },
-      team: { type: mongoose.Schema.Types.ObjectId, ref: 'Team' },
-      photo: { type: String },
-      goals: { type: Number, default: 0 }
-    },
     bestForward: {
       playerName: { type: String, trim: true },
       team: { type: mongoose.Schema.Types.ObjectId, ref: 'Team' },
       photo: { type: String },
-      assists: { type: Number, default: 0 }
+      stats: {
+        avgPerformance: { type: Number, default: 0 },
+        totalMatches: { type: Number, default: 0 }
+      }
+    },
+    bestCenter: {
+      playerName: { type: String, trim: true },
+      team: { type: mongoose.Schema.Types.ObjectId, ref: 'Team' },
+      photo: { type: String },
+      stats: {
+        avgPerformance: { type: Number, default: 0 },
+        totalMatches: { type: Number, default: 0 }
+      }
     },
     bestDefender: {
       playerName: { type: String, trim: true },
       team: { type: mongoose.Schema.Types.ObjectId, ref: 'Team' },
       photo: { type: String },
-      saves: { type: Number, default: 0 }
+      stats: {
+        avgPerformance: { type: Number, default: 0 },
+        totalMatches: { type: Number, default: 0 }
+      }
+    },
+    bestKeeper: {
+      playerName: { type: String, trim: true },
+      team: { type: mongoose.Schema.Types.ObjectId, ref: 'Team' },
+      photo: { type: String },
+      stats: {
+        avgPerformance: { type: Number, default: 0 },
+        totalMatches: { type: Number, default: 0 }
+      }
     }
   },
 

@@ -126,6 +126,14 @@ export const setTournamentWinners = async (tournamentId, winners) => {
   return response.data;
 };
 
+// Generate tournament final report (ADMIN ONLY)
+export const generateTournamentFinalReport = async (tournamentId) => {
+  const response = await axios.post(
+    `${API_BASE_URL}/tournaments/${tournamentId}/generate-final-report`
+  );
+  return response.data;
+};
+
 // ==================== TEAMS ====================
 
 // Get all teams
@@ -345,18 +353,6 @@ export const getTournamentReports = async (tournamentId) => {
   return response.data;
 };
 
-// Get reports for match
-export const getMatchReports = async (matchId) => {
-  const response = await axios.get(`${API_BASE_URL}/reports/match/${matchId}`);
-  return response.data;
-};
-
-// Get single report
-export const getReportById = async (reportId) => {
-  const response = await axios.get(`${API_BASE_URL}/reports/${reportId}`);
-  return response.data;
-};
-
 // ==================== DRONES ====================
 
 // Get all drones
@@ -448,6 +444,68 @@ export const deleteSchool = async (schoolId) => {
   return response.data;
 };
 
+// ==================== REPORTS (ADMIN ONLY) ====================
+
+// Get all tournaments with report counts
+export const getReportTournaments = async (filters = {}) => {
+  const params = {};
+  if (filters.city) params.city = filters.city;
+  if (filters.dateFrom) params.dateFrom = filters.dateFrom;
+  if (filters.dateTo) params.dateTo = filters.dateTo;
+
+  const response = await axios.get(`${API_BASE_URL}/reports/tournaments`, { params });
+  return response.data;
+};
+
+// Get team aggregates for a tournament
+export const getTournamentTeamAggregates = async (tournamentId) => {
+  const response = await axios.get(`${API_BASE_URL}/reports/tournaments/${tournamentId}/teams`);
+  return response.data;
+};
+
+// Get pilot aggregates for a tournament
+export const getTournamentPilotAggregates = async (tournamentId) => {
+  const response = await axios.get(`${API_BASE_URL}/reports/tournaments/${tournamentId}/pilots`);
+  return response.data;
+};
+
+// Get all reports for a match
+export const getMatchReports = async (matchId) => {
+  const response = await axios.get(`${API_BASE_URL}/reports/matches/${matchId}`);
+  return response.data;
+};
+
+// Get single report by ID
+export const getReportById = async (reportId) => {
+  const response = await axios.get(`${API_BASE_URL}/reports/${reportId}`);
+  return response.data;
+};
+
+// Download PDF report for a drone report
+export const downloadReportPDF = async (reportId, pilotName, roundNumber) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/reports/${reportId}/pdf`, {
+      responseType: 'blob' // Important for PDF download
+    });
+
+    // Create blob URL and trigger download
+    const blob = new Blob([response.data], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Report_${pilotName.replace(/\s+/g, '_')}_Round${roundNumber}_${Date.now()}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    return { success: true };
+  } catch (error) {
+    console.error('PDF Download Error:', error);
+    throw new Error(error.response?.data?.message || 'Failed to download PDF');
+  }
+};
+
 const apiService = {
   // Tournaments
   getTournaments,
@@ -506,7 +564,15 @@ const apiService = {
   getSchoolStats,
   createSchool,
   updateSchool,
-  deleteSchool
+  deleteSchool,
+
+  // Reports (Admin only)
+  getReportTournaments,
+  getTournamentTeamAggregates,
+  getTournamentPilotAggregates,
+  getMatchReports,
+  getReportById,
+  downloadReportPDF
 };
 
 export default apiService;

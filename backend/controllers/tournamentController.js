@@ -2,6 +2,8 @@
 const Tournament = require('../models/Tournament');
 const TournamentStanding = require('../models/TournamentStanding');
 const Team = require('../models/Team');
+const DroneReport = require('../models/DroneReport');
+const Match = require('../models/Match');
 const path = require('path');
 const fs = require('fs');
 
@@ -31,11 +33,15 @@ exports.getAllTournaments = async (req, res) => {
 exports.getTournamentById = async (req, res) => {
   try {
     const tournament = await Tournament.findById(req.params.id)
-      .populate('registeredTeams', 'name location teamType')
+      .populate('registeredTeams', 'name location teamType members')
       .populate('winners.champion', 'name location')
       .populate('winners.runnerUp', 'name location')
       .populate('winners.thirdPlace', 'name location')
-      .populate('manOfTheTournament.team', 'name location');
+      .populate('manOfTheTournament.team', 'name location')
+      .populate('awards.bestForward.team', 'name')
+      .populate('awards.bestCenter.team', 'name')
+      .populate('awards.bestDefender.team', 'name')
+      .populate('awards.bestKeeper.team', 'name');
 
     if (!tournament) {
       return res.status(404).json({
@@ -91,7 +97,15 @@ exports.createTournament = async (req, res) => {
       });
     }
 
-    // Validate registered teams if provided
+    // Validate at least 2 teams are registered
+    if (!registeredTeams || registeredTeams.length < 2) {
+      return res.status(400).json({
+        success: false,
+        message: 'At least 2 teams must be registered for a tournament'
+      });
+    }
+
+    // Validate registered teams
     if (registeredTeams && registeredTeams.length > 0) {
       // Check if teams exist
       const teams = await Team.find({ '_id': { $in: registeredTeams } });
@@ -150,19 +164,53 @@ exports.createTournament = async (req, res) => {
 // @route   PUT /api/tournaments/:id
 exports.updateTournament = async (req, res) => {
   try {
+    const { registeredTeams, maxTeams, location } = req.body;
+
+    // Validate location if provided
+    if (location && !location.city) {
+      return res.status(400).json({
+        success: false,
+        message: 'City is required in location'
+      });
+    }
+
+    // Validate registered teams if provided
+    if (registeredTeams && registeredTeams.length > 0) {
+      // Check if teams exist
+      const teams = await Team.find({ '_id': { $in: registeredTeams } });
+      if (teams.length !== registeredTeams.length) {
+        return res.status(400).json({
+          success: false,
+          message: 'One or more teams not found'
+        });
+      }
+
+      // Check if exceeds maxTeams
+      const maxAllowed = maxTeams || req.body.maxTeams || 16;
+      if (registeredTeams.length > maxAllowed) {
+        return res.status(400).json({
+          success: false,
+          message: `Cannot register more than ${maxAllowed} teams`
+        });
+      }
+
+      // Update currentTeams count
+      req.body.currentTeams = registeredTeams.length;
+    }
+
     const tournament = await Tournament.findByIdAndUpdate(
       req.params.id,
       req.body,
       { new: true, runValidators: true }
-    );
-    
+    ).populate('registeredTeams', 'name location teamType');
+
     if (!tournament) {
       return res.status(404).json({
         success: false,
         message: 'Tournament not found'
       });
     }
-    
+
     res.json({
       success: true,
       data: tournament
@@ -823,6 +871,280 @@ exports.filterTournaments = async (req, res) => {
       data: tournaments
     });
   } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+// @desc    Generate Tournament Final Report + Calculate Man of the Tournament
+// @route   POST /api/tournaments/:id/generate-final-report
+// @access  Private (Admin only)
+exports.generateTournamentFinalReport = async (req, res) => {
+  try {
+    const { id: tournamentId } = req.params;
+
+    console.log(`\n🏆 Generating Final Report for Tournament ${tournamentId}...`);
+
+    const tournament = await Tournament.findById(tournamentId)
+      .populate('registeredTeams', 'name color members');
+
+    if (!tournament) {
+      return res.status(404).json({
+        success: false,
+        message: 'Tournament not found'
+      });
+    }
+
+    // Get all matches for this tournament
+    const matches = await Match.find({ tournament: tournamentId })
+      .populate('teamA teamB', 'name color');
+
+    if (matches.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No matches found for this tournament'
+      });
+    }
+
+    // Get all drone reports for this tournament
+    const reports = await DroneReport.find({ tournament: tournamentId })
+      .populate('team', 'name color members');
+
+    if (reports.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No reports found. Complete at least one match first.'
+      });
+    }
+
+    console.log(`   📊 Found ${reports.length} reports across ${matches.length} matches`);
+
+    // ============================================================
+    // CALCULATE MAN OF THE TOURNAMENT
+    // ============================================================
+    const pilotStats = {};
+
+    reports.forEach(report => {
+      const pilotId = report.pilotId;
+
+      if (!pilotStats[pilotId]) {
+        pilotStats[pilotId] = {
+          pilotId: report.pilotId,
+          pilotName: report.pilotName,
+          team: report.team,
+          photo: null,
+          totalScore: 0,
+          matchesPlayed: new Set(),
+          roundsPlayed: 0,
+          avgPerformance: 0,
+          bestPerformance: 0,
+          totalDistance: 0,
+          avgSpeed: 0,
+          totalBatteryUsed: 0,
+          mlMetrics: {
+            aggressiveness: 0,
+            defensiveness: 0,
+            teamwork: 0,
+            efficiency: 0
+          }
+        };
+      }
+
+      const stats = pilotStats[pilotId];
+      stats.totalScore += report.performanceScore || 0;
+      stats.matchesPlayed.add(report.match.toString());
+      stats.roundsPlayed++;
+      stats.totalDistance += report.totalDistance || 0;
+      stats.avgSpeed += report.averageSpeed || 0;
+      stats.totalBatteryUsed += report.batteryUsage?.consumed || 0;
+
+      if (report.performanceScore > stats.bestPerformance) {
+        stats.bestPerformance = report.performanceScore;
+      }
+
+      if (report.mlAnalysis) {
+        stats.mlMetrics.aggressiveness += report.mlAnalysis.aggressiveness || 0;
+        stats.mlMetrics.defensiveness += report.mlAnalysis.defensiveness || 0;
+        stats.mlMetrics.teamwork += report.mlAnalysis.teamwork || 0;
+        stats.mlMetrics.efficiency += report.mlAnalysis.efficiency || 0;
+      }
+    });
+
+    // Calculate averages and find Man of the Tournament
+    let bestPlayer = null;
+    let highestScore = 0;
+
+    Object.values(pilotStats).forEach(stats => {
+      const count = stats.roundsPlayed;
+      stats.avgPerformance = Math.round(stats.totalScore / count);
+      stats.avgSpeed = Math.round((stats.avgSpeed / count) * 10) / 10;
+      stats.totalDistance = Math.round(stats.totalDistance * 10) / 10;
+      stats.totalBatteryUsed = Math.round(stats.totalBatteryUsed * 10) / 10;
+
+      stats.mlMetrics.aggressiveness = Math.round(stats.mlMetrics.aggressiveness / count);
+      stats.mlMetrics.defensiveness = Math.round(stats.mlMetrics.defensiveness / count);
+      stats.mlMetrics.teamwork = Math.round(stats.mlMetrics.teamwork / count);
+      stats.mlMetrics.efficiency = Math.round(stats.mlMetrics.efficiency / count);
+
+      // Tournament Score = (Avg Performance × 0.5) + (Best Performance × 0.3) + (Matches Played × 2)
+      const tournamentScore = (stats.avgPerformance * 0.5) + (stats.bestPerformance * 0.3) + (stats.matchesPlayed.size * 2);
+
+      if (tournamentScore > highestScore) {
+        highestScore = tournamentScore;
+        bestPlayer = stats;
+      }
+    });
+
+    // Find pilot photo from team members
+    if (bestPlayer) {
+      const member = bestPlayer.team.members.find(m => m._id.toString() === bestPlayer.pilotId);
+      bestPlayer.photo = member?.photo || null;
+
+      // Update tournament with Man of the Tournament
+      tournament.manOfTheTournament = {
+        playerName: bestPlayer.pilotName,
+        team: bestPlayer.team._id,
+        photo: bestPlayer.photo,
+        stats: {
+          goals: 0, // Can be calculated from match data if needed
+          assists: 0,
+          matchesPlayed: bestPlayer.matchesPlayed.size
+        }
+      };
+
+      console.log(`   ⭐ Man of the Tournament: ${bestPlayer.pilotName} (${bestPlayer.team.name})`);
+      console.log(`      Avg Performance: ${bestPlayer.avgPerformance}/100`);
+      console.log(`      Best Performance: ${bestPlayer.bestPerformance}/100`);
+      console.log(`      Matches Played: ${bestPlayer.matchesPlayed.size}`);
+    }
+
+    // ============================================================
+    // CALCULATE TEAM RANKINGS
+    // ============================================================
+    const teamStats = {};
+
+    reports.forEach(report => {
+      const teamId = report.team._id.toString();
+
+      if (!teamStats[teamId]) {
+        teamStats[teamId] = {
+          team: report.team,
+          totalScore: 0,
+          reportsCount: 0,
+          matchesPlayed: new Set(),
+          wins: 0,
+          draws: 0,
+          losses: 0
+        };
+      }
+
+      teamStats[teamId].totalScore += report.performanceScore || 0;
+      teamStats[teamId].reportsCount++;
+      teamStats[teamId].matchesPlayed.add(report.match.toString());
+    });
+
+    // Add match results to team stats
+    matches.forEach(match => {
+      if (match.status === 'completed') {
+        const teamAId = match.teamA._id.toString();
+        const teamBId = match.teamB._id.toString();
+
+        if (teamStats[teamAId]) {
+          if (match.finalScoreA > match.finalScoreB) {
+            teamStats[teamAId].wins++;
+          } else if (match.finalScoreA === match.finalScoreB) {
+            teamStats[teamAId].draws++;
+          } else {
+            teamStats[teamAId].losses++;
+          }
+        }
+
+        if (teamStats[teamBId]) {
+          if (match.finalScoreB > match.finalScoreA) {
+            teamStats[teamBId].wins++;
+          } else if (match.finalScoreA === match.finalScoreB) {
+            teamStats[teamBId].draws++;
+          } else {
+            teamStats[teamBId].losses++;
+          }
+        }
+      }
+    });
+
+    // Sort teams by performance
+    const teamRankings = Object.values(teamStats).map(stats => {
+      const points = (stats.wins * 3) + (stats.draws * 1);
+      const avgPerformance = Math.round(stats.totalScore / stats.reportsCount);
+
+      return {
+        team: stats.team,
+        points,
+        wins: stats.wins,
+        draws: stats.draws,
+        losses: stats.losses,
+        matchesPlayed: stats.matchesPlayed.size,
+        avgPerformance
+      };
+    }).sort((a, b) => {
+      if (b.points !== a.points) return b.points - a.points;
+      return b.avgPerformance - a.avgPerformance;
+    });
+
+    // Update tournament winners
+    if (teamRankings.length >= 1) {
+      tournament.winners.champion = teamRankings[0].team._id;
+      console.log(`   🥇 Champion: ${teamRankings[0].team.name}`);
+    }
+    if (teamRankings.length >= 2) {
+      tournament.winners.runnerUp = teamRankings[1].team._id;
+      console.log(`   🥈 Runner Up: ${teamRankings[1].team.name}`);
+    }
+    if (teamRankings.length >= 3) {
+      tournament.winners.thirdPlace = teamRankings[2].team._id;
+      console.log(`   🥉 Third Place: ${teamRankings[2].team.name}`);
+    }
+
+    // Save tournament
+    await tournament.save();
+
+    console.log(`\n✅ Tournament Final Report Generated Successfully!\n`);
+
+    res.json({
+      success: true,
+      message: 'Tournament final report generated successfully',
+      data: {
+        tournament: {
+          _id: tournament._id,
+          name: tournament.name,
+          status: tournament.status,
+          manOfTheTournament: tournament.manOfTheTournament,
+          winners: tournament.winners
+        },
+        statistics: {
+          totalMatches: matches.length,
+          completedMatches: matches.filter(m => m.status === 'completed').length,
+          totalReports: reports.length,
+          totalPilots: Object.keys(pilotStats).length,
+          teamRankings
+        },
+        topPilots: Object.values(pilotStats)
+          .sort((a, b) => b.avgPerformance - a.avgPerformance)
+          .slice(0, 10)
+          .map(pilot => ({
+            pilotName: pilot.pilotName,
+            team: pilot.team.name,
+            avgPerformance: pilot.avgPerformance,
+            bestPerformance: pilot.bestPerformance,
+            matchesPlayed: pilot.matchesPlayed.size,
+            roundsPlayed: pilot.roundsPlayed
+          }))
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Error generating tournament final report:', error);
     res.status(500).json({
       success: false,
       message: error.message

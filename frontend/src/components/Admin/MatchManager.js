@@ -28,6 +28,8 @@ const MatchManager = () => {
   const [tournaments, setTournaments] = useState([]);
   const [teams, setTeams] = useState([]);
   const [availableTeams, setAvailableTeams] = useState([]); // Filtered teams based on selected tournament
+  const [selectedTournamentFilter, setSelectedTournamentFilter] = useState(''); // Filter for viewing matches
+  const [expandedRounds, setExpandedRounds] = useState({}); // Track which rounds are expanded {matchId: roundNumber}
   const [loading, setLoading] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -396,6 +398,26 @@ const MatchManager = () => {
     return team?.members || [];
   };
 
+  // Toggle round expansion
+  const toggleRound = (matchId, roundNumber) => {
+    setExpandedRounds(prev => {
+      const key = `${matchId}-${roundNumber}`;
+      if (prev[key]) {
+        // Collapse if already expanded
+        const newState = { ...prev };
+        delete newState[key];
+        return newState;
+      } else {
+        // Expand this round
+        return { ...prev, [key]: true };
+      }
+    });
+  };
+
+  const isRoundExpanded = (matchId, roundNumber) => {
+    return expandedRounds[`${matchId}-${roundNumber}`] || false;
+  };
+
   return (
     <div style={styles.container}>
       <div style={styles.header}>
@@ -486,6 +508,23 @@ const MatchManager = () => {
         </form>
       )}
 
+      {/* Tournament Filter */}
+      <div style={styles.filterSection}>
+        <label style={styles.filterLabel}>Filter by Tournament:</label>
+        <select
+          value={selectedTournamentFilter}
+          onChange={(e) => setSelectedTournamentFilter(e.target.value)}
+          style={styles.filterSelect}
+        >
+          <option value="">All Tournaments</option>
+          {tournaments.map((tournament) => (
+            <option key={tournament._id} value={tournament._id}>
+              {tournament.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {/* Matches List */}
       <div style={styles.matchList}>
         {loading && matches.length === 0 ? (
@@ -493,7 +532,11 @@ const MatchManager = () => {
         ) : matches.length === 0 ? (
           <p style={styles.emptyText}>No matches found. Create your first match!</p>
         ) : (
-          matches.map((match) => {
+          matches
+            .filter((match) =>
+              !selectedTournamentFilter || match.tournament?._id === selectedTournamentFilter
+            )
+            .map((match) => {
             const activeRound = match.rounds?.find(r => r.status === 'in_progress');
             const currentRound = match.currentRound || 1;
 
@@ -506,7 +549,7 @@ const MatchManager = () => {
                 <div style={styles.cardHeader}>
                   <div>
                     <h3 style={styles.matchTitle}>
-                      {match.teamA?.name || 'Team A'} vs {match.teamB?.name || 'Team B'}
+                      Match {match.matchNumber || '?'}: {match.teamA?.name || 'Team A'} vs {match.teamB?.name || 'Team B'}
                     </h3>
                     <p style={styles.tournamentName}>{match.tournament?.name || 'Tournament'}</p>
                   </div>
@@ -530,14 +573,24 @@ const MatchManager = () => {
                 <div style={styles.roundsContainer}>
                   <h4 style={styles.roundsTitle}>Rounds</h4>
 
-                  {match.rounds && match.rounds.map((round) => (
+                  {match.rounds && match.rounds.map((round) => {
+                    const isExpanded = isRoundExpanded(match._id, round.roundNumber);
+                    return (
                     <div key={round.roundNumber} style={{
                       ...styles.roundCard,
                       border: round.status === 'in_progress' ? '2px solid #4CAF50' : '1px solid #444'
                     }}>
-                      {/* Round Header */}
-                      <div style={styles.roundHeader}>
-                        <h5 style={styles.roundTitle}>Round {round.roundNumber}</h5>
+                      {/* Round Header - Clickable */}
+                      <div
+                        style={{...styles.roundHeader, cursor: 'pointer'}}
+                        onClick={() => toggleRound(match._id, round.roundNumber)}
+                      >
+                        <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
+                          <span style={{fontSize: '16px'}}>
+                            {isExpanded ? '▼' : '▶'}
+                          </span>
+                          <h5 style={styles.roundTitle}>Round {round.roundNumber}</h5>
+                        </div>
                         <span style={{
                           ...styles.roundStatusBadge,
                           backgroundColor:
@@ -547,6 +600,10 @@ const MatchManager = () => {
                           {round.status.toUpperCase().replace('_', ' ')}
                         </span>
                       </div>
+
+                      {/* Collapsible Round Content */}
+                      {isExpanded && (<>
+
 
                       {/* Round Scores */}
                       {(round.status === 'in_progress' || round.status === 'completed') && (
@@ -659,8 +716,10 @@ const MatchManager = () => {
                           End Round {round.roundNumber}
                         </button>
                       )}
+                      </>)}
                     </div>
-                  ))}
+                  );
+                  })}
                 </div>
 
                 {/* Match Controls */}
@@ -924,6 +983,32 @@ const styles = {
     fontWeight: 'bold',
     cursor: 'pointer'
   },
+  filterSection: {
+    backgroundColor: '#1e1e1e',
+    padding: '16px 20px',
+    borderRadius: '8px',
+    marginBottom: '20px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px'
+  },
+  filterLabel: {
+    fontSize: '14px',
+    color: '#ccc',
+    fontWeight: '500',
+    minWidth: 'fit-content'
+  },
+  filterSelect: {
+    flex: 1,
+    backgroundColor: '#2a2a2a',
+    border: '1px solid #444',
+    borderRadius: '6px',
+    padding: '10px',
+    color: '#fff',
+    fontSize: '14px',
+    cursor: 'pointer',
+    maxWidth: '400px'
+  },
   matchList: {
     display: 'flex',
     flexDirection: 'column',
@@ -942,9 +1027,11 @@ const styles = {
   matchCard: {
     backgroundColor: '#1e1e1e',
     borderRadius: '8px',
-    padding: '24px',
+    padding: '20px',
     border: '1px solid #333',
-    position: 'relative'
+    position: 'relative',
+    maxWidth: '900px',
+    margin: '0 auto'
   },
   currentBadge: {
     position: 'absolute',
@@ -1077,9 +1164,9 @@ const styles = {
   },
   roundCard: {
     backgroundColor: '#2a2a2a',
-    borderRadius: '8px',
-    padding: '20px',
-    marginBottom: '16px'
+    borderRadius: '6px',
+    padding: '12px',
+    marginBottom: '12px'
   },
   roundHeader: {
     display: 'flex',

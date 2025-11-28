@@ -25,7 +25,12 @@ const roundSchema = new mongoose.Schema({
       enum: ['Forward', 'Center', 'Defender', 'Keeper'],
       required: true
     },
-    pilot: {
+    pilotId: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    pilotName: {
       type: String,
       required: true,
       trim: true
@@ -77,6 +82,10 @@ const matchSchema = new mongoose.Schema({
   tournament: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Tournament',
+    required: true
+  },
+  matchNumber: {
+    type: Number,
     required: true
   },
   teamA: {

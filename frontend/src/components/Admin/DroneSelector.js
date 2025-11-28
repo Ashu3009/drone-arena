@@ -4,16 +4,16 @@ import { getAllDrones } from '../../services/api';
 const DroneSelector = ({ matchId, roundNumber, teamA, teamB, onRegister }) => {
   const [allDrones, setAllDrones] = useState([]);
   const [teamALineup, setTeamALineup] = useState([
-    { position: 'Forward', pilot: '', droneId: '', role: 'Forward' },
-    { position: 'Striker', pilot: '', droneId: '', role: 'Striker' },
-    { position: 'Defender', pilot: '', droneId: '', role: 'Defender' },
-    { position: 'Central', pilot: '', droneId: '', role: 'Central' }
+    { position: 'Forward', pilotId: '', pilotName: '', droneId: '', role: 'Forward' },
+    { position: 'Center', pilotId: '', pilotName: '', droneId: '', role: 'Center' },
+    { position: 'Defender', pilotId: '', pilotName: '', droneId: '', role: 'Defender' },
+    { position: 'Keeper', pilotId: '', pilotName: '', droneId: '', role: 'Keeper' }
   ]);
   const [teamBLineup, setTeamBLineup] = useState([
-    { position: 'Forward', pilot: '', droneId: '', role: 'Forward' },
-    { position: 'Striker', pilot: '', droneId: '', role: 'Striker' },
-    { position: 'Defender', pilot: '', droneId: '', role: 'Defender' },
-    { position: 'Central', pilot: '', droneId: '', role: 'Central' }
+    { position: 'Forward', pilotId: '', pilotName: '', droneId: '', role: 'Forward' },
+    { position: 'Center', pilotId: '', pilotName: '', droneId: '', role: 'Center' },
+    { position: 'Defender', pilotId: '', pilotName: '', droneId: '', role: 'Defender' },
+    { position: 'Keeper', pilotId: '', pilotName: '', droneId: '', role: 'Keeper' }
   ]);
 
   useEffect(() => {
@@ -60,14 +60,14 @@ const DroneSelector = ({ matchId, roundNumber, teamA, teamB, onRegister }) => {
 
   const handleRegister = async () => {
     // Validate Team A
-    const teamAValid = teamALineup.every(item => item.pilot && item.droneId);
+    const teamAValid = teamALineup.every(item => item.pilotId && item.droneId);
     if (!teamAValid) {
       alert(`Please select pilot and drone for all ${teamA?.name} positions`);
       return;
     }
 
     // Validate Team B
-    const teamBValid = teamBLineup.every(item => item.pilot && item.droneId);
+    const teamBValid = teamBLineup.every(item => item.pilotId && item.droneId);
     if (!teamBValid) {
       alert(`Please select pilot and drone for all ${teamB?.name} positions`);
       return;
@@ -90,20 +90,22 @@ const DroneSelector = ({ matchId, roundNumber, teamA, teamB, onRegister }) => {
       return drone ? drone.specifications : {};
     };
 
-    // Format for backend: [{droneId, team, role, pilot, specifications}, ...]
+    // Format for backend: [{droneId, team, role, pilotId, pilotName, specifications}, ...]
     const dronesArray = [
       ...teamALineup.map(item => ({
         droneId: item.droneId,
         team: teamA._id,
         role: item.role,
-        pilot: item.pilot,
+        pilotId: item.pilotId,
+        pilotName: item.pilotName,
         specifications: getDroneSpecs(item.droneId)
       })),
       ...teamBLineup.map(item => ({
         droneId: item.droneId,
         team: teamB._id,
         role: item.role,
-        pilot: item.pilot,
+        pilotId: item.pilotId,
+        pilotName: item.pilotName,
         specifications: getDroneSpecs(item.droneId)
       }))
     ];
@@ -126,19 +128,28 @@ const DroneSelector = ({ matchId, roundNumber, teamA, teamB, onRegister }) => {
             <div style={styles.selectWrapper}>
               <label style={styles.selectLabel}>Pilot:</label>
               <select
-                value={item.pilot}
+                value={item.pilotId}
                 onChange={(e) => {
-                  if (team === teamA) {
-                    handleTeamAChange(index, 'pilot', e.target.value);
-                  } else {
-                    handleTeamBChange(index, 'pilot', e.target.value);
+                  const selectedMember = members.find(m => m._id === e.target.value);
+                  if (selectedMember) {
+                    const newLineup = team === teamA ? [...teamALineup] : [...teamBLineup];
+                    newLineup[index] = {
+                      ...newLineup[index],
+                      pilotId: selectedMember._id,
+                      pilotName: selectedMember.name
+                    };
+                    if (team === teamA) {
+                      setTeamALineup(newLineup);
+                    } else {
+                      setTeamBLineup(newLineup);
+                    }
                   }
                 }}
                 style={styles.select}
               >
                 <option value="">Select Pilot</option>
                 {members.map((member, idx) => (
-                  <option key={idx} value={member.name}>
+                  <option key={idx} value={member._id}>
                     {member.name} ({member.role})
                   </option>
                 ))}
@@ -157,7 +168,7 @@ const DroneSelector = ({ matchId, roundNumber, teamA, teamB, onRegister }) => {
                   }
                 }}
                 style={styles.select}
-                disabled={!item.pilot}
+                disabled={!item.pilotId}
               >
                 <option value="">Select Drone</option>
                 {drones.map((drone, idx) => (
@@ -169,9 +180,9 @@ const DroneSelector = ({ matchId, roundNumber, teamA, teamB, onRegister }) => {
             </div>
           </div>
 
-          {item.pilot && item.droneId && (
+          {item.pilotName && item.droneId && (
             <div style={styles.selectionSummary}>
-              ✓ {item.pilot} → {item.droneId}
+              ✓ {item.pilotName} → {item.droneId}
             </div>
           )}
         </div>

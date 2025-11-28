@@ -15,7 +15,8 @@ const {
   setManOfTournament,
   addTeamsToTournament,
   removeTeamFromTournament,
-  filterTournaments
+  filterTournaments,
+  generateTournamentFinalReport
 } = require('../controllers/tournamentController');
 const { protect } = require('../middleware/auth');
 const { uploadBanner: uploadBannerMulter, uploadGallery: uploadGalleryMulter, uploadMOT } = require('../config/multer');
@@ -43,6 +44,9 @@ router.put('/:id/man-of-tournament', protect, uploadMOT.single('photo'), setManO
 // Team management
 router.post('/:id/add-teams', protect, addTeamsToTournament);
 router.delete('/:id/remove-team/:teamId', protect, removeTeamFromTournament);
+
+// Tournament Final Report
+router.post('/:id/generate-final-report', protect, generateTournamentFinalReport);
 
 module.exports = router;
 

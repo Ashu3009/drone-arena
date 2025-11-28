@@ -367,50 +367,64 @@ const TournamentDetail = () => {
         {activeTab === 'awards' && (
           <div>
             {/* Player Awards Section */}
-            {(tournament.awards?.bestStriker || tournament.awards?.bestForward || tournament.awards?.bestDefender) && (
+            {(tournament.awards?.bestForward || tournament.awards?.bestCenter || tournament.awards?.bestDefender || tournament.awards?.bestKeeper) && (
               <>
-                <h2 style={styles.sectionTitle}>Player Awards</h2>
+                <h2 style={styles.sectionTitle}>Player Awards (Role-Based)</h2>
                 <div style={styles.awardsGrid}>
-                  {/* Best Striker */}
-                  {tournament.awards.bestStriker && (
-                    <div style={styles.awardCard}>
-                      <div style={styles.awardIcon}>⚽</div>
-                      <h3 style={styles.awardTitle}>Best Striker</h3>
-                      {tournament.awards.bestStriker.photo && (
-                        <img
-                          src={`http://localhost:5000${tournament.awards.bestStriker.photo}`}
-                          alt={tournament.awards.bestStriker.playerName}
-                          style={styles.awardPhoto}
-                        />
-                      )}
-                      <div style={styles.awardPlayerName}>{tournament.awards.bestStriker.playerName}</div>
-                      <div style={styles.awardTeamName}>
-                        {tournament.awards.bestStriker.team?.name || 'N/A'}
-                      </div>
-                      <div style={styles.awardStat}>
-                        {tournament.awards.bestStriker.goals} Goals
-                      </div>
-                    </div>
-                  )}
-
                   {/* Best Forward */}
                   {tournament.awards.bestForward && (
                     <div style={styles.awardCard}>
-                      <div style={styles.awardIcon}>🎯</div>
+                      <div style={styles.awardIcon}>⚡</div>
                       <h3 style={styles.awardTitle}>Best Forward</h3>
-                      {tournament.awards.bestForward.photo && (
+                      {tournament.awards.bestForward.photo ? (
                         <img
                           src={`http://localhost:5000${tournament.awards.bestForward.photo}`}
                           alt={tournament.awards.bestForward.playerName}
                           style={styles.awardPhoto}
                         />
+                      ) : (
+                        <div style={styles.awardPhotoPlaceholder}>
+                          {tournament.awards.bestForward.playerName?.charAt(0).toUpperCase()}
+                        </div>
                       )}
                       <div style={styles.awardPlayerName}>{tournament.awards.bestForward.playerName}</div>
                       <div style={styles.awardTeamName}>
                         {tournament.awards.bestForward.team?.name || 'N/A'}
                       </div>
                       <div style={styles.awardStat}>
-                        {tournament.awards.bestForward.assists} Assists
+                        Avg: {tournament.awards.bestForward.stats?.avgPerformance || 0} pts
+                      </div>
+                      <div style={styles.awardMatches}>
+                        {tournament.awards.bestForward.stats?.totalMatches || 0} matches
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Best Center */}
+                  {tournament.awards.bestCenter && (
+                    <div style={styles.awardCard}>
+                      <div style={styles.awardIcon}>🎯</div>
+                      <h3 style={styles.awardTitle}>Best Center</h3>
+                      {tournament.awards.bestCenter.photo ? (
+                        <img
+                          src={`http://localhost:5000${tournament.awards.bestCenter.photo}`}
+                          alt={tournament.awards.bestCenter.playerName}
+                          style={styles.awardPhoto}
+                        />
+                      ) : (
+                        <div style={styles.awardPhotoPlaceholder}>
+                          {tournament.awards.bestCenter.playerName?.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <div style={styles.awardPlayerName}>{tournament.awards.bestCenter.playerName}</div>
+                      <div style={styles.awardTeamName}>
+                        {tournament.awards.bestCenter.team?.name || 'N/A'}
+                      </div>
+                      <div style={styles.awardStat}>
+                        Avg: {tournament.awards.bestCenter.stats?.avgPerformance || 0} pts
+                      </div>
+                      <div style={styles.awardMatches}>
+                        {tournament.awards.bestCenter.stats?.totalMatches || 0} matches
                       </div>
                     </div>
                   )}
@@ -420,19 +434,55 @@ const TournamentDetail = () => {
                     <div style={styles.awardCard}>
                       <div style={styles.awardIcon}>🛡️</div>
                       <h3 style={styles.awardTitle}>Best Defender</h3>
-                      {tournament.awards.bestDefender.photo && (
+                      {tournament.awards.bestDefender.photo ? (
                         <img
                           src={`http://localhost:5000${tournament.awards.bestDefender.photo}`}
                           alt={tournament.awards.bestDefender.playerName}
                           style={styles.awardPhoto}
                         />
+                      ) : (
+                        <div style={styles.awardPhotoPlaceholder}>
+                          {tournament.awards.bestDefender.playerName?.charAt(0).toUpperCase()}
+                        </div>
                       )}
                       <div style={styles.awardPlayerName}>{tournament.awards.bestDefender.playerName}</div>
                       <div style={styles.awardTeamName}>
                         {tournament.awards.bestDefender.team?.name || 'N/A'}
                       </div>
                       <div style={styles.awardStat}>
-                        {tournament.awards.bestDefender.saves} Saves
+                        Avg: {tournament.awards.bestDefender.stats?.avgPerformance || 0} pts
+                      </div>
+                      <div style={styles.awardMatches}>
+                        {tournament.awards.bestDefender.stats?.totalMatches || 0} matches
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Best Keeper */}
+                  {tournament.awards.bestKeeper && (
+                    <div style={styles.awardCard}>
+                      <div style={styles.awardIcon}>🥅</div>
+                      <h3 style={styles.awardTitle}>Best Keeper</h3>
+                      {tournament.awards.bestKeeper.photo ? (
+                        <img
+                          src={`http://localhost:5000${tournament.awards.bestKeeper.photo}`}
+                          alt={tournament.awards.bestKeeper.playerName}
+                          style={styles.awardPhoto}
+                        />
+                      ) : (
+                        <div style={styles.awardPhotoPlaceholder}>
+                          {tournament.awards.bestKeeper.playerName?.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <div style={styles.awardPlayerName}>{tournament.awards.bestKeeper.playerName}</div>
+                      <div style={styles.awardTeamName}>
+                        {tournament.awards.bestKeeper.team?.name || 'N/A'}
+                      </div>
+                      <div style={styles.awardStat}>
+                        Avg: {tournament.awards.bestKeeper.stats?.avgPerformance || 0} pts
+                      </div>
+                      <div style={styles.awardMatches}>
+                        {tournament.awards.bestKeeper.stats?.totalMatches || 0} matches
                       </div>
                     </div>
                   )}
@@ -1089,7 +1139,27 @@ const styles = {
     backgroundColor: '#2a2a2a',
     padding: '8px 16px',
     borderRadius: '20px',
-    display: 'inline-block'
+    display: 'inline-block',
+    marginBottom: '8px'
+  },
+  awardMatches: {
+    fontSize: '13px',
+    color: '#999',
+    fontStyle: 'italic'
+  },
+  awardPhotoPlaceholder: {
+    width: '120px',
+    height: '120px',
+    borderRadius: '50%',
+    margin: '0 auto 16px auto',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#3a3a3a',
+    border: '4px solid #FFD700',
+    fontSize: '48px',
+    fontWeight: 'bold',
+    color: '#FFD700'
   },
   clickHint: {
     fontSize: '12px',
