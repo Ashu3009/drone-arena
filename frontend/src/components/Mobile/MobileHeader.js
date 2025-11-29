@@ -7,6 +7,7 @@ const MobileHeader = () => {
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,6 +21,7 @@ const MobileHeader = () => {
   // Close menu when route changes
   useEffect(() => {
     setMenuOpen(false);
+    setNotificationsOpen(false);
   }, [location]);
 
   const getPageTitle = () => {
@@ -39,6 +41,44 @@ const MobileHeader = () => {
     navigate(path);
     setMenuOpen(false);
   };
+
+  const toggleNotifications = () => {
+    setNotificationsOpen(!notificationsOpen);
+    if (menuOpen) setMenuOpen(false); // Close menu if open
+  };
+
+  // Sample notifications data (can be fetched from API later)
+  const notifications = [
+    {
+      id: 1,
+      type: 'match',
+      icon: '🎮',
+      title: 'Match Starting Soon',
+      message: 'Red Hawks vs Blue Storm starts in 10 minutes',
+      time: '5 min ago',
+      read: false
+    },
+    {
+      id: 2,
+      type: 'tournament',
+      icon: '🏆',
+      title: 'Tournament Update',
+      message: 'Winter Championship 2024 - Round 2 begins tomorrow',
+      time: '1 hour ago',
+      read: false
+    },
+    {
+      id: 3,
+      type: 'achievement',
+      icon: '🌟',
+      title: 'New Achievement',
+      message: 'You unlocked "Arena Spectator" badge',
+      time: '2 hours ago',
+      read: true
+    }
+  ];
+
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
     <>
@@ -64,9 +104,14 @@ const MobileHeader = () => {
           {/* Actions */}
           <div className="header-actions">
             {/* Notifications */}
-            <button className="header-action-btn notification-btn">
+            <button
+              className={`header-action-btn notification-btn ${notificationsOpen ? 'active' : ''}`}
+              onClick={toggleNotifications}
+            >
               <span className="action-icon">🔔</span>
-              <span className="notification-badge">3</span>
+              {unreadCount > 0 && (
+                <span className="notification-badge">{unreadCount}</span>
+              )}
             </button>
 
             {/* Menu Toggle */}
@@ -180,6 +225,56 @@ const MobileHeader = () => {
             </button>
             <div className="menu-version">v1.0.0</div>
           </div>
+        </div>
+      </div>
+
+      {/* Notifications Panel */}
+      <div className={`notifications-panel ${notificationsOpen ? 'open' : ''}`}>
+        <div className="notifications-overlay" onClick={() => setNotificationsOpen(false)}></div>
+
+        <div className="notifications-content">
+          {/* Header */}
+          <div className="notifications-header">
+            <h3 className="notifications-title">Notifications</h3>
+            <button
+              className="notifications-close"
+              onClick={() => setNotificationsOpen(false)}
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Notifications List */}
+          <div className="notifications-list">
+            {notifications.length === 0 ? (
+              <div className="no-notifications">
+                <div className="no-notifications-icon">🔔</div>
+                <p className="no-notifications-text">No notifications yet</p>
+              </div>
+            ) : (
+              notifications.map((notification) => (
+                <div
+                  key={notification.id}
+                  className={`notification-item ${notification.read ? 'read' : 'unread'}`}
+                >
+                  <div className="notification-icon">{notification.icon}</div>
+                  <div className="notification-content">
+                    <div className="notification-title">{notification.title}</div>
+                    <div className="notification-message">{notification.message}</div>
+                    <div className="notification-time">{notification.time}</div>
+                  </div>
+                  {!notification.read && <div className="notification-dot"></div>}
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Footer */}
+          {notifications.length > 0 && (
+            <div className="notifications-footer">
+              <button className="mark-all-read-btn">Mark all as read</button>
+            </div>
+          )}
         </div>
       </div>
     </>

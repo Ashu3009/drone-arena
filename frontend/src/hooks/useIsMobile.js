@@ -2,18 +2,19 @@ import { useState, useEffect } from 'react';
 
 /**
  * Custom hook to detect mobile devices
- * Returns true if screen width <= 768px OR if it's a mobile user agent
+ * Returns true if screen width <= 480px OR if it's a mobile user agent
+ * Responsive: Automatically updates on window resize
  */
 export const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const checkIsMobile = () => {
-      // Check screen width
-      const isMobileWidth = window.innerWidth <= 768;
+      // Check screen width (480px for mobile phones only, laptops/tablets show desktop)
+      const isMobileWidth = window.innerWidth <= 480;
 
       // Check user agent for mobile devices
-      const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      const isMobileUA = /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
         navigator.userAgent
       );
 

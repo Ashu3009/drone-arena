@@ -26,27 +26,52 @@ import './App.css';
 import './styles/mobileResponsive.css';
 import './styles/indianTheme.css';
 
-// Responsive Home Component - Auto-detects mobile/desktop
+// Responsive Home Component - Auto-detects mobile/desktop (NO redirect, pure responsive)
 const ResponsiveHome = () => {
   const isMobile = useIsMobile();
 
-  // Redirect to /mobile for mobile devices
+  // Dynamically render mobile or desktop view based on screen size
   if (isMobile) {
-    return <Navigate to="/mobile" replace />;
+    return (
+      <MobileLayout>
+        <MobileHome />
+      </MobileLayout>
+    );
   }
 
   return <><Navbar /><PublicViewer /></>;
 };
 
-// Responsive Tournaments List
+// Responsive Tournaments List - Dynamically switches mobile/desktop
 const ResponsiveTournaments = () => {
   const isMobile = useIsMobile();
 
+  // Pure responsive rendering (no redirect)
   if (isMobile) {
-    return <MobileLayout><MobileTournaments /></MobileLayout>;
+    return (
+      <MobileLayout>
+        <MobileTournaments />
+      </MobileLayout>
+    );
   }
 
   return <><Navbar /><TournamentsList /></>;
+};
+
+// Responsive Leaderboard - Dynamically switches mobile/desktop
+const ResponsiveLeaderboard = () => {
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    return (
+      <MobileLayout>
+        <MobileLeaderboard />
+      </MobileLayout>
+    );
+  }
+
+  // Desktop leaderboard (can be added later, for now redirect to home)
+  return <Navigate to="/" replace />;
 };
 
 function App() {
@@ -58,6 +83,7 @@ function App() {
             {/* Responsive Routes - Auto-detect Mobile/Desktop */}
             <Route path="/" element={<ResponsiveHome />} />
             <Route path="/tournaments" element={<ResponsiveTournaments />} />
+            <Route path="/leaderboard" element={<ResponsiveLeaderboard />} />
             <Route path="/tournament/:id" element={<><Navbar /><TournamentDetail /></>} />
 
             {/* Mobile Routes (for testing/force mobile view) */}
