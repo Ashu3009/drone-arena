@@ -113,6 +113,14 @@ const MobileHome = () => {
           </div>
 
           <div className="match-card">
+            {/* Tournament Name - Prominent Display */}
+            {currentMatch.tournament && (
+              <div className="tournament-header">
+                <span className="tournament-icon">🏆</span>
+                <span className="tournament-name">{currentMatch.tournament.name}</span>
+              </div>
+            )}
+
             {/* Match Number & Round */}
             <div className="match-header">
               <div className="match-number">Match #{currentMatch.matchNumber}</div>
@@ -207,14 +215,6 @@ const MobileHome = () => {
                     🏆 {currentMatch.winner.name} Wins!
                   </div>
                 )}
-              </div>
-            )}
-
-            {/* Tournament Info */}
-            {currentMatch.tournament && (
-              <div className="tournament-tag">
-                <span className="tournament-icon">🏆</span>
-                {currentMatch.tournament.name}
               </div>
             )}
           </div>

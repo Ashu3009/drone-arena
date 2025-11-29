@@ -147,13 +147,38 @@
   border-bottom: 4px solid #138808;
 }
 
+/* Tournament Header - Prominent */
+.tournament-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  margin: -20px -20px 16px -20px;
+  background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
+  border-radius: 14px 14px 0 0;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.tournament-icon {
+  font-size: 1.25rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.tournament-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  letter-spacing: 0.02em;
+}
+
 .match-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .match-number {

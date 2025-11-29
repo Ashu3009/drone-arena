@@ -8,6 +8,7 @@ const MobileTournaments = () => {
   const [tournaments, setTournaments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // all, upcoming, ongoing, completed
+  const [selectedDate, setSelectedDate] = useState(''); // for date filtering
 
   useEffect(() => {
     fetchTournaments();
@@ -36,8 +37,19 @@ const MobileTournaments = () => {
   };
 
   const getFilteredTournaments = () => {
-    if (filter === 'all') return tournaments;
-    return tournaments.filter(t => t.status === filter);
+    let filtered = filter === 'all' ? tournaments : tournaments.filter(t => t.status === filter);
+
+    // Filter by selected date
+    if (selectedDate) {
+      filtered = filtered.filter(t => {
+        if (!t.startDate) return false;
+        const tournamentDate = new Date(t.startDate).toDateString();
+        const filterDate = new Date(selectedDate).toDateString();
+        return tournamentDate === filterDate;
+      });
+    }
+
+    return filtered;
   };
 
   const formatDate = (date) => {
@@ -104,6 +116,34 @@ const MobileTournaments = () => {
         >
           Past ({tournaments.filter(t => t.status === 'completed').length})
         </button>
+      </div>
+
+      {/* Date Filter - Styled like filter tabs */}
+      {selectedDate && (
+        <div className="date-filter-section">
+          <div className="date-filter-header">
+            <span className="date-icon">📅</span>
+            <span className="date-label">Selected Date: {formatDate(selectedDate)}</span>
+            <button
+              className="clear-date-btn-new"
+              onClick={() => setSelectedDate('')}
+              title="Clear date filter"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Date Picker */}
+      <div className="date-picker-section">
+        <label className="date-picker-label">📅 Filter by Date</label>
+        <input
+          type="date"
+          className="date-picker-input"
+          value={selectedDate}
+          onChange={(e) => setSelectedDate(e.target.value)}
+        />
       </div>
 
       {/* Tournaments List */}
