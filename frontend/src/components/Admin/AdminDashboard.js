@@ -8,6 +8,7 @@ import TeamManager from './TeamManager';
 import MatchManager from './MatchManager';
 import ReportsManager from './ReportsManager';
 import DroneManagement from './DroneManagement';
+import StatsManager from './StatsManager';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('tournaments');
@@ -35,6 +36,8 @@ const AdminDashboard = () => {
         return <MatchManager />;
       case 'reports':
         return <ReportsManager />;
+      case 'stats':
+        return <StatsManager />;
       default:
         return <TournamentManager />;
     }
@@ -98,6 +101,12 @@ const AdminDashboard = () => {
           onClick={() => setActiveTab('reports')}
         >
           Reports
+        </button>
+        <button
+          style={activeTab === 'stats' ? {...styles.navButton, ...styles.navButtonActive} : styles.navButton}
+          onClick={() => setActiveTab('stats')}
+        >
+          Site Stats
         </button>
         <a href="/" style={styles.viewPublicLink} target="_blank" rel="noopener noreferrer">
           View Public Dashboard

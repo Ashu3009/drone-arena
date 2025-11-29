@@ -38,6 +38,7 @@ const droneLogRoutes = require('./routes/droneLogRoutes');
 const droneReportRoutes = require('./routes/droneReportRoutes');
 const droneRoutes = require('./routes/droneRoutes');
 const schoolRoutes = require('./routes/schoolRoutes');
+const siteStatsRoutes = require('./routes/siteStatsRoutes');
 
 // Mount Routes
 app.use('/api/auth', authRoutes);
@@ -48,6 +49,7 @@ app.use('/api/telemetry', telemetryRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/drone-logs', droneLogRoutes);
 app.use('/api/reports', droneReportRoutes);
+app.use('/api/stats', siteStatsRoutes);
 app.use('/api/drones', droneRoutes);
 app.use('/api/schools', schoolRoutes);
 

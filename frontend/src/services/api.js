@@ -516,6 +516,32 @@ export const downloadReportPDF = async (reportId, pilotName, roundNumber) => {
   }
 };
 
+// ==================== SITE STATS ====================
+
+// Get site statistics (public)
+export const getSiteStats = async () => {
+  const response = await axios.get(`${API_BASE_URL}/stats`);
+  return response.data;
+};
+
+// Get detailed stats info (admin only)
+export const getSiteStatsDetails = async () => {
+  const response = await axios.get(`${API_BASE_URL}/stats/details`);
+  return response.data;
+};
+
+// Manual override stats (admin only)
+export const overrideSiteStats = async (statsData) => {
+  const response = await axios.put(`${API_BASE_URL}/stats/manual-override`, statsData);
+  return response.data;
+};
+
+// Reset stats to auto-calculated (admin only)
+export const resetSiteStats = async (fields = null) => {
+  const response = await axios.put(`${API_BASE_URL}/stats/reset`, { fields });
+  return response.data;
+};
+
 const apiService = {
   // Tournaments
   getTournaments,
@@ -582,7 +608,13 @@ const apiService = {
   getTournamentPilotAggregates,
   getMatchReports,
   getReportById,
-  downloadReportPDF
+  downloadReportPDF,
+
+  // Site Stats
+  getSiteStats,
+  getSiteStatsDetails,
+  overrideSiteStats,
+  resetSiteStats
 };
 
 export default apiService;
