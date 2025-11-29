@@ -1,73 +1,64 @@
 // frontend/src/components/Public/DroneView3D.js
-import { useState, useEffect, useRef } from 'react';
-import io from 'socket.io-client';
+import { useState, useEffect } from 'react';
+import { getSocket, onTelemetry } from '../services/socket';
 import './DroneView3D.css';
 
 const DroneView3D = ({ matchId }) => {
   const [dronePositions, setDronePositions] = useState({});
   const [connected, setConnected] = useState(false);
-  const socketRef = useRef(null);
 
-  // ✅ Socket.IO Connection
+  // ✅ Use global socket service
   useEffect(() => {
     if (!matchId) {
       console.warn('⚠️ No matchId provided to DroneView3D');
       return;
     }
 
-    console.log('🔌 Initializing Socket.IO for match:', matchId);
+    console.log('🔌 Using global Socket.IO for match:', matchId);
 
-    const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+    const socket = getSocket();
 
-    const socket = io(BACKEND_URL, {
-      transports: ['websocket', 'polling'],
-      reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000
-    });
+    // Check connection status
+    setConnected(socket.connected);
 
-    socketRef.current = socket;
-
-    socket.on('connect', () => {
-      console.log('✅ Socket connected:', socket.id);
+    const handleConnect = () => {
+      console.log('✅ DroneView3D: Socket connected');
       setConnected(true);
+    };
 
-      // Join match room
-      socket.emit('join_match', matchId);
-      console.log(`📍 Joined match room: match_${matchId}`);
-    });
-
-    socket.on('disconnect', () => {
-      console.log('🔌 Socket disconnected');
+    const handleDisconnect = () => {
+      console.log('🔌 DroneView3D: Socket disconnected');
       setConnected(false);
-    });
+    };
 
-    socket.on('connect_error', (error) => {
-      console.error('❌ Socket connection error:', error);
-      setConnected(false);
-    });
+    socket.on('connect', handleConnect);
+    socket.on('disconnect', handleDisconnect);
 
-    // ✅ Listen for real-time telemetry updates
-    socket.on('telemetry_update', (data) => {
-      console.log('📡 Telemetry received:', data);
+    // ✅ Listen for telemetry events (uses hyphen)
+    const handleTelemetry = (data) => {
+      console.log('📡 DroneView3D: Telemetry received:', data.droneId);
 
       setDronePositions(prev => ({
         ...prev,
         [data.droneId]: {
-          x: data.position.x,
-          y: data.position.y,
-          z: data.position.z,
-          battery: data.battery,
+          x: data.x || 0,
+          y: data.y || 0,
+          z: data.z || 0,
+          battery: data.battery || 100,
           droneId: data.droneId,
-          timestamp: data.timestamp
+          timestamp: data.timestamp || Date.now()
         }
       }));
-    });
+    };
+
+    onTelemetry(handleTelemetry);
 
     // Cleanup on unmount
     return () => {
-      console.log('🧹 Cleaning up socket connection');
-      socket.disconnect();
+      console.log('🧹 DroneView3D: Cleaning up listeners');
+      socket.off('connect', handleConnect);
+      socket.off('disconnect', handleDisconnect);
+      socket.off('telemetry', handleTelemetry);
     };
   }, [matchId]);
 

@@ -259,7 +259,7 @@ const TournamentsList = () => {
                 />
               ) : (
                 <div className="tournament-card-banner-placeholder">
-                  🚁
+                  🎯⚽
                 </div>
               )}
               <div className="tournament-card-content">

@@ -37,7 +37,7 @@
     #FF9933 0%, #FF9933 33%,
     #FFFFFF 33%, #FFFFFF 66%,
     #138808 66%, #138808 100%);
-  padding: 30px 40px;
+  padding: 20px 40px;
   border-bottom: 3px solid #FF9933;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
@@ -79,22 +79,44 @@
   }
 }
 
+.tournament-match-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
 .tournament-public {
   margin: 0;
   color: #000080;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
+}
+
+.match-number-public {
+  background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
+  color: white;
+  padding: 4px 14px;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: bold;
+  box-shadow: 0 2px 6px rgba(255, 153, 51, 0.3);
+}
+
+/* Combined Match + Timer Display Section */
+.match-display-section {
+  padding: 0 40px;
+  margin-bottom: 25px;
 }
 
 .match-info-public {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  padding: 40px;
+  padding: 30px;
   background: #FFFFFF;
-  margin-bottom: 30px;
+  margin-bottom: 15px;
   border-radius: 16px;
-  margin: 30px 40px;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
   border: 2px solid #FF9933;
   border-bottom: 4px solid #138808;
@@ -190,6 +212,93 @@
   text-decoration: none;
   font-size: 14px;
   font-weight: bold;
+}
+
+.timer-section-public {
+  /* Timer is now inside match-display-section */
+}
+
+/* Desktop Optimization for 1920x1080 */
+@media (min-width: 1440px) {
+  .header-public {
+    padding: 15px 40px;
+  }
+
+  .header-content-public {
+    margin-bottom: 5px;
+  }
+
+  .title-public {
+    font-size: 28px;
+  }
+
+  .tournament-public {
+    font-size: 14px;
+  }
+
+  .match-display-section {
+    margin-bottom: 20px;
+  }
+
+  .match-info-public {
+    padding: 25px;
+    margin-bottom: 12px;
+  }
+
+  .team-name-public {
+    font-size: 24px;
+    margin: 0 0 15px 0;
+  }
+
+  .score-display-public {
+    font-size: 60px;
+  }
+
+  .vs-public {
+    font-size: 28px;
+  }
+
+  .section-title-public {
+    font-size: 20px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+  }
+
+  .match-timer-container {
+    margin-bottom: 20px;
+  }
+
+  /* Compact timer for desktop */
+  .timer-section-public {
+    margin-bottom: 20px;
+  }
+}
+
+/* Ultra-wide Desktop (1920x1080 and above) */
+@media (min-width: 1920px) {
+  .public-viewer-container {
+    max-width: 1920px;
+    margin: 0 auto;
+  }
+
+  /* Make header + match + timer fit in viewport (1920x1080) */
+  .header-public {
+    padding: 10px 60px;
+  }
+
+  .match-display-section {
+    padding: 0 60px;
+    margin-bottom: 15px;
+  }
+
+  .match-info-public {
+    padding: 20px 30px;
+    margin-bottom: 10px;
+  }
+
+  .section-title-public {
+    margin-bottom: 12px;
+  }
 }
 
 /* Responsive */

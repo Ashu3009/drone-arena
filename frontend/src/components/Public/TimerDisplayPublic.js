@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
-const TimerDisplayPublic = ({ round }) => {
+const TimerDisplayPublic = ({ round, roundDuration }) => {
   const [elapsedTime, setElapsedTime] = useState(0);
-  const MAX_TIME = 180; // 3 minutes
+  const MAX_TIME = (roundDuration || 3) * 60; // Convert minutes to seconds
 
   useEffect(() => {
     if (round.timerStatus === 'running') {
@@ -25,7 +25,7 @@ const TimerDisplayPublic = ({ round }) => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const remaining = MAX_TIME - elapsedTime;
+  const remaining = Math.max(0, MAX_TIME - elapsedTime);
   const percentage = (elapsedTime / MAX_TIME) * 100;
 
   return (
@@ -66,50 +66,59 @@ const TimerDisplayPublic = ({ round }) => {
 
 const styles = {
   container: {
-    backgroundColor: '#1e1e1e',
-    padding: '25px',
+    background: 'linear-gradient(135deg, rgba(255,153,51,0.1) 0%, rgba(255,255,255,0.05) 50%, rgba(19,136,8,0.1) 100%)',
+    padding: '20px',
     borderRadius: '12px',
-    marginBottom: '20px',
-    border: '2px solid #333'
+    marginBottom: '0',
+    border: '2px solid',
+    borderImage: 'linear-gradient(135deg, #FF9933 0%, #FFFFFF 50%, #138808 100%) 1',
+    boxShadow: '0 4px 15px rgba(0,0,0,0.3)'
   },
   timerDisplay: {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: '10px',
-    marginBottom: '20px'
+    gap: '8px',
+    marginBottom: '15px'
   },
   timeLabel: {
-    fontSize: '16px',
-    color: '#aaa'
+    fontSize: '14px',
+    color: '#ccc',
+    fontWeight: '600',
+    letterSpacing: '1px'
   },
   time: {
-    fontSize: '64px',
+    fontSize: '48px',
     fontWeight: 'bold',
     fontFamily: 'monospace',
-    textShadow: '0 0 20px rgba(76, 175, 80, 0.5)'
+    color: '#FF9933',
+    textShadow: '2px 2px 4px rgba(0,0,0,0.5), 0 0 20px rgba(255,153,51,0.6)'
   },
   elapsedLabel: {
-    fontSize: '14px',
-    color: '#888'
+    fontSize: '12px',
+    color: '#999'
   },
   progressBar: {
     width: '100%',
-    height: '12px',
-    backgroundColor: '#333',
-    borderRadius: '6px',
+    height: '10px',
+    background: 'linear-gradient(90deg, rgba(255,153,51,0.2) 0%, rgba(19,136,8,0.2) 100%)',
+    borderRadius: '5px',
     overflow: 'hidden',
-    marginBottom: '20px'
+    marginBottom: '12px',
+    border: '1px solid rgba(255,153,51,0.3)'
   },
   progressFill: {
     height: '100%',
-    transition: 'width 0.5s ease, background-color 0.3s ease'
+    transition: 'width 0.5s ease, background-color 0.3s ease',
+    background: 'linear-gradient(90deg, #FF9933 0%, #FFFFFF 50%, #138808 100%)',
+    boxShadow: '0 0 10px rgba(255,153,51,0.5)'
   },
   status: {
     textAlign: 'center',
-    fontSize: '14px',
-    color: '#aaa'
+    fontSize: '13px',
+    color: '#bbb',
+    fontWeight: '600'
   }
 };
 

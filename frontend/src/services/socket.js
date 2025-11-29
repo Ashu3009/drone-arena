@@ -7,21 +7,31 @@ let socket = null;
 // Initialize socket connection
 export const initSocket = () => {
   if (!socket) {
+    console.log('🔌 Initializing socket connection to:', SOCKET_URL);
     socket = io(SOCKET_URL, {
-      transports: ['websocket'],
-      autoConnect: true
+      transports: ['websocket', 'polling'],
+      autoConnect: true,
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionAttempts: 5
     });
 
     socket.on('connect', () => {
       console.log('✅ Socket.io connected:', socket.id);
+      console.log('📡 Socket URL:', SOCKET_URL);
     });
 
-    socket.on('disconnect', () => {
-      console.log('❌ Socket.io disconnected');
+    socket.on('disconnect', (reason) => {
+      console.log('❌ Socket.io disconnected. Reason:', reason);
     });
 
     socket.on('connect_error', (error) => {
-      console.error('Socket connection error:', error);
+      console.error('❌ Socket connection error:', error.message);
+      console.error('📍 Trying to connect to:', SOCKET_URL);
+    });
+
+    socket.on('reconnect', (attemptNumber) => {
+      console.log('🔄 Socket reconnected after', attemptNumber, 'attempts');
     });
   }
   return socket;
@@ -52,13 +62,19 @@ export const leaveMatch = (matchId) => {
 // Listen to round-started event
 export const onRoundStarted = (callback) => {
   const s = getSocket();
-  s.on('round-started', callback);
+  s.on('round-started', (data) => {
+    console.log('🎬 [SOCKET] Round started received:', data);
+    callback(data);
+  });
 };
 
 // Listen to score-updated event
 export const onScoreUpdated = (callback) => {
   const s = getSocket();
-  s.on('score-updated', callback);
+  s.on('score-updated', (data) => {
+    console.log('⚽ [SOCKET] Score update received:', data);
+    callback(data);
+  });
 };
 
 // Listen to round-ended event
@@ -88,6 +104,24 @@ export const onCurrentMatchUpdated = (callback) => {
   s.on('current-match-updated', callback);
 };
 
+// Listen to timer-paused event
+export const onTimerPaused = (callback) => {
+  const s = getSocket();
+  s.on('timer-paused', callback);
+};
+
+// Listen to timer-resumed event
+export const onTimerResumed = (callback) => {
+  const s = getSocket();
+  s.on('timer-resumed', callback);
+};
+
+// Listen to timer-reset event
+export const onTimerReset = (callback) => {
+  const s = getSocket();
+  s.on('timer-reset', callback);
+};
+
 // Remove all listeners (cleanup)
 export const removeAllListeners = () => {
   const s = getSocket();
@@ -97,6 +131,9 @@ export const removeAllListeners = () => {
   s.off('match-completed');
   s.off('telemetry');
   s.off('current-match-updated');
+  s.off('timer-paused');
+  s.off('timer-resumed');
+  s.off('timer-reset');
 };
 
 // Disconnect socket
@@ -119,6 +156,9 @@ const socketService = {
   onMatchCompleted,
   onTelemetry,
   onCurrentMatchUpdated,
+  onTimerPaused,
+  onTimerResumed,
+  onTimerReset,
   removeAllListeners,
   disconnectSocket
 };

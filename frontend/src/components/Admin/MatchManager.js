@@ -87,7 +87,13 @@ const MatchManager = () => {
       ]);
 
       if (matchesRes.success) setMatches(matchesRes.data);
-      if (tournamentsRes.success) setTournaments(tournamentsRes.data);
+      if (tournamentsRes.success) {
+        // Filter to show only upcoming and ongoing tournaments for match creation
+        const activeTournaments = tournamentsRes.data.filter(
+          t => t.status === 'upcoming' || t.status === 'ongoing'
+        );
+        setTournaments(activeTournaments);
+      }
       if (teamsRes.success) setTeams(teamsRes.data);
     } catch (error) {
       console.error('Error loading data:', error);

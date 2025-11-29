@@ -227,7 +227,7 @@ exports.updateTournament = async (req, res) => {
 // @route   DELETE /api/tournaments/:id
 exports.deleteTournament = async (req, res) => {
   try {
-    const tournament = await Tournament.findByIdAndDelete(req.params.id);
+    const tournament = await Tournament.findById(req.params.id);
 
     if (!tournament) {
       return res.status(404).json({
@@ -236,14 +236,37 @@ exports.deleteTournament = async (req, res) => {
       });
     }
 
-    // Also delete associated standings
+    // Get all matches for this tournament
+    const matches = await Match.find({ tournament: req.params.id });
+    const matchIds = matches.map(m => m._id);
+
+    // Cascade delete in order:
+    // 1. Delete all drone reports for these matches
+    if (matchIds.length > 0) {
+      await DroneReport.deleteMany({ match: { $in: matchIds } });
+      console.log(`🗑️  Deleted drone reports for ${matchIds.length} matches`);
+    }
+
+    // 2. Delete all matches
+    await Match.deleteMany({ tournament: req.params.id });
+    console.log(`🗑️  Deleted ${matchIds.length} matches`);
+
+    // 3. Delete tournament standings
     await TournamentStanding.deleteMany({ tournament: req.params.id });
+
+    // 4. Delete the tournament itself
+    await Tournament.findByIdAndDelete(req.params.id);
 
     res.json({
       success: true,
-      message: 'Tournament deleted successfully'
+      message: 'Tournament and all associated data deleted successfully',
+      deletedData: {
+        matches: matchIds.length,
+        tournament: tournament.name
+      }
     });
   } catch (error) {
+    console.error('Error deleting tournament:', error);
     res.status(500).json({
       success: false,
       message: error.message

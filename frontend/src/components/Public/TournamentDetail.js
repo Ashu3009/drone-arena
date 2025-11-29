@@ -95,7 +95,7 @@ const TournamentDetail = () => {
           />
         ) : (
           <div className="tournament-detail-banner-placeholder">
-            🚁
+            🎯⚽
           </div>
         )}
         <div className="tournament-detail-header-content">

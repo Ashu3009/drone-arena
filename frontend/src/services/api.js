@@ -187,8 +187,16 @@ export const uploadMemberPhoto = async (teamId, memberIndex, photoFile) => {
 // ==================== MATCHES ====================
 
 // Get all matches
-export const getMatches = async () => {
-  const response = await axios.get(`${API_BASE_URL}/matches`);
+export const getMatches = async (filters = {}) => {
+  const params = new URLSearchParams();
+  if (filters.tournamentId) params.append('tournamentId', filters.tournamentId);
+  if (filters.status) params.append('status', filters.status);
+
+  const url = params.toString()
+    ? `${API_BASE_URL}/matches?${params.toString()}`
+    : `${API_BASE_URL}/matches`;
+
+  const response = await axios.get(url);
   return response.data;
 };
 

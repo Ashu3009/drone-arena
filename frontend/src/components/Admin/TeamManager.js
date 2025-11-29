@@ -189,9 +189,9 @@ const TeamManager = () => {
       ? team.members
       : [
           { name: '', role: 'Forward', contactEmail: '', isPrimary: true },
-          { name: '', role: 'Center', contactEmail: '', isPrimary: true },
+          { name: '', role: 'Striker', contactEmail: '', isPrimary: true },
           { name: '', role: 'Defender', contactEmail: '', isPrimary: true },
-          { name: '', role: 'Keeper', contactEmail: '', isPrimary: true }
+          { name: '', role: 'Central', contactEmail: '', isPrimary: true }
         ];
 
     setFormData({
@@ -222,9 +222,9 @@ const TeamManager = () => {
       color: '#3B82F6',
       members: [
         { name: '', role: 'Forward', contactEmail: '', isPrimary: true },
-        { name: '', role: 'Center', contactEmail: '', isPrimary: true },
+        { name: '', role: 'Striker', contactEmail: '', isPrimary: true },
         { name: '', role: 'Defender', contactEmail: '', isPrimary: true },
-        { name: '', role: 'Keeper', contactEmail: '', isPrimary: true }
+        { name: '', role: 'Central', contactEmail: '', isPrimary: true }
       ]
     });
   };

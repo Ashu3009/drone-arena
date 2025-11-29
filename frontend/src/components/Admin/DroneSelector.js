@@ -5,15 +5,15 @@ const DroneSelector = ({ matchId, roundNumber, teamA, teamB, onRegister }) => {
   const [allDrones, setAllDrones] = useState([]);
   const [teamALineup, setTeamALineup] = useState([
     { position: 'Forward', pilotId: '', pilotName: '', droneId: '', role: 'Forward' },
-    { position: 'Center', pilotId: '', pilotName: '', droneId: '', role: 'Center' },
+    { position: 'Striker', pilotId: '', pilotName: '', droneId: '', role: 'Striker' },
     { position: 'Defender', pilotId: '', pilotName: '', droneId: '', role: 'Defender' },
-    { position: 'Keeper', pilotId: '', pilotName: '', droneId: '', role: 'Keeper' }
+    { position: 'Central', pilotId: '', pilotName: '', droneId: '', role: 'Central' }
   ]);
   const [teamBLineup, setTeamBLineup] = useState([
     { position: 'Forward', pilotId: '', pilotName: '', droneId: '', role: 'Forward' },
-    { position: 'Center', pilotId: '', pilotName: '', droneId: '', role: 'Center' },
+    { position: 'Striker', pilotId: '', pilotName: '', droneId: '', role: 'Striker' },
     { position: 'Defender', pilotId: '', pilotName: '', droneId: '', role: 'Defender' },
-    { position: 'Keeper', pilotId: '', pilotName: '', droneId: '', role: 'Keeper' }
+    { position: 'Central', pilotId: '', pilotName: '', droneId: '', role: 'Central' }
   ]);
 
   useEffect(() => {
