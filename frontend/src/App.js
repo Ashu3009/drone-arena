@@ -30,8 +30,9 @@ import './styles/indianTheme.css';
 const ResponsiveHome = () => {
   const isMobile = useIsMobile();
 
+  // Redirect to /mobile for mobile devices
   if (isMobile) {
-    return <MobileLayout><MobileHome /></MobileLayout>;
+    return <Navigate to="/mobile" replace />;
   }
 
   return <><Navbar /><PublicViewer /></>;

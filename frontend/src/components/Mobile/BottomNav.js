@@ -38,6 +38,10 @@ const BottomNav = () => {
   ];
 
   const isActive = (path) => {
+    // Home is active for both "/" and "/mobile"
+    if (path === '/mobile') {
+      return location.pathname === '/' || location.pathname === '/mobile';
+    }
     return location.pathname === path;
   };
 
