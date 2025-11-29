@@ -31,6 +31,9 @@ const MobileHome = () => {
       const response = await getCurrentMatch();
       if (response.data) {
         setCurrentMatch(response.data);
+        // Debug: Check if member photos are coming from backend
+        console.log('📸 Team A Members:', response.data.teamA?.members);
+        console.log('📸 Team B Members:', response.data.teamB?.members);
       }
       setLoading(false);
     } catch (err) {
@@ -143,7 +146,14 @@ const MobileHome = () => {
                     {currentMatch.teamA?.members?.slice(0, 3).map((member, idx) => (
                       <div key={idx} className="member-avatar">
                         {member.photo ? (
-                          <img src={member.photo} alt={member.name} />
+                          <img
+                            src={`http://localhost:5000/${member.photo}`}
+                            alt={member.name}
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                              e.target.parentElement.innerHTML = `<div class="avatar-placeholder">${member.name[0]}</div>`;
+                            }}
+                          />
                         ) : (
                           <div className="avatar-placeholder">{member.name[0]}</div>
                         )}
@@ -178,7 +188,14 @@ const MobileHome = () => {
                     {currentMatch.teamB?.members?.slice(0, 3).map((member, idx) => (
                       <div key={idx} className="member-avatar">
                         {member.photo ? (
-                          <img src={member.photo} alt={member.name} />
+                          <img
+                            src={`http://localhost:5000/${member.photo}`}
+                            alt={member.name}
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                              e.target.parentElement.innerHTML = `<div class="avatar-placeholder">${member.name[0]}</div>`;
+                            }}
+                          />
                         ) : (
                           <div className="avatar-placeholder">{member.name[0]}</div>
                         )}

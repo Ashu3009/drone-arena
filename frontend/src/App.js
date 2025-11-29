@@ -26,20 +26,25 @@ import './App.css';
 import './styles/mobileResponsive.css';
 import './styles/indianTheme.css';
 
-// Responsive Home Component - Auto-detects mobile/desktop (NO redirect, pure responsive)
+// Responsive Home Component - Auto-detects mobile/desktop
 const ResponsiveHome = () => {
   const isMobile = useIsMobile();
 
-  // Dynamically render mobile or desktop view based on screen size
+  // Render mobile view with layout (header + bottom nav)
   if (isMobile) {
     return (
-      <MobileLayout>
+      <MobileLayout key="mobile-home">
         <MobileHome />
       </MobileLayout>
     );
   }
 
-  return <><Navbar /><PublicViewer /></>;
+  return (
+    <div key="desktop-home" style={{ width: '100%', height: '100%' }}>
+      <Navbar />
+      <PublicViewer />
+    </div>
+  );
 };
 
 // Responsive Tournaments List - Dynamically switches mobile/desktop
@@ -49,13 +54,18 @@ const ResponsiveTournaments = () => {
   // Pure responsive rendering (no redirect)
   if (isMobile) {
     return (
-      <MobileLayout>
+      <MobileLayout key="mobile-tournaments">
         <MobileTournaments />
       </MobileLayout>
     );
   }
 
-  return <><Navbar /><TournamentsList /></>;
+  return (
+    <div key="desktop-tournaments" style={{ width: '100%', height: '100%' }}>
+      <Navbar />
+      <TournamentsList />
+    </div>
+  );
 };
 
 // Responsive Leaderboard - Dynamically switches mobile/desktop
@@ -64,7 +74,7 @@ const ResponsiveLeaderboard = () => {
 
   if (isMobile) {
     return (
-      <MobileLayout>
+      <MobileLayout key="mobile-leaderboard">
         <MobileLeaderboard />
       </MobileLayout>
     );

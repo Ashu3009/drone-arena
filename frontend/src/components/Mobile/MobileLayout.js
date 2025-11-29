@@ -4,13 +4,14 @@ import MobileHeader from './MobileHeader';
 import BottomNav from './BottomNav';
 import './MobileLayout.css';
 
-const MobileLayout = () => {
+const MobileLayout = ({ children }) => {
   return (
     <div className="mobile-layout">
       <MobileHeader />
 
       <main className="mobile-main">
-        <Outlet />
+        {/* Support both children (for responsive rendering) and Outlet (for routes) */}
+        {children || <Outlet />}
       </main>
 
       <BottomNav />
