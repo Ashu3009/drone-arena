@@ -770,6 +770,7 @@ const MatchManager = () => {
                     </>
                   )}
 
+                  {/* Complete Match - Auto (all rounds done) */}
                   {match.status === 'in_progress' && currentRound >= 3 && !activeRound && (
                     <button
                       onClick={() => handleCompleteMatch(match._id)}
@@ -777,6 +778,22 @@ const MatchManager = () => {
                       disabled={loading}
                     >
                       Complete Match
+                    </button>
+                  )}
+
+                  {/* Force Complete - Manual (any time) */}
+                  {match.status !== 'completed' && (
+                    <button
+                      onClick={() => {
+                        if (window.confirm(`Force complete this match?\n\nThis will mark the match as completed regardless of rounds played.`)) {
+                          handleCompleteMatch(match._id);
+                        }
+                      }}
+                      style={{...styles.controlButton, backgroundColor: '#FF9800', fontSize: '0.85rem'}}
+                      disabled={loading}
+                      title="Force complete match (even if rounds incomplete)"
+                    >
+                      Force Complete
                     </button>
                   )}
 
