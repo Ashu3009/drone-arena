@@ -32,7 +32,10 @@
       "Bash(python:*)",
       "Bash(dir c:UsersADMINDesktopdrone-arena *.py /s /b)",
       "Bash(node seedTestData.js:*)",
-      "Bash(node configureMatches.js:*)"
+      "Bash(node configureMatches.js:*)",
+      "Bash(dir:*)",
+      "Bash(del /f \"c:\\Users\\ADMIN\\Desktop\\drone-arena\\nul\")",
+      "Bash(node scripts/updateImageUrls.js:*)"
     ],
     "deny": [],
     "ask": []

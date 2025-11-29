@@ -42,7 +42,7 @@ const droneReportSchema = new mongoose.Schema({
   role: {
     type: String,
     required: true,
-    enum: ['Forward', 'Center', 'Defender', 'Keeper'],
+    enum: ['Forward', 'Striker', 'Defender', 'Central'],
     trim: true
   },
 

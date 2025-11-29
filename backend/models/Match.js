@@ -22,7 +22,7 @@ const roundSchema = new mongoose.Schema({
     },
     role: {
       type: String,
-      enum: ['Forward', 'Center', 'Defender', 'Keeper'],
+      enum: ['Forward', 'Striker', 'Defender', 'Central'],
       required: true
     },
     pilotId: {
@@ -125,6 +125,12 @@ const matchSchema = new mongoose.Schema({
   scheduledTime: {
     type: Date,
     default: Date.now
+  },
+  roundDuration: {
+    type: Number,
+    default: 3, // minutes
+    min: 1,
+    max: 10
   },
   isCurrentMatch: {
     type: Boolean,

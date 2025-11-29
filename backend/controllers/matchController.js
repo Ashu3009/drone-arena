@@ -15,6 +15,9 @@ const { generateSummary, generateRecommendations } = require('../utils/reportTem
 // ✅ Global map to store running simulators (matchId -> process)
 const runningSimulators = new Map();
 
+// ✅ Global map to store active round timers (matchId-roundNumber -> timeoutId)
+const activeRoundTimers = new Map();
+
 /**
  * ✅ HELPER: Calculate Man of the Match based on DroneReports
  * Uses role-specific scoring and overall performance
@@ -203,18 +206,29 @@ const createMatch = async (req, res) => {
     const matchCount = await Match.countDocuments({ tournament: tournamentId });
     const matchNumber = matchCount + 1;
 
-    // Create match with 3 empty rounds
+    // Get round duration from tournament settings
+    const roundDuration = tournament.settings?.roundDuration || 3;
+
+    // Create rounds based on tiebreaker setting
+    const rounds = [
+      { roundNumber: 1, status: 'pending', teamAScore: 0, teamBScore: 0 },
+      { roundNumber: 2, status: 'pending', teamAScore: 0, teamBScore: 0 }
+    ];
+
+    // Add 3rd round only if tiebreaker is enabled
+    if (tournament.settings?.hasTiebreaker !== false) {
+      rounds.push({ roundNumber: 3, status: 'pending', teamAScore: 0, teamBScore: 0 });
+    }
+
+    // Create match with rounds
     const match = await Match.create({
       tournament: tournamentId,
       matchNumber,
       teamA: teamAId,
       teamB: teamBId,
       scheduledTime: scheduledTime || new Date(),
-      rounds: [
-        { roundNumber: 1, status: 'pending', teamAScore: 0, teamBScore: 0 },
-        { roundNumber: 2, status: 'pending', teamAScore: 0, teamBScore: 0 },
-        { roundNumber: 3, status: 'pending', teamAScore: 0, teamBScore: 0 }
-      ],
+      roundDuration,
+      rounds,
       currentRound: 0,
       status: 'scheduled'
     });
@@ -369,6 +383,63 @@ const startRound = async (req, res) => {
       console.log(`📡 Socket event emitted: round-started (Round ${nextRound.roundNumber})`);
     }
 
+    // ✅ AUTO-END TIMER: Automatically end round after configured duration
+    const timerKey = `${matchId}-${nextRound.roundNumber}`;
+    const roundDurationMinutes = match.roundDuration || 3;
+    const MAX_ROUND_TIME = roundDurationMinutes * 60 * 1000; // Convert minutes to milliseconds
+
+    // Clear any existing timer for this round
+    if (activeRoundTimers.has(timerKey)) {
+      clearTimeout(activeRoundTimers.get(timerKey));
+      activeRoundTimers.delete(timerKey);
+    }
+
+    // Set new auto-end timer
+    const autoEndTimer = setTimeout(async () => {
+      try {
+        console.log(`⏰ Auto-ending Round ${nextRound.roundNumber} after ${roundDurationMinutes} minutes...`);
+
+        // Call endRound internally
+        const endMatch = await Match.findById(matchId).populate('teamA teamB tournament');
+        if (!endMatch) return;
+
+        const endRound = endMatch.rounds.find(r => r.roundNumber === nextRound.roundNumber);
+        if (!endRound || endRound.status !== 'in_progress') return;
+
+        // End the round
+        endRound.status = 'completed';
+        endRound.endTime = new Date();
+        endRound.timerStatus = 'ended';
+
+        // Update match scores
+        endMatch.finalScoreA += endRound.teamAScore || 0;
+        endMatch.finalScoreB += endRound.teamBScore || 0;
+
+        await endMatch.save();
+
+        // Emit socket event
+        if (global.io) {
+          global.io.to(`match-${matchId}`).emit('round-ended', {
+            matchId,
+            roundNumber: nextRound.roundNumber,
+            teamAScore: endMatch.finalScoreA,
+            teamBScore: endMatch.finalScoreB
+          });
+        }
+
+        // Clean up timer
+        activeRoundTimers.delete(timerKey);
+
+        console.log(`✅ Round ${nextRound.roundNumber} auto-ended successfully`);
+      } catch (error) {
+        console.error('❌ Error auto-ending round:', error);
+      }
+    }, MAX_ROUND_TIME);
+
+    // Store timer reference
+    activeRoundTimers.set(timerKey, autoEndTimer);
+    console.log(`⏱️  Auto-end timer set for Round ${nextRound.roundNumber} (${roundDurationMinutes} minutes)`);
+
     // ✅ AUTO-START ESP SIMULATOR
     try {
       // Stop any existing simulator for this match
@@ -480,7 +551,7 @@ const updateScore = async (req, res) => {
 
     // ✅ Emit Socket.io event for live score updates
     if (global.io) {
-      global.io.to(`match-${matchId}`).emit('score-updated', {
+      const scoreData = {
         matchId: matchId,
         roundNumber: match.currentRound,
         teamAScore: currentRound.teamAScore,
@@ -488,7 +559,13 @@ const updateScore = async (req, res) => {
         finalScoreA: match.finalScoreA,
         finalScoreB: match.finalScoreB,
         updatedTeam: team
-      });
+      };
+
+      const roomSize = global.io.sockets.adapter.rooms.get(`match-${matchId}`)?.size || 0;
+      console.log(`📡 [SOCKET] Emitting score-updated to match-${matchId} (${roomSize} clients)`);
+      console.log(`   Score: Team ${team} ${increment > 0 ? '+1' : '-1'} | Final: ${match.finalScoreA} - ${match.finalScoreB}`);
+
+      global.io.to(`match-${matchId}`).emit('score-updated', scoreData);
       console.log(`📡 Socket event emitted: score-updated (Team ${team})`);
     }
 
@@ -522,7 +599,25 @@ const pauseTimer = async (req, res) => {
     round.timerStatus = 'paused';
     await match.save();
 
+    // ✅ Clear auto-end timer when paused
+    const timerKey = `${matchId}-${roundNumber}`;
+    if (activeRoundTimers.has(timerKey)) {
+      clearTimeout(activeRoundTimers.get(timerKey));
+      activeRoundTimers.delete(timerKey);
+      console.log(`⏱️  Cleared auto-end timer for paused Round ${roundNumber}`);
+    }
+
     console.log(`⏸️  Timer paused for Round ${roundNumber}`);
+
+    // Emit socket event
+    if (global.io) {
+      global.io.to(`match-${matchId}`).emit('timer-paused', {
+        matchId,
+        roundNumber: parseInt(roundNumber),
+        elapsedTime: round.elapsedTime,
+        timerStatus: 'paused'
+      });
+    }
 
     res.json({ success: true, data: match });
   } catch (error) {
@@ -550,6 +645,62 @@ const resumeTimer = async (req, res) => {
 
     console.log(`▶️  Timer resumed for Round ${roundNumber}`);
 
+    // Emit socket event
+    if (global.io) {
+      global.io.to(`match-${matchId}`).emit('timer-resumed', {
+        matchId,
+        roundNumber: parseInt(roundNumber),
+        startTime: round.startTime,
+        timerStatus: 'running'
+      });
+    }
+
+    // ✅ Restart auto-end timer with remaining time
+    const timerKey = `${matchId}-${roundNumber}`;
+    const roundDurationMinutes = match.roundDuration || 3;
+    const MAX_ROUND_TIME = roundDurationMinutes * 60; // Convert minutes to seconds
+    const remainingTime = Math.max(0, MAX_ROUND_TIME - round.elapsedTime);
+
+    if (remainingTime > 0) {
+      const autoEndTimer = setTimeout(async () => {
+        try {
+          console.log(`⏰ Auto-ending Round ${roundNumber} after resume...`);
+
+          const endMatch = await Match.findById(matchId).populate('teamA teamB tournament');
+          if (!endMatch) return;
+
+          const endRound = endMatch.rounds.find(r => r.roundNumber === parseInt(roundNumber));
+          if (!endRound || endRound.status !== 'in_progress') return;
+
+          endRound.status = 'completed';
+          endRound.endTime = new Date();
+          endRound.timerStatus = 'ended';
+
+          endMatch.finalScoreA += endRound.teamAScore || 0;
+          endMatch.finalScoreB += endRound.teamBScore || 0;
+
+          await endMatch.save();
+
+          if (global.io) {
+            global.io.to(`match-${matchId}`).emit('round-ended', {
+              matchId,
+              roundNumber: parseInt(roundNumber),
+              teamAScore: endMatch.finalScoreA,
+              teamBScore: endMatch.finalScoreB
+            });
+          }
+
+          activeRoundTimers.delete(timerKey);
+          console.log(`✅ Round ${roundNumber} auto-ended after resume`);
+        } catch (error) {
+          console.error('❌ Error auto-ending round:', error);
+        }
+      }, remainingTime * 1000);
+
+      activeRoundTimers.set(timerKey, autoEndTimer);
+      console.log(`⏱️  Auto-end timer restarted with ${remainingTime}s remaining`);
+    }
+
     res.json({ success: true, data: match });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -574,6 +725,66 @@ const resetTimer = async (req, res) => {
     await match.save();
 
     console.log(`🔄 Timer reset for Round ${roundNumber}`);
+
+    // Emit socket event
+    if (global.io) {
+      global.io.to(`match-${matchId}`).emit('timer-reset', {
+        matchId,
+        roundNumber: parseInt(roundNumber),
+        startTime: round.startTime,
+        timerStatus: 'running'
+      });
+    }
+
+    // ✅ Reset auto-end timer to full duration
+    const timerKey = `${matchId}-${roundNumber}`;
+    const roundDurationMinutes = match.roundDuration || 3;
+
+    // Clear existing timer
+    if (activeRoundTimers.has(timerKey)) {
+      clearTimeout(activeRoundTimers.get(timerKey));
+      activeRoundTimers.delete(timerKey);
+    }
+
+    // Set new timer
+    const MAX_ROUND_TIME = roundDurationMinutes * 60 * 1000; // Convert minutes to milliseconds
+    const autoEndTimer = setTimeout(async () => {
+      try {
+        console.log(`⏰ Auto-ending Round ${roundNumber} after ${roundDurationMinutes} minutes...`);
+
+        const endMatch = await Match.findById(matchId).populate('teamA teamB tournament');
+        if (!endMatch) return;
+
+        const endRound = endMatch.rounds.find(r => r.roundNumber === parseInt(roundNumber));
+        if (!endRound || endRound.status !== 'in_progress') return;
+
+        endRound.status = 'completed';
+        endRound.endTime = new Date();
+        endRound.timerStatus = 'ended';
+
+        endMatch.finalScoreA += endRound.teamAScore || 0;
+        endMatch.finalScoreB += endRound.teamBScore || 0;
+
+        await endMatch.save();
+
+        if (global.io) {
+          global.io.to(`match-${matchId}`).emit('round-ended', {
+            matchId,
+            roundNumber: parseInt(roundNumber),
+            teamAScore: endMatch.finalScoreA,
+            teamBScore: endMatch.finalScoreB
+          });
+        }
+
+        activeRoundTimers.delete(timerKey);
+        console.log(`✅ Round ${roundNumber} auto-ended successfully`);
+      } catch (error) {
+        console.error('❌ Error auto-ending round:', error);
+      }
+    }, MAX_ROUND_TIME);
+
+    activeRoundTimers.set(timerKey, autoEndTimer);
+    console.log(`⏱️  Auto-end timer reset to full ${roundDurationMinutes} minutes`);
 
     res.json({ success: true, data: match });
   } catch (error) {
@@ -617,6 +828,14 @@ const endRound = async (req, res) => {
     
     const roundNumber = activeRound.roundNumber;  // ✅ Defined here!
     console.log(`🏁 Ending Round ${roundNumber}...`);
+
+    // ✅ Clear auto-end timer if exists
+    const timerKey = `${matchId}-${roundNumber}`;
+    if (activeRoundTimers.has(timerKey)) {
+      clearTimeout(activeRoundTimers.get(timerKey));
+      activeRoundTimers.delete(timerKey);
+      console.log(`⏱️  Cleared auto-end timer for Round ${roundNumber}`);
+    }
 
     activeRound.status = 'completed';
     activeRound.endTime = new Date();

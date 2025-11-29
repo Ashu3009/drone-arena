@@ -35,19 +35,24 @@ const generateReportPDF = (report, match) => {
     // PAGE 1: PERFORMANCE OVERVIEW
     // ============================================================
 
-    // Header with team color
-    doc.rect(0, 0, 595, 70).fill(teamColor);
+    // Header with Indian Tricolor - Saffron, White, Green
+    doc.rect(0, 0, 595, 23).fill('#FF9933');      // Saffron
+    doc.rect(0, 23, 595, 24).fill('#FFFFFF');     // White
+    doc.rect(0, 47, 595, 23).fill('#138808');     // Green
 
-    doc.fillColor('#FFFFFF')
+    // Title on white section with dark text
+    doc.fillColor('#000000')
        .fontSize(22)
        .font('Helvetica-Bold')
        .text('DRONE PERFORMANCE REPORT', 0, 20, { align: 'center', width: 595 });
 
-    doc.fontSize(11)
+    // Subtitle on green section with white text
+    doc.fillColor('#FFFFFF')
+       .fontSize(11)
        .font('Helvetica')
-       .text(`Match ${match?.matchNumber || 'N/A'} - Round ${report.roundNumber}`, 0, 48, { align: 'center', width: 595 });
+       .text(`Match ${match?.matchNumber || 'N/A'} - Round ${report.roundNumber}`, 0, 51, { align: 'center', width: 595 });
 
-    // Reset text color
+    // Reset text color to dark
     doc.fillColor('#000000');
 
     let yPos = 90;
@@ -251,14 +256,18 @@ const generateReportPDF = (report, match) => {
     // ============================================================
     doc.addPage();
 
-    // Page 2 Header
-    doc.rect(0, 0, 595, 50).fill(teamColor);
-    doc.fillColor('#FFFFFF')
+    // Page 2 Header with Indian Tricolor
+    doc.rect(0, 0, 595, 17).fill('#FF9933');      // Saffron
+    doc.rect(0, 17, 595, 16).fill('#FFFFFF');     // White
+    doc.rect(0, 33, 595, 17).fill('#138808');     // Green
+
+    // Title on white section with dark text
+    doc.fillColor('#000000')
        .fontSize(18)
        .font('Helvetica-Bold')
        .text('PERFORMANCE ANALYSIS & RECOMMENDATIONS', 0, 17, { align: 'center', width: 595 });
 
-    // Reset text color
+    // Reset text color to dark
     doc.fillColor('#000000');
 
     // Role-Specific Summary

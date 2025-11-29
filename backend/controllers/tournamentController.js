@@ -164,7 +164,7 @@ exports.createTournament = async (req, res) => {
 // @route   PUT /api/tournaments/:id
 exports.updateTournament = async (req, res) => {
   try {
-    const { registeredTeams, maxTeams, location } = req.body;
+    const { registeredTeams, maxTeams, location, status } = req.body;
 
     // Validate location if provided
     if (location && !location.city) {
@@ -196,6 +196,15 @@ exports.updateTournament = async (req, res) => {
 
       // Update currentTeams count
       req.body.currentTeams = registeredTeams.length;
+    }
+
+    // Auto-complete matches when tournament is marked as completed
+    if (status === 'completed') {
+      await Match.updateMany(
+        { tournament: req.params.id, status: { $ne: 'completed' } },
+        { status: 'completed' }
+      );
+      console.log(`✅ Auto-completed all matches for tournament ${req.params.id}`);
     }
 
     const tournament = await Tournament.findByIdAndUpdate(

@@ -105,30 +105,34 @@ const io = socketIo(server, {
 });
 
 // Socket.io connection handler
-// Socket.io connection handler
 io.on('connection', (socket) => {
   console.log('✅ Client connected:', socket.id);
+  console.log('📊 Active connections:', io.engine.clientsCount);
 
   // Join match room
-  socket.on('join_match', (matchId) => {
-    socket.join(`match_${matchId}`);
-    console.log(`📍 Socket ${socket.id} joined match_${matchId}`);
+  socket.on('join-match', (matchId) => {
+    socket.join(`match-${matchId}`);
+    const roomSize = io.sockets.adapter.rooms.get(`match-${matchId}`)?.size || 0;
+    console.log(`📍 Socket ${socket.id} joined match-${matchId} (${roomSize} clients in room)`);
   });
 
   // Leave match room
-  socket.on('leave_match', (matchId) => {
-    socket.leave(`match_${matchId}`);
-    console.log(`📍 Socket ${socket.id} left match_${matchId}`);
+  socket.on('leave-match', (matchId) => {
+    socket.leave(`match-${matchId}`);
+    const roomSize = io.sockets.adapter.rooms.get(`match-${matchId}`)?.size || 0;
+    console.log(`📍 Socket ${socket.id} left match-${matchId} (${roomSize} clients remaining)`);
   });
 
   // Disconnect handler
-  socket.on('disconnect', () => {
-    console.log('❌ Client disconnected:', socket.id);
+  socket.on('disconnect', (reason) => {
+    console.log(`❌ Client disconnected: ${socket.id} (Reason: ${reason})`);
+    console.log('📊 Active connections:', io.engine.clientsCount);
   });
 });
 
 // Make io available to routes via app
 app.set('io', io);
+global.io = io; // Make io globally available for controllers
 
 // Start server
 const PORT = process.env.PORT || 5000;

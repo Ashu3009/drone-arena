@@ -27,9 +27,9 @@ const tournamentSchema = new mongoose.Schema({
     required: [true, 'End date is required'],
     validate: {
       validator: function(value) {
-        return value > this.startDate;
+        return value >= this.startDate;
       },
-      message: 'End date must be after start date'
+      message: 'End date must be on or after start date'
     }
   },
   status: {
