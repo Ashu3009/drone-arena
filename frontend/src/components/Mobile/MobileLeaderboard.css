@@ -25,7 +25,7 @@
 
 .page-subtitle {
   font-size: 0.875rem;
-  color: #94a3b8;
+  color: #333;
   margin: 0;
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -174,7 +174,7 @@
 
 .rank-number {
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: #3e3f41;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -215,7 +215,7 @@
 
 .podium-stat-label {
   font-size: 0.625rem;
-  color: #94a3b8;
+  color: #232323;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -305,7 +305,7 @@
 
 .ranking-location {
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: #4e545d;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -340,7 +340,7 @@
 
 .stat-label {
   font-size: 0.625rem;
-  color: #64748b;
+  color: #3f4143;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-weight: 600;
