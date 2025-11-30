@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useUserAuth } from '../../context/UserAuthContext';
 import './MobileHeader.css';
 
 const MobileHeader = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, isAuthenticated, logout } = useUserAuth();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -143,11 +145,21 @@ const MobileHeader = () => {
           <div className="menu-header">
             <div className="menu-user-info">
               <div className="user-avatar">
-                <span className="avatar-icon">👤</span>
+                {isAuthenticated && user?.photo ? (
+                  <img src={user.photo} alt={user.name} style={{width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover'}} />
+                ) : isAuthenticated && user?.name ? (
+                  <span className="avatar-icon">{user.name.charAt(0).toUpperCase()}</span>
+                ) : (
+                  <span className="avatar-icon">👤</span>
+                )}
               </div>
               <div className="user-details">
-                <div className="user-name">Guest User</div>
-                <div className="user-status">🟢 Online</div>
+                <div className="user-name">
+                  {isAuthenticated && user?.name ? user.name : 'Guest User'}
+                </div>
+                <div className="user-status">
+                  {isAuthenticated ? '🟢 Online' : '⚪ Not Logged In'}
+                </div>
               </div>
             </div>
           </div>
@@ -219,10 +231,24 @@ const MobileHeader = () => {
 
           {/* Menu Footer */}
           <div className="menu-footer">
-            <button className="logout-btn">
-              <span className="logout-icon">🚪</span>
-              Sign Out
-            </button>
+            {isAuthenticated ? (
+              <button className="logout-btn" onClick={async () => {
+                await logout();
+                setMenuOpen(false);
+                navigate('/login');
+              }}>
+                <span className="logout-icon">🚪</span>
+                Sign Out
+              </button>
+            ) : (
+              <button className="logout-btn" onClick={() => {
+                setMenuOpen(false);
+                navigate('/login');
+              }}>
+                <span className="logout-icon">🔐</span>
+                Login
+              </button>
+            )}
             <div className="menu-version">v1.0.0</div>
           </div>
         </div>

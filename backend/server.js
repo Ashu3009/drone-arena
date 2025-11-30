@@ -28,7 +28,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Import Routes
-const authRoutes = require('./routes/authRoutes');
+const authRoutes = require('./routes/authRoutes'); // Admin auth
+const userAuthRoutes = require('./routes/userAuthRoutes'); // Public user auth
 const tournamentRoutes = require('./routes/tournamentRoutes');
 const teamRoutes = require('./routes/teamRoutes');
 const matchRoutes = require('./routes/matchRoutes');
@@ -41,7 +42,8 @@ const schoolRoutes = require('./routes/schoolRoutes');
 const siteStatsRoutes = require('./routes/siteStatsRoutes');
 
 // Mount Routes
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes); // Admin authentication
+app.use('/api/users/auth', userAuthRoutes); // Public user authentication
 app.use('/api/tournaments', tournamentRoutes);
 app.use('/api/teams', teamRoutes);
 app.use('/api/matches', matchRoutes);

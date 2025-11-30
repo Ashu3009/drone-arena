@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { UserAuthProvider } from './context/UserAuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
 import useIsMobile from './hooks/useIsMobile';
@@ -8,6 +9,13 @@ import useIsMobile from './hooks/useIsMobile';
 // Admin Components
 import Login from './components/Admin/Login';
 import AdminDashboard from './components/Admin/AdminDashboard';
+
+// Public User Auth Components
+import UserSignup from './components/Auth/UserSignup';
+import UserLogin from './components/Auth/UserLogin';
+import EmailVerification from './components/Auth/EmailVerification';
+import ForgotPassword from './components/Auth/ForgotPassword';
+import ResetPassword from './components/Auth/ResetPassword';
 
 // Public Components
 import PublicViewer from './components/Public/PublicViewer';
@@ -20,6 +28,7 @@ import {
   MobileHome,
   MobileLeaderboard,
   MobileTournaments,
+  MobileProfile,
 } from './components/Mobile';
 
 import './App.css';
@@ -87,9 +96,10 @@ const ResponsiveLeaderboard = () => {
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <div className="App">
-          <Routes>
+      <UserAuthProvider>
+        <Router>
+          <div className="App">
+            <Routes>
             {/* Responsive Routes - Auto-detect Mobile/Desktop */}
             <Route path="/" element={<ResponsiveHome />} />
             <Route path="/tournaments" element={<ResponsiveTournaments />} />
@@ -101,8 +111,15 @@ function App() {
               <Route index element={<MobileHome />} />
               <Route path="tournaments" element={<MobileTournaments />} />
               <Route path="leaderboard" element={<MobileLeaderboard />} />
-              <Route path="profile" element={<div style={{padding: '20px', textAlign: 'center', color: '#94a3b8'}}>Profile Coming Soon</div>} />
+              <Route path="profile" element={<MobileProfile />} />
             </Route>
+
+            {/* Public User Auth Routes */}
+            <Route path="/signup" element={<UserSignup />} />
+            <Route path="/login" element={<UserLogin />} />
+            <Route path="/verify-email/:token" element={<EmailVerification />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
 
             {/* Admin Routes */}
             <Route path="/admin/login" element={<Login />} />
@@ -118,6 +135,7 @@ function App() {
           </Routes>
         </div>
       </Router>
+      </UserAuthProvider>
     </AuthProvider>
   );
 }

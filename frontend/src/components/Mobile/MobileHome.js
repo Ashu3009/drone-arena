@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getCurrentMatch, getSiteStats } from '../../services/api';
+import TimerDisplayPublic from '../Public/TimerDisplayPublic';
 import './MobileHome.css';
 
 const MobileHome = () => {
@@ -213,6 +214,19 @@ const MobileHome = () => {
                 </div>
               </div>
             </div>
+
+            {/* Timer Display (if round is active) */}
+            {currentMatch.status === 'in_progress' && (() => {
+              const activeRound = currentMatch.rounds?.find(r => r.status === 'in_progress');
+              return activeRound && activeRound.timerStatus ? (
+                <div style={{ marginTop: '20px' }}>
+                  <TimerDisplayPublic
+                    round={activeRound}
+                    roundDuration={currentMatch.roundDuration || 3}
+                  />
+                </div>
+              ) : null;
+            })()}
 
             {/* Final Score (if completed) */}
             {currentMatch.status === 'completed' && (

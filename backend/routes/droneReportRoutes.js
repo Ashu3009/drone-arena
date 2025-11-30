@@ -11,7 +11,7 @@ const {
 } = require('../controllers/droneReportController');
 const { protect } = require('../middleware/auth');
 
-// All routes are admin-protected
+// Admin-protected routes
 router.get('/tournaments', protect, getReportsByTournament);
 router.get('/tournaments/:tournamentId/teams', protect, getTournamentTeamAggregates);
 router.get('/tournaments/:tournamentId/pilots', protect, getTournamentPilotAggregates);

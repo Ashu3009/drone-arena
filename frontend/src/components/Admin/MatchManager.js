@@ -685,6 +685,7 @@ const MatchManager = () => {
                         <TimerDisplay
                           round={round}
                           matchId={match._id}
+                          roundDuration={match.roundDuration}
                           onPause={handlePauseTimer}
                           onResume={handleResumeTimer}
                           onReset={handleResetTimer}

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
-const TimerDisplay = ({ round, matchId, onPause, onResume, onReset }) => {
+const TimerDisplay = ({ round, matchId, roundDuration, onPause, onResume, onReset }) => {
   const [elapsedTime, setElapsedTime] = useState(0);
-  const MAX_TIME = 180; // 3 minutes
+  const MAX_TIME = (roundDuration || 3) * 60; // Convert minutes to seconds
 
   useEffect(() => {
     if (round.timerStatus === 'running') {
@@ -12,10 +12,10 @@ const TimerDisplay = ({ round, matchId, onPause, onResume, onReset }) => {
         const elapsed = Math.floor((now - start) / 1000);
         setElapsedTime(elapsed);
 
-        // Auto end at 3 minutes
+        // Auto end when time is up
         if (elapsed >= MAX_TIME) {
           clearInterval(interval);
-          alert('3 minutes completed! Please end the round.');
+          alert(`${roundDuration || 3} minutes completed! Please end the round.`);
         }
       }, 1000);
 

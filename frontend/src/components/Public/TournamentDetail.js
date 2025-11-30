@@ -221,16 +221,16 @@ const TournamentDetail = () => {
                   </p>
                   <div className="tournament-mot-stats">
                     <div className="tournament-stat-item">
-                      <span className="tournament-stat-value">{tournament.manOfTheTournament.stats?.goals || 0}</span>
-                      <span className="tournament-stat-label">Goals</span>
+                      <span className="tournament-stat-value">{tournament.manOfTheTournament.stats?.avgPerformance || 0}</span>
+                      <span className="tournament-stat-label">Avg Score</span>
                     </div>
                     <div className="tournament-stat-item">
-                      <span className="tournament-stat-value">{tournament.manOfTheTournament.stats?.assists || 0}</span>
-                      <span className="tournament-stat-label">Assists</span>
-                    </div>
-                    <div className="tournament-stat-item">
-                      <span className="tournament-stat-value">{tournament.manOfTheTournament.stats?.matchesPlayed || 0}</span>
+                      <span className="tournament-stat-value">{tournament.manOfTheTournament.stats?.totalMatches || 0}</span>
                       <span className="tournament-stat-label">Matches</span>
+                    </div>
+                    <div className="tournament-stat-item">
+                      <span className="tournament-stat-value">{tournament.manOfTheTournament.stats?.avgSpeed?.toFixed(1) || '0.0'}</span>
+                      <span className="tournament-stat-label">Avg Speed</span>
                     </div>
                   </div>
                 </div>

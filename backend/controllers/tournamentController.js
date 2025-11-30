@@ -205,6 +205,12 @@ exports.updateTournament = async (req, res) => {
         { status: 'completed' }
       );
       console.log(`✅ Auto-completed all matches for tournament ${req.params.id}`);
+
+      // Auto-calculate winners from leaderboard
+      await calculateTournamentWinners(req.params.id);
+
+      // Calculate and save awards (MOT, Best Forward, Striker, Defender, Keeper)
+      await calculateTournamentAwards(req.params.id);
     }
 
     const tournament = await Tournament.findByIdAndUpdate(
@@ -283,91 +289,6 @@ exports.deleteTournament = async (req, res) => {
   }
 };
 
-// Helper function to calculate tournament awards from all matches
-const calculateTournamentAwards = async (tournamentId) => {
-  const Match = require('../models/Match');
-
-  try {
-    // Find all completed matches for this tournament
-    const matches = await Match.find({
-      tournament: tournamentId,
-      status: 'completed',
-      'manOfTheMatch.playerName': { $exists: true, $ne: null }
-    }).populate('manOfTheMatch.team', 'name');
-
-    if (matches.length === 0) {
-      return null; // No matches with Man of the Match data
-    }
-
-    // Aggregate player stats
-    const playerStats = {};
-
-    matches.forEach(match => {
-      if (match.manOfTheMatch && match.manOfTheMatch.playerName) {
-        const playerKey = `${match.manOfTheMatch.playerName}|${match.manOfTheMatch.team?._id || 'unknown'}`;
-
-        if (!playerStats[playerKey]) {
-          playerStats[playerKey] = {
-            playerName: match.manOfTheMatch.playerName,
-            team: match.manOfTheMatch.team?._id || null,
-            photo: match.manOfTheMatch.photo || null,
-            goals: 0,
-            assists: 0,
-            saves: 0
-          };
-        }
-
-        // Accumulate stats
-        playerStats[playerKey].goals += match.manOfTheMatch.stats?.goals || 0;
-        playerStats[playerKey].assists += match.manOfTheMatch.stats?.assists || 0;
-        playerStats[playerKey].saves += match.manOfTheMatch.stats?.saves || 0;
-      }
-    });
-
-    // Convert to array
-    const players = Object.values(playerStats);
-
-    // Find best striker (most goals)
-    const bestStriker = players.reduce((best, current) =>
-      (current.goals > (best?.goals || 0)) ? current : best
-    , null);
-
-    // Find best forward (most assists)
-    const bestForward = players.reduce((best, current) =>
-      (current.assists > (best?.assists || 0)) ? current : best
-    , null);
-
-    // Find best defender (most saves)
-    const bestDefender = players.reduce((best, current) =>
-      (current.saves > (best?.saves || 0)) ? current : best
-    , null);
-
-    return {
-      bestStriker: bestStriker ? {
-        playerName: bestStriker.playerName,
-        team: bestStriker.team,
-        photo: bestStriker.photo,
-        goals: bestStriker.goals
-      } : null,
-      bestForward: bestForward ? {
-        playerName: bestForward.playerName,
-        team: bestForward.team,
-        photo: bestForward.photo,
-        assists: bestForward.assists
-      } : null,
-      bestDefender: bestDefender ? {
-        playerName: bestDefender.playerName,
-        team: bestDefender.team,
-        photo: bestDefender.photo,
-        saves: bestDefender.saves
-      } : null
-    };
-  } catch (error) {
-    console.error('Error calculating tournament awards:', error);
-    return null;
-  }
-};
-
 // @desc    Set tournament winners
 // @route   PUT /api/tournaments/:id/winners
 exports.setWinners = async (req, res) => {
@@ -424,13 +345,10 @@ exports.setWinners = async (req, res) => {
     // Mark tournament as completed
     tournament.status = 'completed';
 
-    // Calculate and set tournament awards automatically
-    const awards = await calculateTournamentAwards(req.params.id);
-    if (awards) {
-      tournament.awards = awards;
-    }
-
     await tournament.save();
+
+    // Calculate and set tournament awards automatically from drone reports
+    await calculateTournamentAwards(req.params.id);
 
     // Populate winners before returning
     await tournament.populate('winners.champion', 'name location');
@@ -1181,5 +1099,306 @@ exports.generateTournamentFinalReport = async (req, res) => {
       success: false,
       message: error.message
     });
+  }
+};
+
+// ============================================
+// UTILITY: Calculate Tournament Winners from Leaderboard
+// ============================================
+const calculateTournamentWinners = async (tournamentId) => {
+  try {
+    console.log(`\n🏆 Auto-calculating tournament winners from leaderboard...`);
+
+    // Fetch all completed matches for this tournament
+    const matches = await Match.find({
+      tournament: tournamentId,
+      status: 'completed'
+    }).populate('teamA teamB');
+
+    if (matches.length === 0) {
+      console.log('⚠️  No completed matches - skipping winner calculation');
+      return;
+    }
+
+    // Calculate team standings
+    const teamStats = {};
+
+    matches.forEach(match => {
+      const teamAId = match.teamA._id.toString();
+      const teamBId = match.teamB._id.toString();
+
+      // Initialize team stats if not exists
+      if (!teamStats[teamAId]) {
+        teamStats[teamAId] = {
+          team: match.teamA,
+          wins: 0,
+          draws: 0,
+          losses: 0,
+          points: 0,
+          goalsFor: match.finalScoreA || 0,
+          goalsAgainst: match.finalScoreB || 0
+        };
+      } else {
+        teamStats[teamAId].goalsFor += match.finalScoreA || 0;
+        teamStats[teamAId].goalsAgainst += match.finalScoreB || 0;
+      }
+
+      if (!teamStats[teamBId]) {
+        teamStats[teamBId] = {
+          team: match.teamB,
+          wins: 0,
+          draws: 0,
+          losses: 0,
+          points: 0,
+          goalsFor: match.finalScoreB || 0,
+          goalsAgainst: match.finalScoreA || 0
+        };
+      } else {
+        teamStats[teamBId].goalsFor += match.finalScoreB || 0;
+        teamStats[teamBId].goalsAgainst += match.finalScoreA || 0;
+      }
+
+      // Determine match result
+      const scoreA = match.finalScoreA || 0;
+      const scoreB = match.finalScoreB || 0;
+
+      if (scoreA > scoreB) {
+        // Team A wins
+        teamStats[teamAId].wins += 1;
+        teamStats[teamAId].points += 3;
+        teamStats[teamBId].losses += 1;
+      } else if (scoreB > scoreA) {
+        // Team B wins
+        teamStats[teamBId].wins += 1;
+        teamStats[teamBId].points += 3;
+        teamStats[teamAId].losses += 1;
+      } else {
+        // Draw
+        teamStats[teamAId].draws += 1;
+        teamStats[teamAId].points += 1;
+        teamStats[teamBId].draws += 1;
+        teamStats[teamBId].points += 1;
+      }
+    });
+
+    // Convert to array and sort by points (then goal difference)
+    const standings = Object.values(teamStats).sort((a, b) => {
+      if (b.points !== a.points) return b.points - a.points;
+      const gdA = a.goalsFor - a.goalsAgainst;
+      const gdB = b.goalsFor - b.goalsAgainst;
+      if (gdB !== gdA) return gdB - gdA;
+      return b.goalsFor - a.goalsFor;
+    });
+
+    // Set top 3 teams as winners
+    const winners = {
+      champion: standings[0]?.team._id || null,
+      runnerUp: standings[1]?.team._id || null,
+      thirdPlace: standings[2]?.team._id || null
+    };
+
+    // Update tournament with winners
+    await Tournament.findByIdAndUpdate(tournamentId, { winners });
+
+    console.log('✅ Winners calculated from leaderboard:');
+    console.log(`   🥇 Champion: ${standings[0]?.team.name || 'N/A'} (${standings[0]?.points || 0} pts)`);
+    console.log(`   🥈 Runner Up: ${standings[1]?.team.name || 'N/A'} (${standings[1]?.points || 0} pts)`);
+    console.log(`   🥉 Third Place: ${standings[2]?.team.name || 'N/A'} (${standings[2]?.points || 0} pts)`);
+
+  } catch (error) {
+    console.error('❌ Error calculating tournament winners:', error);
+  }
+};
+
+// ============================================
+// UTILITY: Calculate Tournament Awards
+// ============================================
+const calculateTournamentAwards = async (tournamentId) => {
+  try {
+    console.log(`\n🏆 Calculating awards for tournament ${tournamentId}...`);
+
+    // Fetch all drone reports for this tournament
+    const reports = await DroneReport.find({
+      tournament: tournamentId,
+      status: 'completed'
+    }).populate('team', 'name members');
+
+    if (reports.length === 0) {
+      console.log('⚠️  No drone reports found - skipping awards calculation');
+      return;
+    }
+
+    // Group pilots by role and calculate their average performance
+    const pilotsByRole = {
+      Forward: [],
+      Striker: [],
+      Defender: [],
+      Central: []
+    };
+
+    const pilotPerformance = {};
+
+    reports.forEach(report => {
+      const pilotId = report.pilotId;
+      const role = report.role;
+
+      if (!pilotPerformance[pilotId]) {
+        pilotPerformance[pilotId] = {
+          pilotId: report.pilotId,
+          pilotName: report.pilotName,
+          role: report.role,
+          team: report.team,
+          photo: null, // Will be fetched from team members
+          totalPerformance: 0,
+          matchCount: 0,
+          stats: {
+            totalDistance: 0,
+            avgSpeed: 0,
+            maxSpeed: 0,
+            batteryEfficiency: 0
+          }
+        };
+      }
+
+      pilotPerformance[pilotId].totalPerformance += report.performanceScore || 0;
+      pilotPerformance[pilotId].matchCount += 1;
+      pilotPerformance[pilotId].stats.totalDistance += report.totalDistance || 0;
+      pilotPerformance[pilotId].stats.avgSpeed += report.averageSpeed || 0;
+      pilotPerformance[pilotId].stats.maxSpeed = Math.max(
+        pilotPerformance[pilotId].stats.maxSpeed,
+        report.maxSpeed || 0
+      );
+
+      // Battery efficiency (lower consumption is better)
+      if (report.batteryUsage && report.batteryUsage.consumed) {
+        pilotPerformance[pilotId].stats.batteryEfficiency += (100 - report.batteryUsage.consumed);
+      }
+    });
+
+    // Calculate averages and find pilot photos from team members
+    Object.keys(pilotPerformance).forEach(pilotId => {
+      const pilot = pilotPerformance[pilotId];
+      pilot.avgPerformanceScore = pilot.totalPerformance / pilot.matchCount;
+      pilot.stats.avgSpeed = pilot.stats.avgSpeed / pilot.matchCount;
+      pilot.stats.batteryEfficiency = pilot.stats.batteryEfficiency / pilot.matchCount;
+
+      // Find pilot photo from team members
+      if (pilot.team && pilot.team.members) {
+        // Try matching by pilotId first, then by name
+        let member = pilot.team.members.find(m => m.pilotId === pilotId);
+        if (!member) {
+          // Try matching by name if pilotId doesn't match
+          member = pilot.team.members.find(m =>
+            m.name && pilot.pilotName &&
+            m.name.toLowerCase().trim() === pilot.pilotName.toLowerCase().trim()
+          );
+        }
+        if (member && member.photo) {
+          pilot.photo = member.photo;
+          console.log(`   📸 Found photo for ${pilot.pilotName}: ${member.photo}`);
+        } else {
+          console.log(`   ⚠️  No photo found for ${pilot.pilotName} (pilotId: ${pilotId})`);
+        }
+      }
+
+      // Group by role
+      if (pilot.role && pilotsByRole[pilot.role]) {
+        pilotsByRole[pilot.role].push(pilot);
+      }
+    });
+
+    // Sort each role by average performance
+    Object.keys(pilotsByRole).forEach(role => {
+      pilotsByRole[role].sort((a, b) => b.avgPerformanceScore - a.avgPerformanceScore);
+    });
+
+    // Find best players in each role
+    const awards = {
+      bestForward: pilotsByRole.Forward[0] ? {
+        playerName: pilotsByRole.Forward[0].pilotName,
+        pilotId: pilotsByRole.Forward[0].pilotId,
+        team: pilotsByRole.Forward[0].team._id,
+        photo: pilotsByRole.Forward[0].photo,
+        stats: {
+          avgPerformance: Math.round(pilotsByRole.Forward[0].avgPerformanceScore),
+          totalMatches: pilotsByRole.Forward[0].matchCount,
+          totalDistance: Math.round(pilotsByRole.Forward[0].stats.totalDistance),
+          avgSpeed: Math.round(pilotsByRole.Forward[0].stats.avgSpeed * 10) / 10
+        }
+      } : null,
+
+      bestCenter: (pilotsByRole.Striker[0] || pilotsByRole.Central[0]) ? {
+        playerName: (pilotsByRole.Striker[0] || pilotsByRole.Central[0]).pilotName,
+        pilotId: (pilotsByRole.Striker[0] || pilotsByRole.Central[0]).pilotId,
+        team: (pilotsByRole.Striker[0] || pilotsByRole.Central[0]).team._id,
+        photo: (pilotsByRole.Striker[0] || pilotsByRole.Central[0]).photo,
+        stats: {
+          avgPerformance: Math.round((pilotsByRole.Striker[0] || pilotsByRole.Central[0]).avgPerformanceScore),
+          totalMatches: (pilotsByRole.Striker[0] || pilotsByRole.Central[0]).matchCount,
+          totalDistance: Math.round((pilotsByRole.Striker[0] || pilotsByRole.Central[0]).stats.totalDistance),
+          avgSpeed: Math.round((pilotsByRole.Striker[0] || pilotsByRole.Central[0]).stats.avgSpeed * 10) / 10
+        }
+      } : null,
+
+      bestDefender: pilotsByRole.Defender[0] ? {
+        playerName: pilotsByRole.Defender[0].pilotName,
+        pilotId: pilotsByRole.Defender[0].pilotId,
+        team: pilotsByRole.Defender[0].team._id,
+        photo: pilotsByRole.Defender[0].photo,
+        stats: {
+          avgPerformance: Math.round(pilotsByRole.Defender[0].avgPerformanceScore),
+          totalMatches: pilotsByRole.Defender[0].matchCount,
+          totalDistance: Math.round(pilotsByRole.Defender[0].stats.totalDistance),
+          avgSpeed: Math.round(pilotsByRole.Defender[0].stats.avgSpeed * 10) / 10
+        }
+      } : null,
+
+      bestKeeper: pilotsByRole.Central[0] ? {
+        playerName: pilotsByRole.Central[0].pilotName,
+        pilotId: pilotsByRole.Central[0].pilotId,
+        team: pilotsByRole.Central[0].team._id,
+        photo: pilotsByRole.Central[0].photo,
+        stats: {
+          avgPerformance: Math.round(pilotsByRole.Central[0].avgPerformanceScore),
+          totalMatches: pilotsByRole.Central[0].matchCount,
+          totalDistance: Math.round(pilotsByRole.Central[0].stats.totalDistance),
+          avgSpeed: Math.round(pilotsByRole.Central[0].stats.avgSpeed * 10) / 10
+        }
+      } : null
+    };
+
+    // Find Man of the Tournament (overall best performance)
+    const allPilots = Object.values(pilotPerformance);
+    allPilots.sort((a, b) => b.avgPerformanceScore - a.avgPerformanceScore);
+
+    const manOfTheTournament = allPilots[0] ? {
+      playerName: allPilots[0].pilotName,
+      pilotId: allPilots[0].pilotId,
+      team: allPilots[0].team._id,
+      photo: allPilots[0].photo,
+      stats: {
+        avgPerformance: Math.round(allPilots[0].avgPerformanceScore),
+        totalMatches: allPilots[0].matchCount,
+        totalDistance: Math.round(allPilots[0].stats.totalDistance),
+        avgSpeed: Math.round(allPilots[0].stats.avgSpeed * 10) / 10,
+        maxSpeed: Math.round(allPilots[0].stats.maxSpeed * 10) / 10
+      }
+    } : null;
+
+    // Update tournament with awards
+    await Tournament.findByIdAndUpdate(tournamentId, {
+      awards,
+      manOfTheTournament
+    });
+
+    console.log('✅ Awards calculated and saved:');
+    console.log(`   🏆 Man of the Tournament: ${manOfTheTournament?.playerName || 'N/A'}`);
+    console.log(`   ⚡ Best Forward: ${awards.bestForward?.playerName || 'N/A'}`);
+    console.log(`   🎯 Best Center: ${awards.bestCenter?.playerName || 'N/A'}`);
+    console.log(`   🛡️  Best Defender: ${awards.bestDefender?.playerName || 'N/A'}`);
+    console.log(`   🥅 Best Keeper: ${awards.bestKeeper?.playerName || 'N/A'}`);
+
+  } catch (error) {
+    console.error('❌ Error calculating tournament awards:', error);
   }
 };

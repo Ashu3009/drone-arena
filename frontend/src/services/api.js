@@ -5,10 +5,17 @@ const API_BASE_URL = process.env.REACT_APP_API_URL
   : 'http://localhost:5000/api';
 
 // ==================== AXIOS INTERCEPTOR FOR AUTH ====================
-// Add token to all requests
+// Add token to all requests (supports both admin and user tokens)
 axios.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    // Check for user token first (public users)
+    let token = localStorage.getItem('userToken');
+
+    // If no user token, check for admin token
+    if (!token) {
+      token = localStorage.getItem('token'); // admin token
+    }
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -18,6 +25,62 @@ axios.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
+// ==================== PUBLIC USER AUTHENTICATION ====================
+
+// User signup with email/password
+export const userSignup = async (userData) => {
+  const response = await axios.post(`${API_BASE_URL}/users/auth/signup`, userData);
+  return response.data;
+};
+
+// User login with email/password
+export const userLogin = async (credentials) => {
+  const response = await axios.post(`${API_BASE_URL}/users/auth/login`, credentials);
+  return response.data;
+};
+
+// Google OAuth login/signup
+export const userGoogleAuth = async (googleData) => {
+  const response = await axios.post(`${API_BASE_URL}/users/auth/google`, googleData);
+  return response.data;
+};
+
+// Verify email with token
+export const verifyUserEmail = async (token) => {
+  const response = await axios.get(`${API_BASE_URL}/users/auth/verify-email/${token}`);
+  return response.data;
+};
+
+// Resend verification email
+export const resendVerificationEmail = async () => {
+  const response = await axios.post(`${API_BASE_URL}/users/auth/resend-verification`);
+  return response.data;
+};
+
+// Get current logged-in user
+export const getCurrentUser = async () => {
+  const response = await axios.get(`${API_BASE_URL}/users/auth/me`);
+  return response.data;
+};
+
+// User logout
+export const userLogout = async () => {
+  const response = await axios.post(`${API_BASE_URL}/users/auth/logout`);
+  return response.data;
+};
+
+// Forgot password - request reset email
+export const forgotPassword = async (email) => {
+  const response = await axios.post(`${API_BASE_URL}/users/auth/forgot-password`, { email });
+  return response.data;
+};
+
+// Reset password with token
+export const resetPassword = async (token, password) => {
+  const response = await axios.post(`${API_BASE_URL}/users/auth/reset-password/${token}`, { password });
+  return response.data;
+};
 
 // ==================== TOURNAMENTS ====================
 
