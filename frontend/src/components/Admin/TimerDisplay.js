@@ -40,7 +40,7 @@ const TimerDisplay = ({ round, matchId, roundDuration, onPause, onResume, onRese
         <span style={styles.timeLabel}>Time Remaining:</span>
         <span style={{
           ...styles.time,
-          color: remaining < 30 ? '#ff4444' : remaining < 60 ? '#ff9800' : '#4CAF50'
+          color: remaining < 30 ? '#ff4444' : remaining < 60 ? '#ffab00' : '#00d4ff'
         }}>
           {formatTime(remaining)}
         </span>
@@ -52,7 +52,7 @@ const TimerDisplay = ({ round, matchId, roundDuration, onPause, onResume, onRese
         <div style={{
           ...styles.progressFill,
           width: `${percentage}%`,
-          backgroundColor: remaining < 30 ? '#ff4444' : remaining < 60 ? '#ff9800' : '#4CAF50'
+          backgroundColor: remaining < 30 ? '#ff4444' : remaining < 60 ? '#ffab00' : '#00d4ff'
         }} />
       </div>
 
@@ -74,8 +74,8 @@ const TimerDisplay = ({ round, matchId, roundDuration, onPause, onResume, onRese
 
       <div style={styles.status}>
         Status: <span style={{
-          color: round.timerStatus === 'running' ? '#4CAF50' :
-                 round.timerStatus === 'paused' ? '#ff9800' : '#666',
+          color: round.timerStatus === 'running' ? '#00d4ff' :
+                 round.timerStatus === 'paused' ? '#ffab00' : '#666',
           fontWeight: 'bold'
         }}>
           {round.timerStatus.toUpperCase()}
@@ -134,7 +134,7 @@ const styles = {
     marginBottom: '15px'
   },
   pauseButton: {
-    backgroundColor: '#ff9800',
+    backgroundColor: '#ffab00',
     color: 'white',
     padding: '12px 28px',
     border: 'none',
@@ -144,7 +144,7 @@ const styles = {
     fontSize: '16px'
   },
   resumeButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#00d4ff',
     color: 'white',
     padding: '12px 28px',
     border: 'none',

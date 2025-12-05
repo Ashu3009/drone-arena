@@ -1,0 +1,117 @@
+/* ==========================================
+   MOBILE CYBERPUNK THEME FOR TEAM MANAGER
+   ========================================== */
+@media (max-width: 767px) {
+  /* Override inline styles for mobile */
+  [style*="maxWidth"][style*="1200px"] {
+    padding: 16px !important;
+  }
+
+  /* Team Cards - Cyberpunk */
+  [style*="rgba(0, 13, 41, 0.3)"][style*="blur"] {
+    background: rgba(10, 10, 26, 0.5) !important;
+    border: 1px solid rgba(0, 212, 255, 0.3) !important;
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.15) !important;
+  }
+
+  /* Team Grid - Responsive */
+  [style*="gridTemplateColumns"][style*="minmax"] {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  /* Headers with gradient */
+  [style*="linear-gradient(135deg, #007bff, #00d4ff)"] {
+    background: linear-gradient(135deg, #00d4ff 0%, #ff0080 50%, #b026ff 100%) !important;
+    filter: drop-shadow(0 0 12px rgba(0, 212, 255, 0.6)) !important;
+    font-size: 20px !important;
+  }
+
+  /* Form inputs */
+  [style*="background"][style*="rgba(0, 13, 41"] input,
+  [style*="background"][style*="rgba(0, 13, 41"] select,
+  [style*="background"][style*="rgba(0, 13, 41"] textarea {
+    background: rgba(10, 10, 26, 0.6) !important;
+    border: 1px solid rgba(0, 212, 255, 0.3) !important;
+    color: #e2e8f0 !important;
+    font-size: 14px !important;
+  }
+
+  [style*="background"][style*="rgba(0, 13, 41"] input:focus,
+  [style*="background"][style*="rgba(0, 13, 41"] select:focus,
+  [style*="background"][style*="rgba(0, 13, 41"] textarea:focus {
+    border-color: rgba(0, 212, 255, 0.7) !important;
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.3) !important;
+  }
+
+  /* Buttons - Cyberpunk */
+  button[style*="background"][style*="#00d4ff"],
+  button[style*="background"][style*="linear-gradient"] {
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(255, 0, 128, 0.15)) !important;
+    border: 1px solid rgba(0, 212, 255, 0.6) !important;
+    box-shadow: 0 0 12px rgba(0, 212, 255, 0.3) !important;
+    color: #00d4ff !important;
+    font-size: 13px !important;
+    padding: 8px 16px !important;
+  }
+
+  button[style*="background"][style*="#00d4ff"]:hover,
+  button[style*="background"][style*="#00d4ff"]:active {
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.3), rgba(255, 0, 128, 0.25)) !important;
+    box-shadow: 0 0 25px rgba(0, 212, 255, 0.5) !important;
+  }
+
+  /* Delete button */
+  button[style*="background"][style*="#f44336"],
+  button[style*="background"][style*="rgb(244, 67, 54)"] {
+    background: linear-gradient(135deg, #ff0080, #ff00ff) !important;
+    box-shadow: 0 0 12px rgba(255, 0, 128, 0.4) !important;
+  }
+
+  button[style*="background"][style*="#f44336"]:hover,
+  button[style*="background"][style*="rgb(244, 67, 54)"]:hover {
+    background: linear-gradient(135deg, #ff00ff, #ff0080) !important;
+    box-shadow: 0 0 20px rgba(255, 0, 128, 0.6) !important;
+  }
+
+  /* Member badges - Neon */
+  [style*="backgroundColor"][style*="rgba(0, 123, 255"] {
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.3), rgba(176, 38, 255, 0.2)) !important;
+    border: 1px solid rgba(0, 212, 255, 0.5) !important;
+    box-shadow: 0 0 8px rgba(0, 212, 255, 0.3) !important;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  [style*="maxWidth"][style*="1200px"] {
+    padding: 12px !important;
+  }
+
+  /* Reduce font sizes */
+  h2,
+  h3 {
+    font-size: 18px !important;
+  }
+
+  h4 {
+    font-size: 16px !important;
+  }
+
+  /* Form groups stack better */
+  [style*="gridTemplateColumns"][style*="1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Member rows wrap */
+  [style*="memberRow"] {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  /* Buttons full width */
+  button {
+    width: 100% !important;
+    font-size: 12px !important;
+  }
+}

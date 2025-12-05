@@ -1233,7 +1233,7 @@ const calculateTournamentAwards = async (tournamentId) => {
       Forward: [],
       Striker: [],
       Defender: [],
-      Central: []
+      Keeper: []
     };
 
     const pilotPerformance = {};
@@ -1327,16 +1327,16 @@ const calculateTournamentAwards = async (tournamentId) => {
         }
       } : null,
 
-      bestCenter: (pilotsByRole.Striker[0] || pilotsByRole.Central[0]) ? {
-        playerName: (pilotsByRole.Striker[0] || pilotsByRole.Central[0]).pilotName,
-        pilotId: (pilotsByRole.Striker[0] || pilotsByRole.Central[0]).pilotId,
-        team: (pilotsByRole.Striker[0] || pilotsByRole.Central[0]).team._id,
-        photo: (pilotsByRole.Striker[0] || pilotsByRole.Central[0]).photo,
+      bestStriker: pilotsByRole.Striker[0] ? {
+        playerName: pilotsByRole.Striker[0].pilotName,
+        pilotId: pilotsByRole.Striker[0].pilotId,
+        team: pilotsByRole.Striker[0].team._id,
+        photo: pilotsByRole.Striker[0].photo,
         stats: {
-          avgPerformance: Math.round((pilotsByRole.Striker[0] || pilotsByRole.Central[0]).avgPerformanceScore),
-          totalMatches: (pilotsByRole.Striker[0] || pilotsByRole.Central[0]).matchCount,
-          totalDistance: Math.round((pilotsByRole.Striker[0] || pilotsByRole.Central[0]).stats.totalDistance),
-          avgSpeed: Math.round((pilotsByRole.Striker[0] || pilotsByRole.Central[0]).stats.avgSpeed * 10) / 10
+          avgPerformance: Math.round(pilotsByRole.Striker[0].avgPerformanceScore),
+          totalMatches: pilotsByRole.Striker[0].matchCount,
+          totalDistance: Math.round(pilotsByRole.Striker[0].stats.totalDistance),
+          avgSpeed: Math.round(pilotsByRole.Striker[0].stats.avgSpeed * 10) / 10
         }
       } : null,
 
@@ -1353,16 +1353,16 @@ const calculateTournamentAwards = async (tournamentId) => {
         }
       } : null,
 
-      bestKeeper: pilotsByRole.Central[0] ? {
-        playerName: pilotsByRole.Central[0].pilotName,
-        pilotId: pilotsByRole.Central[0].pilotId,
-        team: pilotsByRole.Central[0].team._id,
-        photo: pilotsByRole.Central[0].photo,
+      bestKeeper: pilotsByRole.Keeper[0] ? {
+        playerName: pilotsByRole.Keeper[0].pilotName,
+        pilotId: pilotsByRole.Keeper[0].pilotId,
+        team: pilotsByRole.Keeper[0].team._id,
+        photo: pilotsByRole.Keeper[0].photo,
         stats: {
-          avgPerformance: Math.round(pilotsByRole.Central[0].avgPerformanceScore),
-          totalMatches: pilotsByRole.Central[0].matchCount,
-          totalDistance: Math.round(pilotsByRole.Central[0].stats.totalDistance),
-          avgSpeed: Math.round(pilotsByRole.Central[0].stats.avgSpeed * 10) / 10
+          avgPerformance: Math.round(pilotsByRole.Keeper[0].avgPerformanceScore),
+          totalMatches: pilotsByRole.Keeper[0].matchCount,
+          totalDistance: Math.round(pilotsByRole.Keeper[0].stats.totalDistance),
+          avgSpeed: Math.round(pilotsByRole.Keeper[0].stats.avgSpeed * 10) / 10
         }
       } : null
     };

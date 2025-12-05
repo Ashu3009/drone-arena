@@ -11,7 +11,7 @@ const droneSchema = new mongoose.Schema({
   role: {
     type: String,
     required: [true, 'Please provide drone role'],
-    enum: ['Forward', 'Striker', 'Defender', 'Central'],
+    enum: ['Forward', 'Striker', 'Defender', 'Keeper'],
     default: 'Forward'
   },
   specifications: {
@@ -78,7 +78,7 @@ droneSchema.statics.ROLE_SPECS = {
     batteryCapacity: 2800,
     weight: 310
   },
-  Central: {
+  Keeper: {
     speed: 120,
     agility: 85,
     stability: 80,

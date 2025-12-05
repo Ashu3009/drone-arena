@@ -191,9 +191,9 @@ const AllTournamentsManager = () => {
 
   const getStatusColor = (status) => {
     switch(status) {
-      case 'completed': return '#4CAF50';
-      case 'ongoing': return '#FF9800';
-      case 'upcoming': return '#2196F3';
+      case 'completed': return '#00d4ff';
+      case 'ongoing': return '#ffab00';
+      case 'upcoming': return '#00d4ff';
       default: return '#666';
     }
   };

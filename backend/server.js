@@ -40,6 +40,8 @@ const droneReportRoutes = require('./routes/droneReportRoutes');
 const droneRoutes = require('./routes/droneRoutes');
 const schoolRoutes = require('./routes/schoolRoutes');
 const siteStatsRoutes = require('./routes/siteStatsRoutes');
+const espRoutes = require('./routes/espRoutes');
+const analysisRoutes = require('./routes/analysisRoutes');
 
 // Mount Routes
 app.use('/api/auth', authRoutes); // Admin authentication
@@ -54,6 +56,8 @@ app.use('/api/reports', droneReportRoutes);
 app.use('/api/stats', siteStatsRoutes);
 app.use('/api/drones', droneRoutes);
 app.use('/api/schools', schoolRoutes);
+app.use('/api/esp', espRoutes);
+app.use('/api/analysis', analysisRoutes);
 
 // Basic test route
 app.get('/', (req, res) => {
@@ -140,7 +144,9 @@ global.io = io; // Make io globally available for controllers
 
 // Start server
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+const HOST = '0.0.0.0'; // Listen on all network interfaces
+server.listen(PORT, HOST, () => {
+  console.log(`🚀 Server running on ${HOST}:${PORT}`);
   console.log(`📡 Socket.io ready for real-time updates`);
+  console.log(`🌐 Network access: http://10.93.182.196:${PORT}`);
 });

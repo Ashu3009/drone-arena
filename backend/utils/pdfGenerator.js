@@ -101,7 +101,10 @@ const generateReportPDF = (report, match) => {
        .text(new Date(report.generatedAt).toLocaleDateString(), 380, yPos);
 
     // Calculate performance score early (needed for Match Context Box)
-    const perfScore = report.performanceScore || 0;
+    // Support both old (performanceScore) and new (performance.overallScore) structure
+    const perfScore = report.performance?.overallScore
+      ? report.performance.overallScore
+      : (report.performanceScore || 0);
     const scoreColor = getScoreColor(perfScore);
 
     // Match Context Box
@@ -145,12 +148,28 @@ const generateReportPDF = (report, match) => {
     doc.fontSize(42)
        .fillColor(scoreColor)
        .font('Helvetica-Bold')
-       .text(perfScore.toString(), 0, yPos + 10, { align: 'center', width: 595 });
+       .text(perfScore.toFixed(2), 0, yPos + 10, { align: 'center', width: 595 });
 
     doc.fontSize(10)
        .fillColor('#666666')
        .font('Helvetica')
        .text('/100', 0, yPos + 42, { align: 'center', width: 595 });
+
+    // Status Warning for Disconnected/Not Registered Drones
+    if (report.status === 'not_registered' || report.status === 'disconnected' || perfScore === 0) {
+      yPos += 70;
+      const statusColor = report.status === 'not_registered' ? '#FF6B6B' : '#FFA500';
+      const statusText = report.status === 'not_registered'
+        ? '⚠️ ESP HARDWARE NOT REGISTERED'
+        : '⚠️ DRONE DISCONNECTED - NO TELEMETRY DATA';
+
+      doc.rect(40, yPos, 515, 40).fillAndStroke(statusColor + '20', statusColor);
+      doc.fontSize(12)
+         .fillColor(statusColor)
+         .font('Helvetica-Bold')
+         .text(statusText, 0, yPos + 13, { align: 'center', width: 595 });
+      yPos += 20;
+    }
 
     // Flight Metrics Section
     yPos = 320;
@@ -160,11 +179,12 @@ const generateReportPDF = (report, match) => {
        .text('FLIGHT METRICS', 40, yPos);
 
     yPos += 25;
+    // Support both old and new metric structure
     const metrics = [
-      { label: 'Total Distance', value: `${(report.totalDistance || 0).toFixed(1)} m` },
-      { label: 'Average Speed', value: `${(report.averageSpeed || 0).toFixed(1)} m/s` },
-      { label: 'Max Speed', value: `${(report.maxSpeed || 0).toFixed(1)} m/s` },
-      { label: 'Position Accuracy', value: `${(report.positionAccuracy || 0).toFixed(0)}%` }
+      { label: 'Avg Intensity', value: `${(report.metrics?.avgIntensity || report.totalDistance || 0).toFixed(1)} m/s²` },
+      { label: 'Peak Intensity', value: `${(report.metrics?.peakIntensity || report.maxSpeed || 0).toFixed(1)} m/s²` },
+      { label: 'Active Time', value: `${(report.metrics?.activeTimePercentage || report.positionAccuracy || 0).toFixed(0)}%` },
+      { label: 'Data Points', value: `${report.metrics?.dataPoints || 0}` }
     ];
 
     metrics.forEach((metric, idx) => {
@@ -400,11 +420,11 @@ const generateReportPDF = (report, match) => {
  * Get performance rating label and color
  */
 const getPerformanceRating = (score) => {
-  if (score >= 90) return { label: '⭐ EXCELLENT', color: '#00AA00' };
-  if (score >= 75) return { label: '✓ GOOD', color: '#4CAF50' };
-  if (score >= 60) return { label: '○ AVERAGE', color: '#FFA500' };
-  if (score >= 45) return { label: '△ NEEDS IMPROVEMENT', color: '#FF8800' };
-  return { label: '✗ POOR', color: '#CC0000' };
+  if (score >= 90) return { label: 'EXCELLENT', color: '#00AA00' };
+  if (score >= 75) return { label: 'GOOD', color: '#4CAF50' };
+  if (score >= 60) return { label: 'AVERAGE', color: '#FFA500' };
+  if (score >= 45) return { label: 'NEEDS IMPROVEMENT', color: '#FF8800' };
+  return { label: 'POOR', color: '#CC0000' };
 };
 
 /**
