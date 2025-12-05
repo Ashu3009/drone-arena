@@ -584,7 +584,7 @@ const MatchManager = () => {
                     return (
                     <div key={round.roundNumber} style={{
                       ...styles.roundCard,
-                      border: round.status === 'in_progress' ? '2px solid #4CAF50' : '1px solid #444'
+                      border: round.status === 'in_progress' ? '2px solid #00d4ff' : '1px solid #444'
                     }}>
                       {/* Round Header - Clickable */}
                       <div
@@ -600,8 +600,8 @@ const MatchManager = () => {
                         <span style={{
                           ...styles.roundStatusBadge,
                           backgroundColor:
-                            round.status === 'completed' ? '#2196F3' :
-                            round.status === 'in_progress' ? '#4CAF50' : '#666'
+                            round.status === 'completed' ? '#00d4ff' :
+                            round.status === 'in_progress' ? '#00d4ff' : '#666'
                         }}>
                           {round.status.toUpperCase().replace('_', ' ')}
                         </span>
@@ -629,7 +629,8 @@ const MatchManager = () => {
                                 </button>
                                 <button
                                   onClick={() => handleScoreUpdate(match._id, 'A', 1)}
-                                  style={{...styles.scoreButton, backgroundColor: '#4CAF50'}}
+                                  style={{...styles.scoreButton, background: 'linear-gradient(135deg, rgba(0, 79, 249, 0.3), rgba(0, 123, 255, 0.2))',
+    color: '#00d4ff', border: '1px solid rgba(0, 123, 255, 0.5)', boxShadow: '0 0 15px rgba(0, 123, 255, 0.3)'}}
                                   disabled={loading}
                                 >
                                   +1
@@ -652,7 +653,8 @@ const MatchManager = () => {
                                 </button>
                                 <button
                                   onClick={() => handleScoreUpdate(match._id, 'B', 1)}
-                                  style={{...styles.scoreButton, backgroundColor: '#4CAF50'}}
+                                  style={{...styles.scoreButton, background: 'linear-gradient(135deg, rgba(0, 79, 249, 0.3), rgba(0, 123, 255, 0.2))',
+    color: '#00d4ff', border: '1px solid rgba(0, 123, 255, 0.5)', boxShadow: '0 0 15px rgba(0, 123, 255, 0.3)'}}
                                   disabled={loading}
                                 >
                                   +1
@@ -707,7 +709,8 @@ const MatchManager = () => {
                       {round.status === 'pending' && round.registeredDrones && round.registeredDrones.length > 0 && (
                         <button
                           onClick={() => handleStartRound(match._id, round.roundNumber)}
-                          style={{...styles.controlButton, backgroundColor: '#4CAF50', width: '100%', marginTop: '10px'}}
+                          style={{...styles.controlButton, background: 'linear-gradient(135deg, rgba(0, 79, 249, 0.3), rgba(0, 123, 255, 0.2))',
+    color: '#00d4ff', border: '1px solid rgba(0, 123, 255, 0.5)', boxShadow: '0 0 15px rgba(0, 123, 255, 0.3)', width: '100%', marginTop: '10px'}}
                           disabled={loading}
                         >
                           Start Round {round.roundNumber}
@@ -717,7 +720,7 @@ const MatchManager = () => {
                       {round.status === 'in_progress' && (
                         <button
                           onClick={() => handleEndRound(match._id, round.roundNumber)}
-                          style={{...styles.controlButton, backgroundColor: '#ff9800', width: '100%', marginTop: '10px'}}
+                          style={{...styles.controlButton, backgroundColor: '#ffab00', width: '100%', marginTop: '10px'}}
                           disabled={loading}
                         >
                           End Round {round.roundNumber}
@@ -775,7 +778,8 @@ const MatchManager = () => {
                   {match.status === 'in_progress' && currentRound >= 3 && !activeRound && (
                     <button
                       onClick={() => handleCompleteMatch(match._id)}
-                      style={{...styles.controlButton, backgroundColor: '#2196F3'}}
+                      style={{...styles.controlButton, background: 'linear-gradient(135deg, rgba(0, 79, 249, 0.3), rgba(0, 123, 255, 0.2))',
+    color: '#00d4ff', border: '1px solid rgba(0, 123, 255, 0.5)'}}
                       disabled={loading}
                     >
                       Complete Match
@@ -790,7 +794,7 @@ const MatchManager = () => {
                           handleCompleteMatch(match._id);
                         }
                       }}
-                      style={{...styles.controlButton, backgroundColor: '#FF9800', fontSize: '0.85rem'}}
+                      style={{...styles.controlButton, backgroundColor: '#ffab00', fontSize: '0.85rem'}}
                       disabled={loading}
                       title="Force complete match (even if rounds incomplete)"
                     >
@@ -937,9 +941,8 @@ const styles = {
     margin: 0
   },
   createButton: {
-    backgroundColor: '#4CAF50',
-    color: 'white',
-    border: 'none',
+    background: 'linear-gradient(135deg, rgba(0, 79, 249, 0.3), rgba(0, 123, 255, 0.2))',
+    color: '#00d4ff', border: '1px solid rgba(0, 123, 255, 0.5)', boxShadow: '0 0 15px rgba(0, 123, 255, 0.3)',
     borderRadius: '6px',
     padding: '12px 24px',
     fontSize: '14px',
@@ -947,7 +950,7 @@ const styles = {
     cursor: 'pointer'
   },
   form: {
-    backgroundColor: '#1e1e1e',
+    background: 'rgba(0, 13, 41, 0.3)', backdropFilter: 'blur(15px)', border: '1px solid rgba(0, 123, 255, 0.3)', boxShadow: '0 0 20px rgba(0, 123, 255, 0.15)',
     padding: '24px',
     borderRadius: '8px',
     marginBottom: '30px'
@@ -969,12 +972,12 @@ const styles = {
     display: 'block',
     marginBottom: '6px',
     fontSize: '14px',
-    color: '#ccc'
+    color: '#cbd5e1'
   },
   input: {
     width: '100%',
-    backgroundColor: '#2a2a2a',
-    border: '1px solid #444',
+    background: 'rgba(0, 13, 41, 0.4)',
+    border: '1px solid rgba(0, 123, 255, 0.3)',
     borderRadius: '6px',
     padding: '10px',
     color: '#fff',
@@ -987,9 +990,8 @@ const styles = {
     marginTop: '20px'
   },
   submitButton: {
-    backgroundColor: '#4CAF50',
-    color: 'white',
-    border: 'none',
+    background: 'linear-gradient(135deg, rgba(0, 79, 249, 0.3), rgba(0, 123, 255, 0.2))',
+    color: '#00d4ff', border: '1px solid rgba(0, 123, 255, 0.5)', boxShadow: '0 0 15px rgba(0, 123, 255, 0.3)',
     borderRadius: '6px',
     padding: '12px 24px',
     fontSize: '14px',
@@ -998,9 +1000,9 @@ const styles = {
     flex: 1
   },
   cancelButton: {
-    backgroundColor: '#666',
-    color: 'white',
-    border: 'none',
+    background: 'rgba(100, 116, 139, 0.3)',
+    color: '#cbd5e1',
+    border: '1px solid rgba(100, 116, 139, 0.5)',
     borderRadius: '6px',
     padding: '12px 24px',
     fontSize: '14px',
@@ -1008,7 +1010,7 @@ const styles = {
     cursor: 'pointer'
   },
   filterSection: {
-    backgroundColor: '#1e1e1e',
+    background: 'rgba(0, 13, 41, 0.3)', backdropFilter: 'blur(15px)', border: '1px solid rgba(0, 123, 255, 0.3)', boxShadow: '0 0 20px rgba(0, 123, 255, 0.15)',
     padding: '16px 20px',
     borderRadius: '8px',
     marginBottom: '20px',
@@ -1018,14 +1020,14 @@ const styles = {
   },
   filterLabel: {
     fontSize: '14px',
-    color: '#ccc',
+    color: '#cbd5e1',
     fontWeight: '500',
     minWidth: 'fit-content'
   },
   filterSelect: {
     flex: 1,
-    backgroundColor: '#2a2a2a',
-    border: '1px solid #444',
+    background: 'rgba(0, 13, 41, 0.4)',
+    border: '1px solid rgba(0, 123, 255, 0.3)',
     borderRadius: '6px',
     padding: '10px',
     color: '#fff',
@@ -1040,19 +1042,21 @@ const styles = {
   },
   loadingText: {
     textAlign: 'center',
-    color: '#888',
+    color: '#94a3b8',
     padding: '40px'
   },
   emptyText: {
     textAlign: 'center',
-    color: '#888',
+    color: '#94a3b8',
     padding: '40px'
   },
   matchCard: {
-    backgroundColor: '#1e1e1e',
+    background: 'rgba(0, 13, 41, 0.3)',
+    backdropFilter: 'blur(15px)',
+    border: '1px solid rgba(0, 123, 255, 0.3)',
+    boxShadow: '0 0 20px rgba(0, 123, 255, 0.15)',
     borderRadius: '8px',
     padding: '20px',
-    border: '1px solid #333',
     position: 'relative',
     maxWidth: '900px',
     margin: '0 auto'
@@ -1061,7 +1065,7 @@ const styles = {
     position: 'absolute',
     top: '12px',
     right: '12px',
-    backgroundColor: '#ff9800',
+    backgroundColor: '#ffab00',
     color: 'white',
     padding: '4px 12px',
     borderRadius: '12px',
@@ -1074,7 +1078,7 @@ const styles = {
     alignItems: 'start',
     marginBottom: '16px',
     paddingBottom: '12px',
-    borderBottom: '1px solid #333'
+    borderBottom: '1px solid rgba(0, 123, 255, 0.2)'
   },
   matchTitle: {
     margin: 0,
@@ -1083,11 +1087,11 @@ const styles = {
   tournamentName: {
     margin: '4px 0 0 0',
     fontSize: '13px',
-    color: '#888'
+    color: '#94a3b8'
   },
   statusBadge: {
-    backgroundColor: '#4CAF50',
-    color: 'white',
+    background: 'linear-gradient(135deg, rgba(0, 79, 249, 0.3), rgba(0, 123, 255, 0.2))',
+    color: '#00d4ff', border: '1px solid rgba(0, 123, 255, 0.5)', boxShadow: '0 0 15px rgba(0, 123, 255, 0.3)',
     padding: '6px 14px',
     borderRadius: '12px',
     fontSize: '12px',
@@ -1101,7 +1105,7 @@ const styles = {
   },
   scoreBox: {
     flex: 1,
-    backgroundColor: '#2a2a2a',
+    background: 'rgba(0, 13, 41, 0.4)', border: '1px solid rgba(0, 123, 255, 0.25)',
     padding: '16px',
     borderRadius: '6px',
     display: 'flex',
@@ -1110,13 +1114,13 @@ const styles = {
   },
   teamLabel: {
     fontSize: '12px',
-    color: '#888',
+    color: '#94a3b8',
     marginBottom: '8px'
   },
   score: {
     fontSize: '32px',
     fontWeight: 'bold',
-    color: '#4CAF50'
+    color: '#00d4ff'
   },
   roundInfo: {
     display: 'flex',
@@ -1124,11 +1128,11 @@ const styles = {
     alignItems: 'center',
     marginBottom: '16px',
     fontSize: '14px',
-    color: '#aaa'
+    color: '#94a3b8'
   },
   activeRound: {
-    backgroundColor: '#4CAF50',
-    color: 'white',
+    background: 'linear-gradient(135deg, rgba(0, 79, 249, 0.3), rgba(0, 123, 255, 0.2))',
+    color: '#00d4ff', border: '1px solid rgba(0, 123, 255, 0.5)', boxShadow: '0 0 15px rgba(0, 123, 255, 0.3)',
     padding: '4px 10px',
     borderRadius: '10px',
     fontSize: '11px',
@@ -1139,12 +1143,11 @@ const styles = {
     flexWrap: 'wrap',
     gap: '10px',
     paddingTop: '16px',
-    borderTop: '1px solid #333'
+    borderTop: '1px solid rgba(0, 123, 255, 0.2)'
   },
   controlButton: {
-    backgroundColor: '#2196F3',
-    color: 'white',
-    border: 'none',
+    background: 'linear-gradient(135deg, rgba(0, 79, 249, 0.3), rgba(0, 123, 255, 0.2))',
+    color: '#00d4ff', border: '1px solid rgba(0, 123, 255, 0.5)',
     borderRadius: '6px',
     padding: '10px 20px',
     fontSize: '13px',
@@ -1162,13 +1165,12 @@ const styles = {
   },
   batchLabel: {
     fontSize: '13px',
-    color: '#aaa',
+    color: '#94a3b8',
     fontWeight: 'bold'
   },
   batchButton: {
-    backgroundColor: '#4CAF50',
-    color: 'white',
-    border: 'none',
+    background: 'linear-gradient(135deg, rgba(0, 79, 249, 0.3), rgba(0, 123, 255, 0.2))',
+    color: '#00d4ff', border: '1px solid rgba(0, 123, 255, 0.5)', boxShadow: '0 0 15px rgba(0, 123, 255, 0.3)',
     borderRadius: '4px',
     padding: '8px 16px',
     fontSize: '12px',
@@ -1187,7 +1189,7 @@ const styles = {
     fontWeight: 'bold'
   },
   roundCard: {
-    backgroundColor: '#2a2a2a',
+    background: 'rgba(0, 13, 41, 0.4)', border: '1px solid rgba(0, 123, 255, 0.25)',
     borderRadius: '6px',
     padding: '12px',
     marginBottom: '12px'
@@ -1221,28 +1223,28 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'center',
     padding: '12px',
-    backgroundColor: '#1e1e1e',
+    background: 'rgba(0, 13, 41, 0.3)', backdropFilter: 'blur(15px)', border: '1px solid rgba(0, 123, 255, 0.3)', boxShadow: '0 0 20px rgba(0, 123, 255, 0.15)',
     borderRadius: '6px'
   },
   scoreLabel: {
     fontSize: '12px',
-    color: '#888',
+    color: '#94a3b8',
     marginBottom: '6px'
   },
   scoreValue: {
     fontSize: '24px',
     fontWeight: 'bold',
-    color: '#4CAF50'
+    color: '#00d4ff'
   },
   registeredDrones: {
     marginBottom: '16px',
     padding: '12px',
-    backgroundColor: '#1e1e1e',
+    background: 'rgba(0, 13, 41, 0.3)', backdropFilter: 'blur(15px)', border: '1px solid rgba(0, 123, 255, 0.3)', boxShadow: '0 0 20px rgba(0, 123, 255, 0.15)',
     borderRadius: '6px'
   },
   dronesLabel: {
     fontSize: '12px',
-    color: '#aaa',
+    color: '#94a3b8',
     marginBottom: '8px',
     display: 'block'
   },
@@ -1289,14 +1291,16 @@ const styles = {
     zIndex: 1000
   },
   modalContent: {
-    backgroundColor: '#1e1e1e',
+    background: 'rgba(0, 13, 41, 0.3)',
+    backdropFilter: 'blur(15px)',
+    border: '1px solid rgba(0, 123, 255, 0.3)',
+    boxShadow: '0 0 20px rgba(0, 123, 255, 0.15)',
     borderRadius: '12px',
     padding: '32px',
     maxWidth: '600px',
     width: '90%',
     maxHeight: '90vh',
-    overflow: 'auto',
-    border: '1px solid #444'
+    overflow: 'auto'
   },
   modalTitle: {
     margin: '0 0 8px 0',
@@ -1306,7 +1310,7 @@ const styles = {
   modalSubtitle: {
     margin: '0 0 24px 0',
     fontSize: '14px',
-    color: '#888'
+    color: '#94a3b8'
   },
   statsRow: {
     display: 'flex',

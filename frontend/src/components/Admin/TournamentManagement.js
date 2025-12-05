@@ -576,11 +576,11 @@ const styles = {
   tabActive: {
     backgroundColor: 'transparent',
     border: 'none',
-    borderBottom: '3px solid #4CAF50',
+    borderBottom: '3px solid #00d4ff',
     padding: '12px 20px',
     fontSize: '14px',
     fontWeight: 'bold',
-    color: '#4CAF50',
+    color: '#00d4ff',
     cursor: 'pointer',
     whiteSpace: 'nowrap'
   },
@@ -630,12 +630,12 @@ const styles = {
   },
   fileName: {
     fontSize: '13px',
-    color: '#4CAF50',
+    color: '#00d4ff',
     marginBottom: '12px'
   },
   uploadButton: {
     width: '100%',
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#00d4ff',
     border: 'none',
     borderRadius: '6px',
     padding: '12px',
@@ -690,7 +690,7 @@ const styles = {
   },
   saveButton: {
     width: '100%',
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#00d4ff',
     border: 'none',
     borderRadius: '6px',
     padding: '14px',
@@ -718,7 +718,7 @@ const styles = {
     height: '80px',
     borderRadius: '50%',
     objectFit: 'cover',
-    border: '3px solid #4CAF50'
+    border: '3px solid #00d4ff'
   },
   motNamePreview: {
     fontSize: '18px',
@@ -751,7 +751,7 @@ const styles = {
   teamNumber: {
     fontSize: '20px',
     fontWeight: 'bold',
-    color: '#4CAF50',
+    color: '#00d4ff',
     minWidth: '30px'
   },
   teamInfo: {

@@ -369,7 +369,7 @@ const MobileHome = () => {
                   <ul style={{ lineHeight: '1.8', color: '#cbd5e1' }}>
                     <li><strong>Position Data:</strong> Real-time X, Y, Z coordinates of all drones in 3D arena</li>
                     <li><strong>Velocity Metrics:</strong> Speed, acceleration, and movement patterns</li>
-                    <li><strong>Role Performance:</strong> Forward, Striker, Defender, Central drone statistics</li>
+                    <li><strong>Role Performance:</strong> Forward, Striker, Defender, Keeper drone statistics</li>
                     <li><strong>Hit Detection:</strong> Successful hits, misses, and accuracy percentages</li>
                     <li><strong>Energy Levels:</strong> Battery consumption and efficiency analysis</li>
                   </ul>

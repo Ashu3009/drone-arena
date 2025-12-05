@@ -121,9 +121,9 @@ const ReportsManager = () => {
   const getPlayingStyleColor = (style) => {
     switch (style) {
       case 'Aggressive': return '#ff4444';
-      case 'Defensive': return '#4CAF50';
-      case 'Balanced': return '#2196F3';
-      case 'Offensive-minded': return '#FF9800';
+      case 'Defensive': return '#00d4ff';
+      case 'Balanced': return '#00d4ff';
+      case 'Offensive-minded': return '#ffab00';
       case 'Defensive-minded': return '#00BCD4';
       default: return '#888';
     }
@@ -434,7 +434,7 @@ const ReportsManager = () => {
                           <div style={{
                             ...styles.barFill,
                             width: `${pilot.avgDefensiveness}%`,
-                            backgroundColor: '#4CAF50'
+                            backgroundColor: '#00d4ff'
                           }} />
                         </div>
                         <span style={styles.metricValue}>{pilot.avgDefensiveness}%</span>
@@ -446,7 +446,7 @@ const ReportsManager = () => {
                           <div style={{
                             ...styles.barFill,
                             width: `${pilot.avgEfficiency}%`,
-                            backgroundColor: '#2196F3'
+                            backgroundColor: '#00d4ff'
                           }} />
                         </div>
                         <span style={styles.metricValue}>{pilot.avgEfficiency}%</span>
@@ -480,7 +480,7 @@ const styles = {
     fontSize: '28px',
     fontWeight: 'bold',
     marginBottom: '20px',
-    color: '#4CAF50'
+    color: '#00d4ff'
   },
 
   // Filters
@@ -493,7 +493,7 @@ const styles = {
   filterTitle: {
     fontSize: '18px',
     marginBottom: '15px',
-    color: '#4CAF50'
+    color: '#00d4ff'
   },
   filterGrid: {
     display: 'grid',
@@ -523,7 +523,7 @@ const styles = {
     gap: '10px'
   },
   btnApply: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#00d4ff',
     color: 'white',
     border: 'none',
     borderRadius: '6px',
@@ -550,7 +550,7 @@ const styles = {
   sectionTitle: {
     fontSize: '20px',
     marginBottom: '15px',
-    color: '#4CAF50'
+    color: '#00d4ff'
   },
   loading: {
     color: '#888',
@@ -603,8 +603,8 @@ const styles = {
     transition: 'all 0.3s'
   },
   tabActive: {
-    color: '#4CAF50',
-    borderBottomColor: '#4CAF50'
+    color: '#00d4ff',
+    borderBottomColor: '#00d4ff'
   },
 
   // Tournament Grid
@@ -624,7 +624,7 @@ const styles = {
   tournamentName: {
     fontSize: '18px',
     marginBottom: '10px',
-    color: '#4CAF50'
+    color: '#00d4ff'
   },
   tournamentInfo: {
     fontSize: '14px',
@@ -653,7 +653,7 @@ const styles = {
   },
   matchTitle: {
     fontSize: '18px',
-    color: '#4CAF50'
+    color: '#00d4ff'
   },
   matchDate: {
     fontSize: '12px',
@@ -679,7 +679,7 @@ const styles = {
   teamScore: {
     fontSize: '24px',
     fontWeight: 'bold',
-    color: '#4CAF50'
+    color: '#00d4ff'
   },
   vs: {
     fontSize: '14px',
@@ -703,7 +703,7 @@ const styles = {
   roundTitle: {
     fontSize: '18px',
     marginBottom: '15px',
-    color: '#4CAF50',
+    color: '#00d4ff',
     borderBottom: '2px solid #333',
     paddingBottom: '8px'
   },
@@ -733,7 +733,7 @@ const styles = {
   reportScore: {
     fontSize: '20px',
     fontWeight: 'bold',
-    color: '#4CAF50'
+    color: '#00d4ff'
   },
   pilotInfo: {
     fontSize: '14px',
@@ -796,7 +796,7 @@ const styles = {
     position: 'absolute',
     top: '10px',
     right: '10px',
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#00d4ff',
     color: 'white',
     padding: '6px 12px',
     borderRadius: '20px',
@@ -823,7 +823,7 @@ const styles = {
   },
   pilotStatValue: {
     fontWeight: 'bold',
-    color: '#4CAF50'
+    color: '#00d4ff'
   },
   playingStyleBadge: {
     marginTop: '15px',
@@ -882,7 +882,7 @@ const styles = {
     marginTop: '12px',
     width: '100%',
     padding: '10px',
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#00d4ff',
     color: 'white',
     border: 'none',
     borderRadius: '6px',

@@ -3,8 +3,18 @@ const express = require('express');
 const router = express.Router();
 const Match = require('../models/Match');
 const DroneTelemetry = require('../models/DroneTelemetry');
+const telemetryController = require('../controllers/telemetryController');
 
-// POST - Receive telemetry data from drone
+// POST - Receive telemetry from ESP32 (with MAC address auto-detection)
+router.post('/receive', telemetryController.receiveTelemetry);
+
+// POST - Heartbeat endpoint for ESP32
+router.post('/heartbeat', (req, res) => {
+  // Simple heartbeat response
+  res.status(200).json({ success: true, message: 'Heartbeat received' });
+});
+
+// POST - Receive telemetry data from drone (legacy endpoint)
 router.post('/', async (req, res) => {
   try {
     const { matchId, teamId, droneId, x, y, z, pitch, roll, yaw, battery } = req.body;

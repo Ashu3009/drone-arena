@@ -1,8 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL
-  ? `${process.env.REACT_APP_API_URL}/api`
-  : 'http://localhost:5000/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 // ==================== AXIOS INTERCEPTOR FOR AUTH ====================
 // Add token to all requests (supports both admin and user tokens)
@@ -602,6 +600,44 @@ export const overrideSiteStats = async (statsData) => {
 // Reset stats to auto-calculated (admin only)
 export const resetSiteStats = async (fields = null) => {
   const response = await axios.put(`${API_BASE_URL}/stats/reset`, { fields });
+  return response.data;
+};
+
+// ==================== ESP DEVICE MANAGEMENT ====================
+
+// Get all registered ESP devices
+export const getAllESPs = async () => {
+  const response = await axios.get(`${API_BASE_URL}/esp`);
+  return response.data;
+};
+
+// Get available (online) ESPs
+export const getAvailableESPs = async () => {
+  const response = await axios.get(`${API_BASE_URL}/esp/available`);
+  return response.data;
+};
+
+// Register new ESP device
+export const registerESP = async (espData) => {
+  const response = await axios.post(`${API_BASE_URL}/esp/register`, espData);
+  return response.data;
+};
+
+// Update ESP device
+export const updateESP = async (espId, espData) => {
+  const response = await axios.put(`${API_BASE_URL}/esp/${espId}`, espData);
+  return response.data;
+};
+
+// Delete ESP device
+export const deleteESP = async (espId) => {
+  const response = await axios.delete(`${API_BASE_URL}/esp/${espId}`);
+  return response.data;
+};
+
+// Check and mark offline ESPs
+export const checkOfflineESPs = async () => {
+  const response = await axios.post(`${API_BASE_URL}/esp/check-offline`);
   return response.data;
 };
 

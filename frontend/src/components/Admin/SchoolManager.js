@@ -172,7 +172,7 @@ const SchoolManager = () => {
                 <span
                   style={{
                     ...styles.statusBadge,
-                    backgroundColor: school.status === 'Active' ? '#4CAF50' : '#9E9E9E'
+                    backgroundColor: school.status === 'Active' ? '#00d4ff' : '#9E9E9E'
                   }}
                 >
                   {school.status}
@@ -398,9 +398,10 @@ const styles = {
   },
   addButton: {
     padding: '10px 20px',
-    backgroundColor: '#4CAF50',
-    color: 'white',
-    border: 'none',
+    background: 'linear-gradient(135deg, rgba(0, 79, 249, 0.3), rgba(0, 123, 255, 0.2))',
+    color: '#00d4ff',
+    border: '1px solid rgba(0, 123, 255, 0.5)',
+    boxShadow: '0 0 15px rgba(0, 123, 255, 0.3)',
     borderRadius: '4px',
     cursor: 'pointer',
     fontSize: '14px',
@@ -413,7 +414,7 @@ const styles = {
   },
   emptyMessage: {
     textAlign: 'center',
-    color: '#666',
+    color: '#64748b',
     fontSize: '16px',
     gridColumn: '1 / -1'
   },
@@ -461,12 +462,13 @@ const styles = {
     color: '#333'
   },
   detailValue: {
-    color: '#2196F3',
+    color: '#00d4ff',
     textDecoration: 'none'
   },
   teamCount: {
-    backgroundColor: '#2196F3',
-    color: 'white',
+    background: 'linear-gradient(135deg, rgba(0, 79, 249, 0.3), rgba(0, 123, 255, 0.2))',
+    color: '#00d4ff',
+    border: '1px solid rgba(0, 123, 255, 0.5)',
     padding: '2px 8px',
     borderRadius: '10px',
     fontSize: '12px',
@@ -480,9 +482,9 @@ const styles = {
   editButton: {
     flex: 1,
     padding: '10px',
-    backgroundColor: '#2196F3',
-    color: 'white',
-    border: 'none',
+    background: 'linear-gradient(135deg, rgba(0, 79, 249, 0.3), rgba(0, 123, 255, 0.2))',
+    color: '#00d4ff',
+    border: '1px solid rgba(0, 123, 255, 0.5)',
     borderRadius: '4px',
     cursor: 'pointer',
     fontSize: '14px',
@@ -574,9 +576,10 @@ const styles = {
   submitButton: {
     flex: 1,
     padding: '12px',
-    backgroundColor: '#4CAF50',
-    color: 'white',
-    border: 'none',
+    background: 'linear-gradient(135deg, rgba(0, 79, 249, 0.3), rgba(0, 123, 255, 0.2))',
+    color: '#00d4ff',
+    border: '1px solid rgba(0, 123, 255, 0.5)',
+    boxShadow: '0 0 15px rgba(0, 123, 255, 0.3)',
     borderRadius: '4px',
     cursor: 'pointer',
     fontSize: '16px',

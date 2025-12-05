@@ -36,7 +36,11 @@ const char* WIFI_PASSWORD = "12345678";
 const char* SERVER_URL = "http://10.93.182.196:5000";
 // For DEPLOYED backend, use: "https://dronearena-backend.onrender.com"
 
+<<<<<<< HEAD
 // ===================================a=====
+=======
+// ========================================
+>>>>>>> 636707b7b781a076dce84fc533fc585edc7b2bc6
 // Pin Configuration (ESP32-CAM specific)
 // ========================================
 // Using GPIO14 and GPIO15 to avoid camera conflicts

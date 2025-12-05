@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getTeams, createTeam, updateTeam, deleteTeam, getAllSchools, uploadMemberPhoto } from '../../services/api';
+import './TeamManager.css';
 
 const TeamManager = () => {
   const [teams, setTeams] = useState([]);
@@ -22,7 +23,7 @@ const TeamManager = () => {
       { name: '', role: 'Forward', photo: null, photoFile: null, jerseyNumber: '' },
       { name: '', role: 'Defender', photo: null, photoFile: null, jerseyNumber: '' },
       { name: '', role: 'Striker', photo: null, photoFile: null, jerseyNumber: '' },
-      { name: '', role: 'Central', photo: null, photoFile: null, jerseyNumber: '' }
+      { name: '', role: 'Keeper', photo: null, photoFile: null, jerseyNumber: '' }
     ]
   });
 
@@ -191,7 +192,7 @@ const TeamManager = () => {
           { name: '', role: 'Forward', contactEmail: '', isPrimary: true },
           { name: '', role: 'Striker', contactEmail: '', isPrimary: true },
           { name: '', role: 'Defender', contactEmail: '', isPrimary: true },
-          { name: '', role: 'Central', contactEmail: '', isPrimary: true }
+          { name: '', role: 'Keeper', contactEmail: '', isPrimary: true }
         ];
 
     setFormData({
@@ -224,7 +225,7 @@ const TeamManager = () => {
         { name: '', role: 'Forward', contactEmail: '', isPrimary: true },
         { name: '', role: 'Striker', contactEmail: '', isPrimary: true },
         { name: '', role: 'Defender', contactEmail: '', isPrimary: true },
-        { name: '', role: 'Central', contactEmail: '', isPrimary: true }
+        { name: '', role: 'Keeper', contactEmail: '', isPrimary: true }
       ]
     });
   };
@@ -380,10 +381,14 @@ const TeamManager = () => {
                 {/* Name */}
                 <input
                   type="text"
-                  value={member.name}
+                  value={member.name || ''}
                   onChange={(e) => handleMemberChange(index, 'name', e.target.value)}
-                  style={styles.memberInput}
-                  placeholder="Player name"
+                  style={{
+                    ...styles.memberInput,
+                    minWidth: '200px',
+                    outline: 'none'
+                  }}
+                  placeholder="Enter player name"
                   required
                 />
 
@@ -397,7 +402,7 @@ const TeamManager = () => {
                   <option value="Forward">Forward</option>
                   <option value="Defender">Defender</option>
                   <option value="Striker">Striker</option>
-                  <option value="Central">Central</option>
+                  <option value="Keeper">Keeper</option>
                   <option value="Substitute">Substitute</option>
                 </select>
 
@@ -439,10 +444,14 @@ const TeamManager = () => {
                   {/* Name */}
                   <input
                     type="text"
-                    value={member.name}
+                    value={member.name || ''}
                     onChange={(e) => handleMemberChange(index + 4, 'name', e.target.value)}
-                    style={styles.memberInput}
-                    placeholder="Player name"
+                    style={{
+                      ...styles.memberInput,
+                      minWidth: '200px',
+                      outline: 'none'
+                    }}
+                    placeholder="Enter player name"
                   />
 
                   {/* Role */}
@@ -454,7 +463,7 @@ const TeamManager = () => {
                     <option value="Forward">Forward</option>
                     <option value="Defender">Defender</option>
                     <option value="Striker">Striker</option>
-                    <option value="Central">Central</option>
+                    <option value="Keeper">Keeper</option>
                     <option value="Substitute">Substitute</option>
                   </select>
 
@@ -576,28 +585,39 @@ const styles = {
   },
   title: {
     fontSize: '24px',
-    margin: 0
+    margin: 0,
+    background: 'linear-gradient(135deg, #007bff, #00d4ff)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    backgroundClip: 'text',
+    filter: 'drop-shadow(0 0 10px rgba(0, 123, 255, 0.4))'
   },
   createButton: {
-    backgroundColor: '#4CAF50',
-    color: 'white',
-    border: 'none',
+    background: 'linear-gradient(135deg, rgba(0, 79, 249, 0.3), rgba(0, 123, 255, 0.2))',
+    color: '#00d4ff',
+    border: '1px solid rgba(0, 123, 255, 0.5)',
     borderRadius: '6px',
     padding: '12px 24px',
     fontSize: '14px',
     fontWeight: 'bold',
-    cursor: 'pointer'
+    cursor: 'pointer',
+    boxShadow: '0 0 15px rgba(0, 123, 255, 0.3)',
+    transition: 'all 0.3s ease'
   },
   form: {
-    backgroundColor: '#1e1e1e',
+    background: 'rgba(0, 13, 41, 0.4)',
+    backdropFilter: 'blur(15px)',
     padding: '24px',
     borderRadius: '8px',
-    marginBottom: '30px'
+    marginBottom: '30px',
+    border: '1px solid rgba(0, 123, 255, 0.3)',
+    boxShadow: '0 0 30px rgba(0, 123, 255, 0.2)'
   },
   formTitle: {
     marginTop: 0,
     marginBottom: '20px',
-    fontSize: '18px'
+    fontSize: '18px',
+    color: '#e2e8f0'
   },
   formGroup: {
     marginBottom: '16px'
@@ -606,23 +626,24 @@ const styles = {
     display: 'block',
     marginBottom: '6px',
     fontSize: '14px',
-    color: '#ccc'
+    color: '#94a3b8'
   },
   input: {
     width: '100%',
-    backgroundColor: '#2a2a2a',
-    border: '1px solid #444',
+    background: 'rgba(0, 13, 41, 0.5)',
+    border: '1px solid rgba(0, 123, 255, 0.3)',
     borderRadius: '6px',
     padding: '10px',
-    color: '#fff',
+    color: '#e2e8f0',
     fontSize: '14px',
-    boxSizing: 'border-box'
+    boxSizing: 'border-box',
+    transition: 'all 0.3s ease'
   },
   colorInput: {
     width: '100px',
     height: '40px',
-    backgroundColor: '#2a2a2a',
-    border: '1px solid #444',
+    background: 'rgba(0, 13, 41, 0.5)',
+    border: '1px solid rgba(0, 123, 255, 0.3)',
     borderRadius: '6px',
     cursor: 'pointer'
   },
@@ -630,7 +651,8 @@ const styles = {
     marginTop: '24px',
     marginBottom: '16px',
     padding: '16px',
-    backgroundColor: '#2a2a2a',
+    background: 'rgba(0, 13, 41, 0.4)',
+    border: '1px solid rgba(0, 123, 255, 0.25)',
     borderRadius: '6px'
   },
   sectionTitle: {
@@ -640,21 +662,23 @@ const styles = {
   },
   helperText: {
     margin: '0 0 16px 0',
-    fontSize: '13px',
-    color: '#888',
-    fontStyle: 'italic'
+    fontSize: '14px',
+    color: '#94a3b8',
+    fontStyle: 'italic',
+    lineHeight: '1.5'
   },
   memberRow: {
     display: 'flex',
-    gap: '10px',
-    marginBottom: '12px',
-    alignItems: 'center'
+    gap: '12px',
+    marginBottom: '16px',
+    alignItems: 'center',
+    flexWrap: 'nowrap'
   },
   memberNumber: {
     minWidth: '50px',
     fontSize: '14px',
     fontWeight: 'bold',
-    color: '#aaa'
+    color: '#94a3b8'
   },
   photoUpload: {
     display: 'flex',
@@ -667,7 +691,7 @@ const styles = {
     height: '60px',
     borderRadius: '50%',
     objectFit: 'cover',
-    border: '2px solid #4CAF50'
+    border: '2px solid #00d4ff'
   },
   noPhoto: {
     width: '60px',
@@ -678,31 +702,36 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     fontSize: '10px',
-    color: '#666',
+    color: '#64748b',
     border: '2px solid #444'
   },
   fileInput: {
     fontSize: '10px',
-    color: '#aaa',
+    color: '#94a3b8',
     width: '60px'
   },
   memberInput: {
     flex: 1,
-    backgroundColor: '#1e1e1e',
-    border: '1px solid #444',
-    borderRadius: '4px',
-    padding: '8px',
+    backgroundColor: '#3a3a3a',
+    border: '2px solid #00d4ff',
+    borderRadius: '6px',
+    padding: '10px 12px',
     color: '#fff',
-    fontSize: '13px'
+    fontSize: '14px',
+    boxSizing: 'border-box',
+    WebkitAppearance: 'none',
+    MozAppearance: 'textfield'
   },
   memberSelect: {
     minWidth: '160px',
-    backgroundColor: '#1e1e1e',
-    border: '1px solid #444',
-    borderRadius: '4px',
-    padding: '8px',
+    backgroundColor: '#3a3a3a',
+    border: '2px solid #00d4ff',
+    borderRadius: '6px',
+    padding: '10px 12px',
     color: '#fff',
-    fontSize: '13px'
+    fontSize: '14px',
+    cursor: 'pointer',
+    outline: 'none'
   },
   removeButton: {
     backgroundColor: '#ff4444',
@@ -715,9 +744,9 @@ const styles = {
     fontWeight: 'bold'
   },
   addMemberButton: {
-    backgroundColor: '#2196F3',
-    color: 'white',
-    border: 'none',
+    background: 'linear-gradient(135deg, rgba(0, 79, 249, 0.3), rgba(0, 123, 255, 0.2))',
+    color: '#00d4ff',
+    border: '1px solid rgba(0, 123, 255, 0.5)',
     borderRadius: '6px',
     padding: '10px 20px',
     fontSize: '14px',
@@ -732,9 +761,10 @@ const styles = {
     marginTop: '20px'
   },
   submitButton: {
-    backgroundColor: '#4CAF50',
-    color: 'white',
-    border: 'none',
+    background: 'linear-gradient(135deg, rgba(0, 79, 249, 0.3), rgba(0, 123, 255, 0.2))',
+    color: '#00d4ff',
+    border: '1px solid rgba(0, 123, 255, 0.5)',
+    boxShadow: '0 0 15px rgba(0, 123, 255, 0.3)',
     borderRadius: '6px',
     padding: '12px 24px',
     fontSize: '14px',
@@ -743,9 +773,9 @@ const styles = {
     flex: 1
   },
   cancelButton: {
-    backgroundColor: '#666',
-    color: 'white',
-    border: 'none',
+    background: 'rgba(100, 116, 139, 0.3)',
+    color: '#cbd5e1',
+    border: '1px solid rgba(100, 116, 139, 0.5)',
     borderRadius: '6px',
     padding: '12px 24px',
     fontSize: '14px',
@@ -754,31 +784,33 @@ const styles = {
   },
   teamList: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 350px), 1fr))',
     gap: '20px'
   },
   loadingText: {
     textAlign: 'center',
-    color: '#888',
+    color: '#94a3b8',
     padding: '40px',
     gridColumn: '1 / -1'
   },
   emptyText: {
     textAlign: 'center',
-    color: '#888',
+    color: '#94a3b8',
     padding: '40px',
     gridColumn: '1 / -1'
   },
   teamCard: {
-    backgroundColor: '#1e1e1e',
+    background: 'rgba(0, 13, 41, 0.3)',
+    backdropFilter: 'blur(15px)',
+    border: '1px solid rgba(0, 123, 255, 0.3)',
+    boxShadow: '0 0 20px rgba(0, 123, 255, 0.15)',
     borderRadius: '8px',
-    padding: '20px',
-    border: '1px solid #333'
+    padding: '20px'
   },
   cardHeader: {
     marginBottom: '16px',
     paddingBottom: '12px',
-    borderBottom: '1px solid #333'
+    borderBottom: '1px solid rgba(0, 123, 255, 0.2)'
   },
   cardTitle: {
     margin: 0,
@@ -799,28 +831,28 @@ const styles = {
   infoRow: {
     margin: '8px 0',
     fontSize: '14px',
-    color: '#ccc'
+    color: '#cbd5e1'
   },
   membersList: {
     margin: '8px 0'
   },
   memberBadge: {
     display: 'inline-block',
-    backgroundColor: '#2a2a2a',
+    background: 'rgba(0, 13, 41, 0.4)', border: '1px solid rgba(0, 123, 255, 0.25)',
     padding: '4px 8px',
     borderRadius: '4px',
     fontSize: '12px',
     margin: '4px 4px 0 0',
-    color: '#ccc'
+    color: '#cbd5e1'
   },
   cardActions: {
     display: 'flex',
     gap: '8px'
   },
   editButton: {
-    backgroundColor: '#2196F3',
-    color: 'white',
-    border: 'none',
+    background: 'linear-gradient(135deg, rgba(0, 79, 249, 0.3), rgba(0, 123, 255, 0.2))',
+    color: '#00d4ff',
+    border: '1px solid rgba(0, 123, 255, 0.5)',
     borderRadius: '4px',
     padding: '8px 16px',
     fontSize: '13px',

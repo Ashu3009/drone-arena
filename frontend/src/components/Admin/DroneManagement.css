@@ -1,0 +1,188 @@
+/* ==========================================
+   MOBILE GLASSMORPHISM THEME FOR DRONE MANAGEMENT
+   ========================================== */
+@media (max-width: 767px) {
+  /* Container padding */
+  [style*="maxWidth"][style*="1200px"] {
+    padding: 16px !important;
+  }
+
+  /* Headers - Soft gradient */
+  h2[style*="linear-gradient"] {
+    background: linear-gradient(135deg, #00d4ff 0%, #ff00ff 50%, #8b5cf6 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.25)) !important;
+    font-size: 20px !important;
+  }
+
+  /* Drone Grid - Single column on mobile */
+  [style*="gridTemplateColumns"][style*="repeat(auto-fill"] {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  /* Drone Cards - Glassmorphism */
+  [style*="backgroundColor"][style*="rgba(0, 13, 41"] {
+    background: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  /* Drone ID - Soft glow */
+  [style*="fontSize"][style*="20px"][style*="fontWeight"][style*="bold"] {
+    color: #00d4ff !important;
+    text-shadow: 0 0 6px rgba(0, 212, 255, 0.25) !important;
+    font-size: 18px !important;
+  }
+
+  /* Role badges - Soft gradient */
+  [style*="backgroundColor"][style*="#"] span {
+    background: rgba(0, 212, 255, 0.15) !important;
+    border: 1px solid rgba(0, 212, 255, 0.3) !important;
+    box-shadow: 0 0 6px rgba(0, 212, 255, 0.15) !important;
+  }
+
+  /* Filter buttons - Glass */
+  button[style*="padding"][style*="10px 20px"] {
+    background: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(8px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #9ca3af !important;
+    box-shadow: none !important;
+    font-size: 12px !important;
+    padding: 8px 12px !important;
+  }
+
+  button[style*="padding"][style*="10px 20px"]:hover,
+  button[style*="padding"][style*="10px 20px"]:active {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(0, 212, 255, 0.3) !important;
+    color: #00d4ff !important;
+    box-shadow: 0 0 8px rgba(0, 212, 255, 0.15) !important;
+  }
+
+  /* Active filter button */
+  button[style*="background"][style*="linear-gradient(135deg, rgba(0, 79, 249"] {
+    background: rgba(0, 212, 255, 0.15) !important;
+    border: 1px solid rgba(0, 212, 255, 0.4) !important;
+    color: #00d4ff !important;
+    box-shadow: 0 0 12px rgba(0, 212, 255, 0.2) !important;
+  }
+
+  /* Add Drone button */
+  button[style*="background"][style*="#00d4ff"] {
+    background: rgba(0, 212, 255, 0.15) !important;
+    backdrop-filter: blur(8px) !important;
+    border: 1px solid rgba(0, 212, 255, 0.3) !important;
+    color: #00d4ff !important;
+    box-shadow: 0 0 8px rgba(0, 212, 255, 0.15) !important;
+    font-size: 13px !important;
+    padding: 10px 16px !important;
+  }
+
+  button[style*="background"][style*="#00d4ff"]:hover,
+  button[style*="background"][style*="#00d4ff"]:active {
+    background: rgba(0, 212, 255, 0.2) !important;
+    border-color: rgba(0, 212, 255, 0.5) !important;
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.3) !important;
+  }
+
+  /* Edit buttons - Glass */
+  button[style*="background"][style*="rgba(0, 123, 255"] {
+    background: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(8px) !important;
+    border: 1px solid rgba(0, 212, 255, 0.3) !important;
+    color: #00d4ff !important;
+    box-shadow: 0 0 8px rgba(0, 212, 255, 0.15) !important;
+    font-size: 12px !important;
+  }
+
+  button[style*="background"][style*="rgba(0, 123, 255"]:hover,
+  button[style*="background"][style*="rgba(0, 123, 255"]:active {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(0, 212, 255, 0.5) !important;
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.3) !important;
+  }
+
+  /* Delete buttons - Magenta Glass */
+  button[style*="background"][style*="rgb(239, 68, 68)"] {
+    background: rgba(255, 0, 255, 0.1) !important;
+    backdrop-filter: blur(8px) !important;
+    border: 1px solid rgba(255, 0, 255, 0.3) !important;
+    color: #ff00ff !important;
+    box-shadow: 0 0 8px rgba(255, 0, 255, 0.2) !important;
+  }
+
+  button[style*="background"][style*="rgb(239, 68, 68)"]:hover,
+  button[style*="background"][style*="rgb(239, 68, 68)"]:active {
+    background: rgba(255, 0, 255, 0.15) !important;
+    border-color: rgba(255, 0, 255, 0.5) !important;
+    box-shadow: 0 0 12px rgba(255, 0, 255, 0.3) !important;
+  }
+
+  /* Form inputs - Transparent Glass */
+  input[style*="background"],
+  select[style*="background"] {
+    background: rgba(255, 255, 255, 0.03) !important;
+    backdrop-filter: blur(8px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+    font-size: 14px !important;
+  }
+
+  input[style*="background"]:focus,
+  select[style*="background"]:focus {
+    border-color: rgba(0, 212, 255, 0.4) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    box-shadow: 0 0 12px rgba(0, 212, 255, 0.2) !important;
+  }
+
+  /* Specs rows - Subtle borders */
+  [style*="borderBottom"][style*="#374151"] {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  }
+
+  /* Text colors */
+  p,
+  span {
+    color: #9ca3af !important;
+  }
+
+  strong {
+    color: #00d4ff !important;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  [style*="maxWidth"][style*="1200px"] {
+    padding: 12px !important;
+  }
+
+  /* Filter section - Stack vertically */
+  [style*="display"][style*="flex"][style*="flexWrap"] {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+
+  button {
+    width: 100% !important;
+    font-size: 12px !important;
+  }
+
+  /* Card padding */
+  [style*="backgroundColor"][style*="rgba"] {
+    padding: 12px !important;
+  }
+
+  /* Reduce font sizes */
+  h2 {
+    font-size: 18px !important;
+  }
+
+  [style*="fontSize"][style*="20px"] {
+    font-size: 16px !important;
+  }
+}
