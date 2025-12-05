@@ -20,7 +20,20 @@ connectDB();
 require('./services/mqttService');
 
 // Middleware
-app.use(cors());
+// app.use(cors());
+
+app.use(cors({
+  origin: [
+    'https://drone-arena-frontend.vercel.app',
+    'https://drone-arena-frontend-ashus-projects-831330bf.vercel.app',
+    'http://localhost:3000',
+    'http://10.93.182.196:3000'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
