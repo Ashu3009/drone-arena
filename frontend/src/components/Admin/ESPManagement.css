@@ -318,14 +318,14 @@
 }
 
 /* ==========================================
-   MOBILE CYBERPUNK THEME
+   MOBILE GLASSMORPHISM THEME
    ========================================== */
 @media (max-width: 767px) {
   .esp-management {
     padding: 16px;
   }
 
-  /* Header - Neon */
+  /* Header - Glass */
   .esp-header {
     flex-direction: column;
     gap: 16px;
@@ -334,10 +334,10 @@
 
   .esp-header h1 {
     font-size: 26px;
-    background: linear-gradient(135deg, #00d4ff 0%, #ff0080 50%, #b026ff 100%);
+    background: linear-gradient(135deg, #00d4ff 0%, #ff00ff 50%, #8b5cf6 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 12px rgba(0, 212, 255, 0.6));
+    filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.25));
   }
 
   .esp-header-actions {
@@ -349,35 +349,36 @@
     flex: 1;
   }
 
-  /* Stats Cards - Cyberpunk */
+  /* Stats Cards - Glassmorphism */
   .esp-stats {
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
   }
 
   .esp-stat-card {
-    background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(176, 38, 255, 0.15));
-    border: 1px solid rgba(0, 212, 255, 0.4);
-    box-shadow: 0 0 18px rgba(0, 212, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
     padding: 18px;
   }
 
   .esp-stat-card:hover,
   .esp-stat-card:active {
-    border-color: rgba(0, 212, 255, 0.6);
-    box-shadow: 0 0 30px rgba(0, 212, 255, 0.35);
+    border-color: rgba(0, 212, 255, 0.2);
+    box-shadow: 0 4px 20px rgba(0, 212, 255, 0.1);
   }
 
   .esp-stat-value {
     font-size: 30px;
-    background: linear-gradient(135deg, #00d4ff 0%, #ff0080 100%);
+    background: linear-gradient(135deg, #00d4ff 0%, #ff00ff 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
   .esp-stat-label {
     font-size: 12px;
-    color: #94a3b8;
+    color: #9ca3af;
   }
 
   /* ESP Grid - Responsive */
@@ -387,35 +388,38 @@
   }
 
   .esp-card {
-    background: rgba(10, 10, 26, 0.5);
-    border: 1px solid rgba(0, 212, 255, 0.3);
-    box-shadow: 0 0 15px rgba(0, 212, 255, 0.15);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
     padding: 16px;
   }
 
   .esp-card:hover,
   .esp-card:active {
-    border-color: rgba(0, 212, 255, 0.6);
-    box-shadow: 0 0 25px rgba(0, 212, 255, 0.3);
+    border-color: rgba(0, 212, 255, 0.2);
+    box-shadow: 0 4px 20px rgba(0, 212, 255, 0.1);
   }
 
   .esp-card-header {
-    border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   }
 
   .esp-status-indicator {
-    box-shadow: 0 0 10px currentColor;
+    box-shadow: 0 0 6px currentColor;
   }
 
   .esp-drone-id {
     font-size: 20px;
     color: #00d4ff;
-    text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+    text-shadow: none;
   }
 
   .esp-role-badge {
-    background: linear-gradient(135deg, #00d4ff, #0099cc);
-    box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+    background: rgba(0, 212, 255, 0.15);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    color: #00d4ff;
+    box-shadow: 0 0 6px rgba(0, 212, 255, 0.15);
     font-size: 11px;
   }
 
@@ -424,106 +428,126 @@
   }
 
   .esp-label {
-    color: #94a3b8;
+    color: #9ca3af;
   }
 
   .esp-value {
-    color: #cbd5e1;
+    color: #ffffff;
   }
 
-  /* Buttons - Neon Style */
+  /* Buttons - Glass Style */
   .esp-btn-primary {
-    background: linear-gradient(135deg, #00d4ff, #0099cc);
-    box-shadow: 0 0 12px rgba(0, 212, 255, 0.4);
+    background: rgba(0, 212, 255, 0.1);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    color: #00d4ff;
+    box-shadow: 0 0 8px rgba(0, 212, 255, 0.15);
   }
 
   .esp-btn-primary:hover,
   .esp-btn-primary:active {
-    background: linear-gradient(135deg, #0099cc, #00d4ff);
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+    background: rgba(0, 212, 255, 0.15);
+    border-color: rgba(0, 212, 255, 0.5);
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
   }
 
   .esp-btn-edit {
-    background: linear-gradient(135deg, #00d4ff, #0099cc);
-    box-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
+    background: rgba(0, 212, 255, 0.1);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    color: #00d4ff;
+    box-shadow: 0 0 8px rgba(0, 212, 255, 0.15);
   }
 
   .esp-btn-edit:hover,
   .esp-btn-edit:active {
-    background: linear-gradient(135deg, #0099cc, #00d4ff);
-    box-shadow: 0 0 18px rgba(0, 212, 255, 0.6);
+    background: rgba(0, 212, 255, 0.15);
+    border-color: rgba(0, 212, 255, 0.5);
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
   }
 
   .esp-btn-delete {
-    background: linear-gradient(135deg, #ff0080, #ff00ff);
-    box-shadow: 0 0 10px rgba(255, 0, 128, 0.4);
+    background: rgba(255, 0, 255, 0.1);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 0, 255, 0.3);
+    color: #ff00ff;
+    box-shadow: 0 0 8px rgba(255, 0, 255, 0.2);
   }
 
   .esp-btn-delete:hover,
   .esp-btn-delete:active {
-    background: linear-gradient(135deg, #ff00ff, #ff0080);
-    box-shadow: 0 0 18px rgba(255, 0, 128, 0.6);
+    background: rgba(255, 0, 255, 0.15);
+    border-color: rgba(255, 0, 255, 0.5);
+    box-shadow: 0 0 12px rgba(255, 0, 255, 0.3);
   }
 
   .esp-btn-secondary {
-    background: linear-gradient(135deg, #64748b, #475569);
-    box-shadow: 0 0 10px rgba(100, 116, 139, 0.4);
+    background: rgba(100, 116, 139, 0.15);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(100, 116, 139, 0.3);
+    color: #94a3b8;
+    box-shadow: 0 0 8px rgba(100, 116, 139, 0.2);
   }
 
   .esp-btn-secondary:hover,
   .esp-btn-secondary:active {
-    background: linear-gradient(135deg, #475569, #64748b);
-    box-shadow: 0 0 18px rgba(100, 116, 139, 0.6);
+    background: rgba(100, 116, 139, 0.2);
+    border-color: rgba(100, 116, 139, 0.5);
+    box-shadow: 0 0 12px rgba(100, 116, 139, 0.3);
   }
 
-  /* Empty State - Cyberpunk */
+  /* Empty State - Glass */
   .esp-empty {
-    background: linear-gradient(135deg, rgba(10, 10, 26, 0.5), rgba(15, 10, 30, 0.5));
-    border: 2px dashed rgba(0, 212, 255, 0.4);
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(8px);
+    border: 2px dashed rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   }
 
   .esp-empty p {
-    color: #94a3b8;
+    color: #9ca3af;
   }
 
-  /* Modal - Cyberpunk */
+  /* Modal - Glassmorphism */
   .esp-modal-overlay {
-    background: rgba(0, 0, 0, 0.9);
+    background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(8px);
   }
 
   .esp-modal {
-    background: rgba(10, 10, 26, 0.95);
-    border: 2px solid rgba(0, 212, 255, 0.5);
-    box-shadow: 0 0 50px rgba(0, 212, 255, 0.4);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
     width: 95%;
     padding: 20px;
   }
 
   .esp-modal h2 {
     color: #00d4ff;
-    text-shadow: 0 0 12px rgba(0, 212, 255, 0.6);
+    text-shadow: none;
     font-size: 20px;
   }
 
   .esp-form-group label {
-    color: #94a3b8;
+    color: #9ca3af;
     font-size: 13px;
   }
 
   .esp-form-group input,
   .esp-form-group select {
-    background: rgba(10, 10, 26, 0.6);
-    border: 1px solid rgba(0, 212, 255, 0.3);
-    color: #e2e8f0;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
     font-size: 13px;
   }
 
   .esp-form-group input:focus,
   .esp-form-group select:focus {
-    border-color: rgba(0, 212, 255, 0.7);
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+    border-color: rgba(0, 212, 255, 0.4);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 12px rgba(0, 212, 255, 0.2);
   }
 
   .esp-modal-actions {

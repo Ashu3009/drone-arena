@@ -1,5 +1,5 @@
 /* ==========================================
-   MOBILE CYBERPUNK THEME FOR DRONE MANAGEMENT
+   MOBILE GLASSMORPHISM THEME FOR DRONE MANAGEMENT
    ========================================== */
 @media (max-width: 767px) {
   /* Container padding */
@@ -7,12 +7,12 @@
     padding: 16px !important;
   }
 
-  /* Headers - Neon gradient */
+  /* Headers - Soft gradient */
   h2[style*="linear-gradient"] {
-    background: linear-gradient(135deg, #00d4ff 0%, #ff0080 50%, #b026ff 100%) !important;
+    background: linear-gradient(135deg, #00d4ff 0%, #ff00ff 50%, #8b5cf6 100%) !important;
     -webkit-background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
-    filter: drop-shadow(0 0 12px rgba(0, 212, 255, 0.6)) !important;
+    filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.25)) !important;
     font-size: 20px !important;
   }
 
@@ -22,116 +22,132 @@
     gap: 16px !important;
   }
 
-  /* Drone Cards - Cyberpunk theme */
+  /* Drone Cards - Glassmorphism */
   [style*="backgroundColor"][style*="rgba(0, 13, 41"] {
-    background: rgba(10, 10, 26, 0.5) !important;
-    border: 1px solid rgba(0, 212, 255, 0.3) !important;
-    box-shadow: 0 0 15px rgba(0, 212, 255, 0.15) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
   }
 
-  /* Drone ID - Neon glow */
+  /* Drone ID - Soft glow */
   [style*="fontSize"][style*="20px"][style*="fontWeight"][style*="bold"] {
     color: #00d4ff !important;
-    text-shadow: 0 0 10px rgba(0, 212, 255, 0.5) !important;
+    text-shadow: 0 0 6px rgba(0, 212, 255, 0.25) !important;
     font-size: 18px !important;
   }
 
-  /* Role badges - Gradient */
+  /* Role badges - Soft gradient */
   [style*="backgroundColor"][style*="#"] span {
-    background: linear-gradient(135deg, #00d4ff, #0099cc) !important;
-    box-shadow: 0 0 10px rgba(0, 212, 255, 0.5) !important;
+    background: rgba(0, 212, 255, 0.15) !important;
+    border: 1px solid rgba(0, 212, 255, 0.3) !important;
+    box-shadow: 0 0 6px rgba(0, 212, 255, 0.15) !important;
   }
 
-  /* Filter buttons - Cyberpunk */
+  /* Filter buttons - Glass */
   button[style*="padding"][style*="10px 20px"] {
-    background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(176, 38, 255, 0.15)) !important;
-    border: 1px solid rgba(0, 212, 255, 0.4) !important;
-    color: #cbd5e1 !important;
-    box-shadow: 0 0 8px rgba(0, 212, 255, 0.1) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(8px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #9ca3af !important;
+    box-shadow: none !important;
     font-size: 12px !important;
     padding: 8px 12px !important;
   }
 
   button[style*="padding"][style*="10px 20px"]:hover,
   button[style*="padding"][style*="10px 20px"]:active {
-    background: linear-gradient(135deg, rgba(0, 212, 255, 0.3), rgba(176, 38, 255, 0.2)) !important;
-    border-color: rgba(0, 212, 255, 0.6) !important;
-    box-shadow: 0 0 15px rgba(0, 212, 255, 0.3) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(0, 212, 255, 0.3) !important;
+    color: #00d4ff !important;
+    box-shadow: 0 0 8px rgba(0, 212, 255, 0.15) !important;
   }
 
   /* Active filter button */
   button[style*="background"][style*="linear-gradient(135deg, rgba(0, 79, 249"] {
-    background: linear-gradient(135deg, rgba(0, 212, 255, 0.4), rgba(255, 0, 128, 0.3)) !important;
-    border: 1px solid rgba(0, 212, 255, 0.7) !important;
+    background: rgba(0, 212, 255, 0.15) !important;
+    border: 1px solid rgba(0, 212, 255, 0.4) !important;
     color: #00d4ff !important;
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.4) !important;
+    box-shadow: 0 0 12px rgba(0, 212, 255, 0.2) !important;
   }
 
   /* Add Drone button */
   button[style*="background"][style*="#00d4ff"] {
-    background: linear-gradient(135deg, #00d4ff, #0099cc) !important;
-    box-shadow: 0 0 15px rgba(0, 212, 255, 0.4) !important;
+    background: rgba(0, 212, 255, 0.15) !important;
+    backdrop-filter: blur(8px) !important;
+    border: 1px solid rgba(0, 212, 255, 0.3) !important;
+    color: #00d4ff !important;
+    box-shadow: 0 0 8px rgba(0, 212, 255, 0.15) !important;
     font-size: 13px !important;
     padding: 10px 16px !important;
   }
 
   button[style*="background"][style*="#00d4ff"]:hover,
   button[style*="background"][style*="#00d4ff"]:active {
-    background: linear-gradient(135deg, #0099cc, #00d4ff) !important;
-    box-shadow: 0 0 25px rgba(0, 212, 255, 0.6) !important;
+    background: rgba(0, 212, 255, 0.2) !important;
+    border-color: rgba(0, 212, 255, 0.5) !important;
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.3) !important;
   }
 
-  /* Edit buttons */
+  /* Edit buttons - Glass */
   button[style*="background"][style*="rgba(0, 123, 255"] {
-    background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(176, 38, 255, 0.15)) !important;
-    border: 1px solid rgba(0, 212, 255, 0.6) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(8px) !important;
+    border: 1px solid rgba(0, 212, 255, 0.3) !important;
     color: #00d4ff !important;
-    box-shadow: 0 0 12px rgba(0, 212, 255, 0.3) !important;
+    box-shadow: 0 0 8px rgba(0, 212, 255, 0.15) !important;
     font-size: 12px !important;
   }
 
   button[style*="background"][style*="rgba(0, 123, 255"]:hover,
   button[style*="background"][style*="rgba(0, 123, 255"]:active {
-    background: linear-gradient(135deg, rgba(0, 212, 255, 0.3), rgba(255, 0, 128, 0.25)) !important;
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.5) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(0, 212, 255, 0.5) !important;
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.3) !important;
   }
 
-  /* Delete buttons */
+  /* Delete buttons - Magenta Glass */
   button[style*="background"][style*="rgb(239, 68, 68)"] {
-    background: linear-gradient(135deg, #ff0080, #ff00ff) !important;
-    box-shadow: 0 0 12px rgba(255, 0, 128, 0.4) !important;
+    background: rgba(255, 0, 255, 0.1) !important;
+    backdrop-filter: blur(8px) !important;
+    border: 1px solid rgba(255, 0, 255, 0.3) !important;
+    color: #ff00ff !important;
+    box-shadow: 0 0 8px rgba(255, 0, 255, 0.2) !important;
   }
 
   button[style*="background"][style*="rgb(239, 68, 68)"]:hover,
   button[style*="background"][style*="rgb(239, 68, 68)"]:active {
-    background: linear-gradient(135deg, #ff00ff, #ff0080) !important;
-    box-shadow: 0 0 20px rgba(255, 0, 128, 0.6) !important;
+    background: rgba(255, 0, 255, 0.15) !important;
+    border-color: rgba(255, 0, 255, 0.5) !important;
+    box-shadow: 0 0 12px rgba(255, 0, 255, 0.3) !important;
   }
 
-  /* Form inputs */
+  /* Form inputs - Transparent Glass */
   input[style*="background"],
   select[style*="background"] {
-    background: rgba(10, 10, 26, 0.6) !important;
-    border: 1px solid rgba(0, 212, 255, 0.3) !important;
-    color: #e2e8f0 !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    backdrop-filter: blur(8px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
     font-size: 14px !important;
   }
 
   input[style*="background"]:focus,
   select[style*="background"]:focus {
-    border-color: rgba(0, 212, 255, 0.7) !important;
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.3) !important;
+    border-color: rgba(0, 212, 255, 0.4) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    box-shadow: 0 0 12px rgba(0, 212, 255, 0.2) !important;
   }
 
-  /* Specs rows - Neon borders */
+  /* Specs rows - Subtle borders */
   [style*="borderBottom"][style*="#374151"] {
-    border-bottom: 1px solid rgba(0, 212, 255, 0.2) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
   }
 
   /* Text colors */
   p,
   span {
-    color: #cbd5e1 !important;
+    color: #9ca3af !important;
   }
 
   strong {

@@ -399,45 +399,47 @@
 }
 
 /* ==========================================
-   MOBILE CYBERPUNK THEME
+   MOBILE GLASSMORPHISM THEME
    ========================================== */
 @media (max-width: 767px) {
   .all-tournaments-manager {
     padding: 16px;
   }
 
-  /* Header - Neon Gradient */
+  /* Header - Glass Effect */
   .tournaments-header {
-    background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(176, 38, 255, 0.15));
-    border: 1px solid rgba(0, 212, 255, 0.5);
-    box-shadow: 0 0 25px rgba(0, 212, 255, 0.3);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
     padding: 20px;
   }
 
   .tournaments-header h2 {
     font-size: 1.5rem;
-    background: linear-gradient(135deg, #00d4ff 0%, #ff0080 50%, #b026ff 100%);
+    background: linear-gradient(135deg, #00d4ff 0%, #ff00ff 50%, #8b5cf6 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 12px rgba(0, 212, 255, 0.6));
+    filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.25));
   }
 
   .tournaments-header p {
     font-size: 0.95rem;
-    color: #cbd5e1;
+    color: #9ca3af;
   }
 
-  /* Filters - Cyberpunk */
+  /* Filters - Glassmorphism */
   .tournaments-filters {
-    background: rgba(10, 10, 26, 0.5);
-    border: 1px solid rgba(0, 212, 255, 0.3);
-    box-shadow: 0 0 15px rgba(0, 212, 255, 0.15);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
     padding: 16px;
   }
 
   .tournaments-filters h3 {
     color: #00d4ff;
-    text-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
+    text-shadow: none;
   }
 
   .filter-row {
@@ -450,41 +452,48 @@
   }
 
   .filter-group label {
-    color: #94a3b8;
+    color: #9ca3af;
     font-size: 0.85rem;
   }
 
   .filter-group select,
   .filter-group input {
-    background: rgba(10, 10, 26, 0.6);
-    border: 1px solid rgba(0, 212, 255, 0.3);
-    color: #e2e8f0;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
     font-size: 0.9rem;
   }
 
   .filter-group select:focus,
   .filter-group input:focus {
-    border-color: rgba(0, 212, 255, 0.7);
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+    border-color: rgba(0, 212, 255, 0.4);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 12px rgba(0, 212, 255, 0.2);
   }
 
   .clear-filters-btn {
-    background: linear-gradient(135deg, #ff0080, #ff00ff);
-    box-shadow: 0 0 12px rgba(255, 0, 128, 0.4);
+    background: rgba(255, 0, 255, 0.1);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 0, 255, 0.3);
+    color: #ff00ff;
+    box-shadow: 0 0 8px rgba(255, 0, 255, 0.2);
     font-size: 0.9rem;
   }
 
   .clear-filters-btn:hover,
   .clear-filters-btn:active {
-    background: linear-gradient(135deg, #ff00ff, #ff0080);
-    box-shadow: 0 0 20px rgba(255, 0, 128, 0.6);
+    background: rgba(255, 0, 255, 0.15);
+    border-color: rgba(255, 0, 255, 0.5);
+    box-shadow: 0 0 12px rgba(255, 0, 255, 0.3);
   }
 
-  /* Table Container - Neon */
+  /* Table Container - Glass */
   .tournaments-table-container {
-    background: rgba(10, 10, 26, 0.5);
-    border: 1px solid rgba(0, 212, 255, 0.3);
-    box-shadow: 0 0 15px rgba(0, 212, 255, 0.15);
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   }
 
   .tournaments-table {
@@ -492,20 +501,20 @@
   }
 
   .tournaments-table thead {
-    background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(176, 38, 255, 0.15));
+    background: rgba(0, 212, 255, 0.08);
   }
 
   .tournaments-table th {
     color: #00d4ff;
-    border-bottom: 2px solid rgba(0, 212, 255, 0.5);
-    text-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
+    border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+    text-shadow: none;
     padding: 10px 8px;
     font-size: 0.75rem;
   }
 
   .tournaments-table td {
-    border-bottom: 1px solid rgba(0, 212, 255, 0.15);
-    color: #cbd5e1;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: #9ca3af;
     padding: 10px 8px;
     font-size: 0.8rem;
     word-wrap: break-word;
@@ -516,7 +525,7 @@
 
   .tournaments-table tbody tr:hover,
   .tournaments-table tbody tr:active {
-    background: rgba(0, 212, 255, 0.08);
+    background: rgba(0, 212, 255, 0.03);
   }
 
   .tournament-name {
@@ -534,8 +543,8 @@
   }
 
   .banner-placeholder {
-    background: rgba(10, 10, 26, 0.6);
-    border: 1px solid rgba(0, 212, 255, 0.4);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   /* Extra small screens - prevent overflow */
@@ -562,24 +571,31 @@
     }
   }
 
-  /* Buttons - Neon Style */
+  /* Buttons - Glass Style */
   .delete-btn {
-    background: linear-gradient(135deg, #ff0080, #ff00ff);
-    box-shadow: 0 0 10px rgba(255, 0, 128, 0.4);
+    background: rgba(255, 0, 255, 0.1);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 0, 255, 0.3);
+    color: #ff00ff;
+    box-shadow: 0 0 8px rgba(255, 0, 255, 0.2);
     padding: 6px 12px;
     font-size: 0.85rem;
   }
 
   .delete-btn:hover,
   .delete-btn:active {
-    background: linear-gradient(135deg, #ff00ff, #ff0080);
-    box-shadow: 0 0 18px rgba(255, 0, 128, 0.6);
+    background: rgba(255, 0, 255, 0.15);
+    border-color: rgba(255, 0, 255, 0.5);
+    box-shadow: 0 0 12px rgba(255, 0, 255, 0.3);
   }
 
   .view-public-btn,
   .complete-btn {
-    background: linear-gradient(135deg, #00d4ff, #0099cc);
-    box-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
+    background: rgba(0, 212, 255, 0.1);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    color: #00d4ff;
+    box-shadow: 0 0 8px rgba(0, 212, 255, 0.15);
     padding: 6px 12px;
     font-size: 0.85rem;
   }
@@ -588,54 +604,64 @@
   .view-public-btn:active,
   .complete-btn:hover,
   .complete-btn:active {
-    background: linear-gradient(135deg, #0099cc, #00d4ff);
-    box-shadow: 0 0 18px rgba(0, 212, 255, 0.6);
+    background: rgba(0, 212, 255, 0.15);
+    border-color: rgba(0, 212, 255, 0.5);
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
   }
 
-  /* Modal - Cyberpunk */
+  /* Modal - Glassmorphism */
   .modal-overlay {
-    background: rgba(0, 0, 0, 0.9);
+    background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(8px);
   }
 
   .modal-content {
-    background: rgba(10, 10, 26, 0.95);
-    border: 2px solid rgba(0, 212, 255, 0.6);
-    box-shadow: 0 0 50px rgba(0, 212, 255, 0.5);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
     padding: 20px;
   }
 
   .modal-content h3 {
-    color: #ff0080;
-    text-shadow: 0 0 12px rgba(255, 0, 128, 0.6);
+    color: #ff00ff;
+    text-shadow: 0 0 8px rgba(255, 0, 255, 0.3);
   }
 
   .tournament-name-highlight {
-    background: rgba(0, 212, 255, 0.2);
-    border: 1px solid rgba(0, 212, 255, 0.5);
+    background: rgba(0, 212, 255, 0.1);
+    border: 1px solid rgba(0, 212, 255, 0.3);
     color: #00d4ff;
-    text-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
+    text-shadow: none;
   }
 
   .cancel-btn {
-    background: linear-gradient(135deg, #64748b, #475569);
-    box-shadow: 0 0 10px rgba(100, 116, 139, 0.4);
+    background: rgba(100, 116, 139, 0.15);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(100, 116, 139, 0.3);
+    color: #94a3b8;
+    box-shadow: 0 0 8px rgba(100, 116, 139, 0.2);
   }
 
   .cancel-btn:hover,
   .cancel-btn:active {
-    background: linear-gradient(135deg, #475569, #64748b);
-    box-shadow: 0 0 18px rgba(100, 116, 139, 0.6);
+    background: rgba(100, 116, 139, 0.2);
+    border-color: rgba(100, 116, 139, 0.5);
+    box-shadow: 0 0 12px rgba(100, 116, 139, 0.3);
   }
 
   .confirm-delete-btn {
-    background: linear-gradient(135deg, #ff0080, #ff00ff);
-    box-shadow: 0 0 10px rgba(255, 0, 128, 0.4);
+    background: rgba(255, 0, 255, 0.1);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 0, 255, 0.3);
+    color: #ff00ff;
+    box-shadow: 0 0 8px rgba(255, 0, 255, 0.2);
   }
 
   .confirm-delete-btn:hover:not(:disabled),
   .confirm-delete-btn:active:not(:disabled) {
-    background: linear-gradient(135deg, #ff00ff, #ff0080);
-    box-shadow: 0 0 18px rgba(255, 0, 128, 0.6);
+    background: rgba(255, 0, 255, 0.15);
+    border-color: rgba(255, 0, 255, 0.5);
+    box-shadow: 0 0 12px rgba(255, 0, 255, 0.3);
   }
 }
