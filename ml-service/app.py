@@ -122,7 +122,7 @@ def analyze_drone(drone_data):
     if variance_data['roll_variance'] > 0.3:
         issues.append('Roll oscillation')
     
-    # Detect spikes
+    # Detect spikes 
     x_spikes = detect_spikes(logs, 'x')
     y_spikes = detect_spikes(logs, 'y')
     z_spikes = detect_spikes(logs, 'z')

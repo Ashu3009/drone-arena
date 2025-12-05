@@ -248,7 +248,7 @@ const generateDefenderSummary = (metrics) => {
     ];
     return pickRandom(variants);
   }
-
+ 
   // Poor defensive performance
   const variants = [
     `Struggled defensively with ${performanceScore}/100 score. Positioning (${stability}%) and timing both need major improvement.`,
