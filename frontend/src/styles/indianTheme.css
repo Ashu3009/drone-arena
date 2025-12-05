@@ -52,11 +52,11 @@
   position: relative;
   background: linear-gradient(180deg,
     var(--india-saffron) 0%,
-    var(--india-saffron) 30%,
-    var(--india-white) 30%,
-    var(--india-white) 70%,
-    var(--india-green) 70%,
-    var(--india-green) 100%) !important;
+    var(--india-saffron) 0%,
+    var(--india-white) 0%,
+    var(--india-white) 0%,
+    var(--india-green) 0%,
+    var(--india-green) 0%) !important;
   padding: 48px 20px 32px;
   text-align: center;
   overflow: hidden;
