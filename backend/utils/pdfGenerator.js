@@ -433,11 +433,12 @@ const getPerformanceRating = (score) => {
 const getKeyHighlights = (report, role) => {
   const highlights = [];
   const ml = report.mlAnalysis || {};
+  const perfScore = report.performance?.overallScore || report.performanceScore || 0;
 
   // Performance-based highlights
-  if (report.performanceScore >= 85) {
-    highlights.push(`Outstanding ${role} performance with ${report.performanceScore}/100 score`);
-  } else if (report.performanceScore >= 70) {
+  if (perfScore >= 85) {
+    highlights.push(`Outstanding ${role} performance with ${perfScore}/100 score`);
+  } else if (perfScore >= 70) {
     highlights.push(`Solid ${role} performance with room for tactical improvements`);
   }
 
@@ -509,6 +510,7 @@ const getScoreColor = (score) => {
 const getStrengths = (report, role) => {
   const strengths = [];
   const ml = report.mlAnalysis || {};
+  const perfScore = report.performance?.overallScore || report.performanceScore || 0;
 
   switch (role) {
     case 'Forward':
@@ -541,8 +543,8 @@ const getStrengths = (report, role) => {
   }
 
   // General strengths for all roles
-  if (report.performanceScore >= 80) strengths.push('Consistently high performance throughout the round');
-  if (report.performanceScore >= 90) strengths.push('Elite-level execution and decision making');
+  if (perfScore >= 80) strengths.push('Consistently high performance throughout the round');
+  if (perfScore >= 90) strengths.push('Elite-level execution and decision making');
   if (ml.teamwork >= 75) strengths.push('Strong collaborative play with teammates');
   if (report.maxSpeed >= 5.5) strengths.push(`Impressive top speed of ${report.maxSpeed.toFixed(1)} m/s demonstrates excellent drone control`);
   if (report.positionAccuracy >= 85) strengths.push('Exceptional spatial awareness and positioning precision');
@@ -563,6 +565,7 @@ const getStrengths = (report, role) => {
 const getTrainingFocus = (report, role) => {
   const tips = [];
   const ml = report.mlAnalysis || {};
+  const perfScore = report.performance?.overallScore || report.performanceScore || 0;
 
   switch (role) {
     case 'Forward':
@@ -596,7 +599,7 @@ const getTrainingFocus = (report, role) => {
 
   // General training tips for all roles
   if (report.batteryUsage?.consumed > 25) tips.push('Practice battery conservation: reduce unnecessary movements and hover time');
-  if (report.performanceScore < 70) tips.push('Focus on consistent performance across all metrics with daily 30-min practice sessions');
+  if (perfScore < 70) tips.push('Focus on consistent performance across all metrics with daily 30-min practice sessions');
   if (report.averageSpeed < 3.5) tips.push('Speed training: practice acceleration drills and quick directional changes');
   if (ml.teamwork < 70) tips.push('Team coordination drills: practice synchronized movements with teammates for 20 mins daily');
   if (report.totalDistance < 80) tips.push('Endurance training: gradually increase flight duration to build stamina');
@@ -617,6 +620,7 @@ const getTrainingFocus = (report, role) => {
 const getRoleRecommendations = (report, role) => {
   const recs = [];
   const ml = report.mlAnalysis || {};
+  const perfScore = report.performance?.overallScore || report.performanceScore || 0;
 
   switch (role) {
     case 'Forward':
@@ -653,7 +657,7 @@ const getRoleRecommendations = (report, role) => {
   }
 
   // Performance-based recommendations
-  if (report.performanceScore < 65) {
+  if (perfScore < 65) {
     recs.push('Schedule extra practice sessions focusing on fundamental skills and role responsibilities');
   }
   if (report.batteryUsage?.consumed > 30) {

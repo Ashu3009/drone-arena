@@ -589,7 +589,8 @@ const analyzeRound = async (req, res) => {
             metrics: analysis.metrics,
             insights: analysis.insights,
             grade: analysis.grade,
-            status: 'completed'
+            status: analysis.status || 'completed',
+            performanceScore: undefined
           });
           await savedReport.save();
         } else {
@@ -606,7 +607,7 @@ const analyzeRound = async (req, res) => {
             metrics: analysis.metrics,
             insights: analysis.insights,
             grade: analysis.grade,
-            status: 'completed'
+            status: analysis.status || 'completed'
           });
         }
 
