@@ -154,7 +154,7 @@ const styles = {
     transition: 'border-color 0.2s'
   },
   button: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#00d4ff',
     color: 'white',
     border: 'none',
     borderRadius: '6px',
@@ -174,7 +174,7 @@ const styles = {
     textAlign: 'center'
   },
   link: {
-    color: '#4CAF50',
+    color: '#00d4ff',
     textDecoration: 'none',
     fontSize: '14px'
   }

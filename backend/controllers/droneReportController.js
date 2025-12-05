@@ -365,7 +365,8 @@ const downloadReportPDF = async (req, res) => {
         path: 'match',
         populate: [
           { path: 'teamA', select: 'name color' },
-          { path: 'teamB', select: 'name color' }
+          { path: 'teamB', select: 'name color' },
+          { path: 'winner', select: 'name color' }
         ]
       });
 
@@ -374,7 +375,7 @@ const downloadReportPDF = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Report not found' });
     }
 
-    console.log(`   ✅ Report found: ${report.pilotName} (${report.droneId})`);
+    console.log(`   ✅ Report found: ${report.pilotName || 'Unknown'} (${report.droneId})`);
     console.log(`   📊 Match: ${report.match?.matchNumber || 'N/A'}`);
     console.log(`   🎯 Round: ${report.roundNumber}`);
 
@@ -383,11 +384,12 @@ const downloadReportPDF = async (req, res) => {
     const pdfDoc = generateReportPDF(report, report.match);
 
     // Set response headers for PDF download
+    const fileName = report.pilotName
+      ? `Report_${report.pilotName.replace(/\s+/g, '_')}_Round${report.roundNumber}_${Date.now()}.pdf`
+      : `Report_${report.droneId}_Round${report.roundNumber}_${Date.now()}.pdf`;
+
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename=Report_${report.pilotName.replace(/\s+/g, '_')}_Round${report.roundNumber}_${Date.now()}.pdf`
-    );
+    res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
 
     // Handle PDF generation errors
     pdfDoc.on('error', (err) => {

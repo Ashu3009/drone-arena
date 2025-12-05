@@ -31,18 +31,18 @@ const droneReportSchema = new mongoose.Schema({
   },
   pilotId: {
     type: String,
-    required: true,
+    required: false,
     trim: true
   },
   pilotName: {
     type: String,
-    required: true,
+    required: false,
     trim: true
   },
   role: {
     type: String,
     required: true,
-    enum: ['Forward', 'Striker', 'Defender', 'Central'],
+    enum: ['Forward', 'Striker', 'Defender', 'Keeper'],
     trim: true
   },
 
@@ -93,6 +93,36 @@ const droneReportSchema = new mongoose.Schema({
   performanceScore: {
     type: Number, // 0-100
     default: 0
+  },
+
+  // New analysis structure (from analysisController)
+  performance: {
+    overallScore: { type: Number, default: 0 },
+    aggression: { type: Number, default: 0 },
+    consistency: { type: Number, default: 0 },
+    effectiveness: { type: Number, default: 0 }
+  },
+
+  metrics: {
+    avgIntensity: { type: Number, default: 0 },
+    peakIntensity: { type: Number, default: 0 },
+    activeTimePercentage: { type: Number, default: 0 },
+    burstCount: { type: Number, default: 0 },
+    idlePercentage: { type: Number, default: 0 },
+    directionChanges: { type: Number, default: 0 },
+    totalDistanceCalc: { type: String, default: '0m' },
+    dataPoints: { type: Number, default: 0 }
+  },
+
+  insights: {
+    insights: [String],
+    recommendations: [String]
+  },
+
+  grade: { type: String, default: 'N/A' },
+  teamId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Team'
   },
 
   // Status

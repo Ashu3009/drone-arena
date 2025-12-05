@@ -22,7 +22,7 @@ const roundSchema = new mongoose.Schema({
     },
     role: {
       type: String,
-      enum: ['Forward', 'Striker', 'Defender', 'Central'],
+      enum: ['Forward', 'Striker', 'Defender', 'Keeper'],
       required: true
     },
     pilotId: {

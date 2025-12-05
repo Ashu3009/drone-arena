@@ -7,6 +7,7 @@ import {
   deleteDrone,
   getRoleSpecs
 } from '../../services/api';
+import './DroneManagement.css';
 
 const DroneManagement = () => {
   const [drones, setDrones] = useState([]);
@@ -163,9 +164,9 @@ const DroneManagement = () => {
 
   const getStatusColor = (status) => {
     const colors = {
-      Active: '#4CAF50',
+      Active: '#00d4ff',
       Inactive: '#9E9E9E',
-      Maintenance: '#FF9800'
+      Maintenance: '#ffab00'
     };
     return colors[status] || '#9E9E9E';
   };
@@ -186,7 +187,7 @@ const DroneManagement = () => {
       <div style={styles.filterSection}>
         <label style={styles.filterLabel}>Filter by Role:</label>
         <div style={styles.filterButtons}>
-          {['All', 'Forward', 'Striker', 'Defender', 'Central'].map(role => (
+          {['All', 'Forward', 'Striker', 'Defender', 'Keeper'].map(role => (
             <button
               key={role}
               onClick={() => setRoleFilter(role)}
@@ -294,7 +295,7 @@ const DroneManagement = () => {
                   <option value="Forward">Forward</option>
                   <option value="Striker">Striker</option>
                   <option value="Defender">Defender</option>
-                  <option value="Central">Central</option>
+                  <option value="Keeper">Keeper</option>
                 </select>
               </div>
 
@@ -409,7 +410,7 @@ const styles = {
   },
   addButton: {
     padding: '10px 20px',
-    backgroundColor: '#4CAF50',
+    background: 'linear-gradient(135deg, rgba(0, 79, 249, 0.3), rgba(0, 123, 255, 0.2))', color: '#00d4ff', border: '1px solid rgba(0, 123, 255, 0.5)', boxShadow: '0 0 15px rgba(0, 123, 255, 0.3)',
     color: 'white',
     border: 'none',
     borderRadius: '4px',
@@ -442,27 +443,29 @@ const styles = {
     fontSize: '14px'
   },
   filterButtonActive: {
-    backgroundColor: '#2196F3',
+    background: 'linear-gradient(135deg, rgba(0, 79, 249, 0.3), rgba(0, 123, 255, 0.2))', color: '#00d4ff', border: '1px solid rgba(0, 123, 255, 0.5)',
     color: 'white',
-    borderColor: '#2196F3'
+    borderColor: '#00d4ff'
   },
   droneGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))',
     gap: '20px'
   },
   emptyMessage: {
     textAlign: 'center',
-    color: '#666',
+    color: '#64748b',
     fontSize: '16px',
     gridColumn: '1 / -1'
   },
   droneCard: {
-    backgroundColor: 'white',
-    border: '1px solid #ddd',
+    backgroundColor: 'rgba(0, 13, 41, 0.3)',
+    backdropFilter: 'blur(15px)',
+    border: '1px solid rgba(0, 123, 255, 0.3)',
     borderRadius: '8px',
     padding: '16px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+    boxShadow: '0 0 20px rgba(0, 123, 255, 0.15)',
+    transition: 'all 0.3s ease'
   },
   droneHeader: {
     display: 'flex',
@@ -484,7 +487,7 @@ const styles = {
   },
   droneRole: {
     fontSize: '16px',
-    color: '#666',
+    color: '#64748b',
     marginBottom: '12px',
     paddingBottom: '12px',
     borderBottom: '1px solid #eee'
@@ -507,7 +510,7 @@ const styles = {
   editButton: {
     flex: 1,
     padding: '8px',
-    backgroundColor: '#2196F3',
+    background: 'linear-gradient(135deg, rgba(0, 79, 249, 0.3), rgba(0, 123, 255, 0.2))', color: '#00d4ff', border: '1px solid rgba(0, 123, 255, 0.5)',
     color: 'white',
     border: 'none',
     borderRadius: '4px',
@@ -596,7 +599,7 @@ const styles = {
   submitButton: {
     flex: 1,
     padding: '10px',
-    backgroundColor: '#4CAF50',
+    background: 'linear-gradient(135deg, rgba(0, 79, 249, 0.3), rgba(0, 123, 255, 0.2))', color: '#00d4ff', border: '1px solid rgba(0, 123, 255, 0.5)', boxShadow: '0 0 15px rgba(0, 123, 255, 0.3)',
     color: 'white',
     border: 'none',
     borderRadius: '4px',

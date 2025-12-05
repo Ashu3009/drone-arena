@@ -4,21 +4,18 @@ import './ReportsViewer.css';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-console.log('🔧 API_URL configured as:', API_URL);
-console.log('🔧 env var REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
-
 const ReportsViewer = () => {
   const [tournaments, setTournaments] = useState([]);
-  const [selectedTournament, setSelectedTournament] = useState(null);
   const [matches, setMatches] = useState([]);
+  const [analysisData, setAnalysisData] = useState(null);
+
+  const [selectedTournament, setSelectedTournament] = useState(null);
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [selectedRound, setSelectedRound] = useState(null);
-  const [analysisData, setAnalysisData] = useState(null);
-  const [droneReports, setDroneReports] = useState({}); // ✅ Map of roundNumber -> DroneReports
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Fetch all tournaments on load
   useEffect(() => {
     fetchTournaments();
   }, []);
@@ -26,22 +23,13 @@ const ReportsViewer = () => {
   const fetchTournaments = async () => {
     try {
       const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
-      console.log('🔍 Fetching tournaments...');
       const response = await axios.get(`${API_URL}/tournaments`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-
-      console.log('📡 Tournaments API Response:', response.data);
-
-      const allTournaments = Array.isArray(response.data)
-        ? response.data
-        : (response.data.data || []);
-
-      console.log('✅ Parsed tournaments:', allTournaments.length, allTournaments);
-
+      const allTournaments = Array.isArray(response.data) ? response.data : (response.data.data || []);
       setTournaments(allTournaments);
     } catch (err) {
-      console.error('❌ Error fetching tournaments:', err);
+      console.error('Error fetching tournaments:', err);
     }
   };
 
@@ -52,11 +40,7 @@ const ReportsViewer = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      const allMatches = Array.isArray(response.data)
-        ? response.data
-        : (response.data.data || []);
-
-      // Filter matches for this tournament and with completed rounds
+      const allMatches = Array.isArray(response.data) ? response.data : (response.data.data || []);
       const tournamentMatches = allMatches.filter(m =>
         m.tournament._id === tournamentId &&
         (m.status === 'completed' || (m.rounds && m.rounds.some(r => r.status === 'completed')))
@@ -68,444 +52,508 @@ const ReportsViewer = () => {
     }
   };
 
-  const fetchAnalysis = async (matchId, roundNumber) => {
+  const fetchAnalysisForRound = async (matchId, roundNumber) => {
     setLoading(true);
     setError('');
-    setAnalysisData(null);
-
     try {
       const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
       const response = await axios.get(
         `${API_URL}/analysis/round/${matchId}/${roundNumber}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
+      console.log('✅ Analysis data received:', response.data);
+      console.log('📊 Team A Reports:', response.data.teamAReports);
+      console.log('📊 Team B Reports:', response.data.teamBReports);
+      console.log('📊 Team A Reports Length:', response.data.teamAReports?.length);
+      console.log('📊 Team B Reports Length:', response.data.teamBReports?.length);
       setAnalysisData(response.data);
-
-      // ✅ Fetch actual DroneReport documents for PDF download
-      const reportsResponse = await axios.get(
-        `${API_URL}/reports/matches/${matchId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      const allReports = reportsResponse.data.data?.reports || [];
-      const roundReports = allReports.filter(r => r.roundNumber === parseInt(roundNumber));
-
-      // Create map of droneId -> report for easy lookup
-      const reportMap = {};
-      roundReports.forEach(report => {
-        reportMap[report.droneId] = report;
-      });
-
-      setDroneReports(reportMap);
-      console.log('✅ Fetched DroneReports:', roundReports.length, reportMap);
-
     } catch (err) {
-      console.error('Analysis error:', err);
-      setError(err.response?.data?.error || 'Failed to generate analysis');
+      console.error('❌ Error fetching analysis:', err);
+      setError('Failed to load reports');
     } finally {
       setLoading(false);
     }
   };
 
-  // ✅ Download PDF for individual drone report
-  const downloadDronePDF = async (reportId, droneId, pilotName) => {
-    try {
-      const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
-      const response = await axios.get(
-        `${API_URL}/reports/${reportId}/pdf`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          responseType: 'blob' // Important for PDF download
-        }
-      );
-
-      // Create download link
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `Report_${pilotName}_${droneId}_${Date.now()}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-
-      console.log(`✅ PDF downloaded for ${droneId}`);
-    } catch (err) {
-      console.error('PDF download error:', err);
-      alert('Failed to download PDF report');
-    }
-  };
-
-  const handleTournamentSelect = (tournament) => {
+  const handleTournamentClick = (tournament) => {
     setSelectedTournament(tournament);
     setSelectedMatch(null);
     setSelectedRound(null);
     setAnalysisData(null);
-    setMatches([]);
     fetchMatchesForTournament(tournament._id);
   };
 
-  const handleMatchSelect = (match) => {
+  const handleMatchClick = (match) => {
     setSelectedMatch(match);
     setSelectedRound(null);
     setAnalysisData(null);
   };
 
-  const handleRoundSelect = (round) => {
+  const handleRoundClick = (round) => {
     setSelectedRound(round);
-    fetchAnalysis(selectedMatch._id, round.roundNumber);
+    fetchAnalysisForRound(selectedMatch._id, round.roundNumber);
   };
 
-  const getGradeColor = (grade) => {
-    if (grade.startsWith('A')) return '#4caf50';
-    if (grade.startsWith('B')) return '#2196f3';
-    if (grade.startsWith('C')) return '#ff9800';
-    return '#f44336';
+  const goBackToTournaments = () => {
+    setSelectedTournament(null);
+    setSelectedMatch(null);
+    setSelectedRound(null);
+    setAnalysisData(null);
+    setMatches([]);
+  };
+
+  const goBackToMatches = () => {
+    setSelectedMatch(null);
+    setSelectedRound(null);
+    setAnalysisData(null);
+  };
+
+  const goBackToRounds = () => {
+    setSelectedRound(null);
+    setAnalysisData(null);
+  };
+
+  const downloadPDF = async (reportId) => {
+    try {
+      const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
+      const response = await axios.get(`${API_URL}/reports/${reportId}/pdf`, {
+        headers: { Authorization: `Bearer ${token}` },
+        responseType: 'blob'
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Drone_Report_${reportId}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err) {
+      console.error('Error downloading PDF:', err);
+      alert('Failed to download PDF');
+    }
   };
 
   const getScoreColor = (score) => {
     if (score >= 75) return '#4caf50';
     if (score >= 55) return '#2196f3';
-    if (score >= 45) return '#ff9800';
+    if (score >= 45) return '#ffab00';
     return '#f44336';
   };
 
-  return (
-    <div className="reports-viewer">
-      <h2>📊 Drone Performance Analysis</h2>
-      <p style={{ color: '#666', marginBottom: '20px', fontSize: '14px' }}>
-        Select Tournament → Match → Round to view detailed performance analysis
-      </p>
+  // VIEW 1: Tournament List
+  if (!selectedTournament) {
+    return (
+      <div className="reports-viewer">
+        <h2>📊 Drone Performance Reports</h2>
+        <p>Select a tournament to view reports</p>
 
-      <div className="reports-layout">
-        {/* Tournament Selection */}
-        <div className="matches-list">
-          <h3>1. Select Tournament</h3>
-          {tournaments.length === 0 ? (
-            <p className="no-data">No tournaments found</p>
-          ) : (
-            tournaments.map(tournament => (
+        {tournaments.length === 0 ? (
+          <p className="no-data">No tournaments found</p>
+        ) : (
+          <div className="items-grid">
+            {tournaments.map(tournament => (
               <div
                 key={tournament._id}
-                className={`match-card ${selectedTournament?._id === tournament._id ? 'selected' : ''}`}
-                onClick={() => handleTournamentSelect(tournament)}
+                className="item-card"
+                onClick={() => handleTournamentClick(tournament)}
               >
-                <div className="match-teams">
-                  <span style={{ fontWeight: 'bold', fontSize: '15px' }}>{tournament.name}</span>
+                <div className="item-title">{tournament.name}</div>
+                <div className="item-subtitle">
+                  {tournament.location?.city || tournament.city || 'Unknown'}
                 </div>
-                <div className="match-tournament">
-                  {tournament.city || 'Tournament'} • {tournament.startDate ? new Date(tournament.startDate).toLocaleDateString() : ''}
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-
-        {/* Match Selection */}
-        {selectedTournament && (
-          <div className="matches-list">
-            <h3>2. Select Match</h3>
-            {matches.length === 0 ? (
-              <p className="no-data">No completed matches in this tournament</p>
-            ) : (
-              matches.map(match => (
-                <div
-                  key={match._id}
-                  className={`match-card ${selectedMatch?._id === match._id ? 'selected' : ''}`}
-                  onClick={() => handleMatchSelect(match)}
-                >
-                  <div className="match-teams">
-                    <span className="team-red">{match.teamA?.name || 'Team A'}</span>
-                    <span className="vs">vs</span>
-                    <span className="team-blue">{match.teamB?.name || 'Team B'}</span>
-                  </div>
-                  <div className="match-score">
-                    {match.finalScoreA} - {match.finalScoreB}
-                  </div>
-                  <div className="match-tournament">
-                    {match.tournament?.name || 'Tournament'}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        )}
-
-        {/* Round Selection */}
-        {selectedMatch && (
-          <div className="rounds-list">
-            <h3>3. Select Round</h3>
-            {selectedMatch.rounds.map(round => (
-              <div
-                key={round.roundNumber}
-                className={`round-card ${selectedRound?.roundNumber === round.roundNumber ? 'selected' : ''}`}
-                onClick={() => handleRoundSelect(round)}
-              >
-                <div className="round-header">
-                  <span className="round-number">Round {round.roundNumber}</span>
-                  <span className={`round-status ${round.status}`}>{round.status}</span>
-                </div>
-                <div className="round-score">
-                  {round.scoreA} - {round.scoreB}
-                </div>
-                <div className="round-drones">
-                  {round.registeredDrones.length} drones
+                <div className="item-subtitle">
+                  {tournament.startDate ? new Date(tournament.startDate).toLocaleDateString() : ''}
                 </div>
               </div>
             ))}
           </div>
         )}
+      </div>
+    );
+  }
 
-        {/* Analysis Results */}
-        {selectedRound && (
-          <div className="analysis-results">
-            <h3>Analysis Results</h3>
+  // VIEW 2: Match List (for selected tournament)
+  if (selectedTournament && !selectedMatch) {
+    return (
+      <div className="reports-viewer">
+        <button className="back-button" onClick={goBackToTournaments}>
+          ← Back to Tournaments
+        </button>
+        <h2>{selectedTournament.name}</h2>
+        <p>Select a match to view round reports</p>
 
-            {loading && <div className="loading">Analyzing performance...</div>}
-
-            {error && <div className="error-message">{error}</div>}
-
-            {analysisData && (
-              <div className="analysis-content">
-                {/* Team Stats Summary */}
-                <div className="team-stats">
-                  <h4>Team Performance</h4>
-                  {Object.entries(analysisData.teamStats).map(([teamName, stats]) => (
-                    <div key={teamName} className="team-stat-card">
-                      <div className="team-name">{teamName}</div>
-                      <div className="team-score">{stats.avgScore}/100</div>
-                      <div className="team-drones">{stats.dronesAnalyzed} drones analyzed</div>
-                    </div>
-                  ))}
+        {matches.length === 0 ? (
+          <p className="no-data">No matches found for this tournament</p>
+        ) : (
+          <div className="items-grid">
+            {matches.map(match => (
+              <div
+                key={match._id}
+                className="item-card"
+                onClick={() => handleMatchClick(match)}
+              >
+                <div className="item-title">
+                  {match.teamA?.name || 'Team A'} vs {match.teamB?.name || 'Team B'}
                 </div>
-
-                {/* Individual Drone Reports */}
-                <div className="drone-reports">
-                  <h4>Individual Drone Performance</h4>
-                  {analysisData.reports.map(report => (
-                    <div key={report.droneId} className={`drone-report-card ${report.status === 'disconnected' || report.status === 'not_registered' ? 'disconnected' : ''}`}>
-                      {(report.status === 'disconnected' || report.status === 'not_registered') ? (
-                        <div className="report-disconnected">
-                          {/* Header */}
-                          <div className="report-header">
-                            <div className="drone-info">
-                              <span className={`drone-id ${report.droneId.startsWith('R') ? 'red' : 'blue'}`}>
-                                {report.droneId}
-                              </span>
-                              <span className="role-badge">{report.role}</span>
-                              <span className="team-name">{report.team}</span>
-                            </div>
-                            <div className="status-badge disconnected">
-                              🔴 {report.status === 'not_registered' ? 'NOT REGISTERED' : 'DISCONNECTED'}
-                            </div>
-                          </div>
-
-                          {/* Message */}
-                          <div className="disconnected-message">
-                            <h5>{report.message}</h5>
-                            <p>No telemetry data was received during this round.</p>
-                          </div>
-
-                          {/* Insights */}
-                          <div className="insights-section">
-                            <h5>Possible Reasons</h5>
-                            <ul className="insights-list">
-                              {report.performance.insights.map((insight, idx) => (
-                                <li key={idx} className="warning">
-                                  {insight}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          {/* Recommendations */}
-                          <div className="recommendations-section">
-                            <h5>Troubleshooting Steps</h5>
-                            <ul className="recommendations-list">
-                              {report.performance.recommendations.map((rec, idx) => (
-                                <li key={idx}>{rec}</li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          {/* Action Button */}
-                          {report.status === 'not_registered' && (
-                            <div className="action-section">
-                              <button
-                                className="register-esp-button"
-                                onClick={() => window.location.href = '/admin?tab=esp'}
-                              >
-                                Register ESP Hardware
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      ) : (
-                        <>
-                          {/* Header */}
-                          <div className="report-header">
-                            <div className="drone-info">
-                              <span className={`drone-id ${report.droneId.startsWith('R') ? 'red' : 'blue'}`}>
-                                {report.droneId}
-                              </span>
-                              <span className="role-badge">{report.role}</span>
-                              <span className="team-name">{report.team}</span>
-                            </div>
-                            <div className="grade-circle" style={{ backgroundColor: getGradeColor(report.grade) }}>
-                              {report.grade}
-                            </div>
-                          </div>
-
-                          {/* Performance Scores */}
-                          <div className="performance-scores">
-                            <div className="score-bar">
-                              <label>Overall</label>
-                              <div className="bar-container">
-                                <div
-                                  className="bar-fill"
-                                  style={{
-                                    width: `${report.performance.overallScore}%`,
-                                    backgroundColor: getScoreColor(report.performance.overallScore)
-                                  }}
-                                />
-                                <span className="score-value">{report.performance.overallScore}</span>
-                              </div>
-                            </div>
-
-                            <div className="score-bar">
-                              <label>Aggression</label>
-                              <div className="bar-container">
-                                <div
-                                  className="bar-fill"
-                                  style={{
-                                    width: `${report.performance.aggression}%`,
-                                    backgroundColor: getScoreColor(report.performance.aggression)
-                                  }}
-                                />
-                                <span className="score-value">{report.performance.aggression}</span>
-                              </div>
-                            </div>
-
-                            <div className="score-bar">
-                              <label>Consistency</label>
-                              <div className="bar-container">
-                                <div
-                                  className="bar-fill"
-                                  style={{
-                                    width: `${report.performance.consistency}%`,
-                                    backgroundColor: getScoreColor(report.performance.consistency)
-                                  }}
-                                />
-                                <span className="score-value">{report.performance.consistency}</span>
-                              </div>
-                            </div>
-
-                            <div className="score-bar">
-                              <label>Effectiveness</label>
-                              <div className="bar-container">
-                                <div
-                                  className="bar-fill"
-                                  style={{
-                                    width: `${report.performance.effectiveness}%`,
-                                    backgroundColor: getScoreColor(report.performance.effectiveness)
-                                  }}
-                                />
-                                <span className="score-value">{report.performance.effectiveness}</span>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Metrics */}
-                          <div className="metrics-grid">
-                            <div className="metric">
-                              <span className="metric-label">Avg Intensity</span>
-                              <span className="metric-value">{report.metrics.avgIntensity} m/s²</span>
-                            </div>
-                            <div className="metric">
-                              <span className="metric-label">Burst Count</span>
-                              <span className="metric-value">{report.metrics.burstCount}</span>
-                            </div>
-                            <div className="metric">
-                              <span className="metric-label">Active Time</span>
-                              <span className="metric-value">{(100 - report.metrics.idlePercentage).toFixed(1)}%</span>
-                            </div>
-                            <div className="metric">
-                              <span className="metric-label">Maneuvers</span>
-                              <span className="metric-value">{report.metrics.directionChanges}</span>
-                            </div>
-                            <div className="metric">
-                              <span className="metric-label">Distance</span>
-                              <span className="metric-value">{report.metrics.totalDistance}</span>
-                            </div>
-                            <div className="metric">
-                              <span className="metric-label">Data Points</span>
-                              <span className="metric-value">{report.metrics.dataPoints}</span>
-                            </div>
-                          </div>
-
-                          {/* Insights */}
-                          <div className="insights-section">
-                            <h5>Insights</h5>
-                            <ul className="insights-list">
-                              {report.performance.insights.map((insight, idx) => (
-                                <li key={idx} className={insight.includes('⚠️') ? 'warning' : 'positive'}>
-                                  {insight}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          {/* Recommendations */}
-                          <div className="recommendations-section">
-                            <h5>Recommendations</h5>
-                            <ul className="recommendations-list">
-                              {report.performance.recommendations.map((rec, idx) => (
-                                <li key={idx}>{rec}</li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          {/* PDF Download Button */}
-                          {droneReports[report.droneId] && (
-                            <div className="pdf-download-section" style={{ marginTop: '15px', textAlign: 'center' }}>
-                              <button
-                                className="pdf-download-button"
-                                onClick={() => downloadDronePDF(
-                                  droneReports[report.droneId]._id,
-                                  report.droneId,
-                                  droneReports[report.droneId].pilotName || 'Pilot'
-                                )}
-                                style={{
-                                  padding: '10px 20px',
-                                  backgroundColor: '#4caf50',
-                                  color: 'white',
-                                  border: 'none',
-                                  borderRadius: '5px',
-                                  cursor: 'pointer',
-                                  fontSize: '14px',
-                                  fontWeight: 'bold',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  gap: '8px',
-                                  margin: '0 auto'
-                                }}
-                              >
-                                📄 Download PDF Report
-                              </button>
-                            </div>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  ))}
+                <div className="item-score">
+                  {match.finalScoreA || 0} - {match.finalScoreB || 0}
+                </div>
+                <div className="item-subtitle">
+                  {match.status === 'completed' ? '✓ Completed' : match.status}
                 </div>
               </div>
-            )}
+            ))}
           </div>
         )}
       </div>
+    );
+  }
+
+  // VIEW 3: Round List (for selected match)
+  if (selectedMatch && !selectedRound) {
+    return (
+      <div className="reports-viewer">
+        <button className="back-button" onClick={goBackToMatches}>
+          ← Back to Matches
+        </button>
+        <h2>{selectedMatch.teamA?.name || 'Team A'} vs {selectedMatch.teamB?.name || 'Team B'}</h2>
+        <p>Select a round to view performance reports</p>
+
+        <div className="rounds-grid">
+          {selectedMatch.rounds?.map(round => (
+            <div
+              key={round.roundNumber}
+              className="round-block"
+              onClick={() => handleRoundClick(round)}
+            >
+              <div className="round-header-block">
+                <div className="round-title">Round {round.roundNumber}</div>
+                <div className={`round-status-badge ${round.status}`}>
+                  {round.status}
+                </div>
+              </div>
+              <div className="round-score-display">
+                {round.teamAScore || 0} - {round.teamBScore || 0}
+              </div>
+              <div className="round-details">
+                <div className="round-detail-row">
+                  <span className="round-detail-label">Drones</span>
+                  <span className="round-detail-value">{round.registeredDrones?.length || 0}</span>
+                </div>
+                <div className="round-detail-row">
+                  <span className="round-detail-label">Duration</span>
+                  <span className="round-detail-value">{round.duration || 180}s</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // VIEW 4: Reports (for selected round)
+  return (
+    <div className="reports-viewer">
+      <button className="back-button" onClick={goBackToRounds}>
+        ← Back to Rounds
+      </button>
+      <h2>Round {selectedRound.roundNumber} - Performance Reports</h2>
+
+      {loading ? (
+        <p className="loading">Loading reports...</p>
+      ) : error ? (
+        <p className="error-message">{error}</p>
+      ) : analysisData ? (
+        <>
+          {/* Team Stats */}
+          <div className="team-stats">
+            <div className="team-stat-card">
+              <div className="team-name">{selectedMatch.teamA?.name || 'Team A'}</div>
+              <div className="team-score">{analysisData.teamAScore?.toFixed(2) || 0}</div>
+              <div className="team-drones">{analysisData.teamAReports?.length || 0} Drones</div>
+            </div>
+            <div className="team-stat-card">
+              <div className="team-name">{selectedMatch.teamB?.name || 'Team B'}</div>
+              <div className="team-score">{analysisData.teamBScore?.toFixed(2) || 0}</div>
+              <div className="team-drones">{analysisData.teamBReports?.length || 0} Drones</div>
+            </div>
+          </div>
+
+          {/* Team A Reports */}
+          <h3 style={{ color: '#00d4ff', marginTop: '30px', marginBottom: '15px' }}>
+            {selectedMatch.teamA?.name || 'Team A'} Drones
+          </h3>
+          {!analysisData.teamAReports || analysisData.teamAReports.length === 0 ? (
+            <p className="no-data">No reports found for Team A</p>
+          ) : (
+            <div className="reports-grid">
+            {analysisData.teamAReports.map(report => (
+            <div key={report._id} className={`drone-report-card ${!report.performance ? 'disconnected' : ''}`}>
+              <div className="report-header">
+                <div className="drone-info">
+                  <span className={`drone-id ${report.droneId.startsWith('R') ? 'red' : 'blue'}`}>
+                    {report.droneId}
+                  </span>
+                  <span className="role-badge">{report.role}</span>
+                </div>
+                {report.performance && report.performance.overallScore > 0 ? (
+                  <div style={{ textAlign: 'center' }}>
+                    <div className="score-display">
+                      {report.performance.overallScore.toFixed(2)}
+                    </div>
+                    <div className="score-label">out of 100</div>
+                  </div>
+                ) : (
+                  <span className="status-badge disconnected">
+                    {report.status === 'not_registered' ? 'NOT REG' : 'OFFLINE'}
+                  </span>
+                )}
+              </div>
+
+              {report.performance ? (
+                <>
+                  <div className="performance-scores">
+                    <div className="score-bar">
+                      <label>Overall</label>
+                      <div className="bar-container">
+                        <div className="bar-fill" style={{
+                          width: `${(report.performance.overallScore / 100).toFixed(2)}%`,
+                          backgroundColor: getScoreColor(report.performance.overallScore / 100)
+                        }} />
+                        <span className="score-value">{(report.performance.overallScore / 100).toFixed(2)}</span>
+                      </div>
+                    </div>
+                    <div className="score-bar">
+                      <label>Aggression</label>
+                      <div className="bar-container">
+                        <div className="bar-fill" style={{
+                          width: `${(report.performance.aggression / 100).toFixed(2)}%`,
+                          backgroundColor: getScoreColor(report.performance.aggression / 100)
+                        }} />
+                        <span className="score-value">{(report.performance.aggression / 100).toFixed(2)}</span>
+                      </div>
+                    </div>
+                    <div className="score-bar">
+                      <label>Consistency</label>
+                      <div className="bar-container">
+                        <div className="bar-fill" style={{
+                          width: `${report.performance.consistency}%`,
+                          backgroundColor: getScoreColor(report.performance.consistency)
+                        }} />
+                        <span className="score-value">{report.performance.consistency.toFixed(2)}</span>
+                      </div>
+                    </div>
+                    <div className="score-bar">
+                      <label>Effectiveness</label>
+                      <div className="bar-container">
+                        <div className="bar-fill" style={{
+                          width: `${(report.performance.effectiveness / 100).toFixed(2)}%`,
+                          backgroundColor: getScoreColor(report.performance.effectiveness / 100)
+                        }} />
+                        <span className="score-value">{(report.performance.effectiveness / 100).toFixed(2)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="metrics-grid">
+                    <div className="metric">
+                      <span className="metric-label">Avg Intensity</span>
+                      <span className="metric-value">{report.metrics.avgIntensity} m/s²</span>
+                    </div>
+                    <div className="metric">
+                      <span className="metric-label">Peak Intensity</span>
+                      <span className="metric-value">{report.metrics.peakIntensity} m/s²</span>
+                    </div>
+                    <div className="metric">
+                      <span className="metric-label">Active Time</span>
+                      <span className="metric-value">{report.metrics.activeTimePercentage}%</span>
+                    </div>
+                  </div>
+
+                  {report.insights?.insights?.length > 0 && (
+                    <div className="insights-section">
+                      <h5>Insights</h5>
+                      <ul className="insights-list">
+                        {report.insights.insights.map((insight, idx) => (
+                          <li key={idx} className={insight.includes('⚠️') ? 'warning' : ''}>
+                            {insight}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {report.insights?.recommendations?.length > 0 && (
+                    <div className="recommendations-section">
+                      <h5>Recommendations</h5>
+                      <ul className="recommendations-list">
+                        {report.insights.recommendations.map((rec, idx) => (
+                          <li key={idx}>{rec}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  <div className="pdf-download-section">
+                    <button
+                      className="pdf-download-button"
+                      onClick={() => downloadPDF(report._id)}
+                    >
+                      📄 Download PDF Report
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="disconnected-message">
+                  <h5>Drone Disconnected</h5>
+                  <p>No telemetry data received during this round</p>
+                </div>
+              )}
+            </div>
+          ))}
+            </div>
+          )}
+
+          {/* Team B Reports */}
+          <h3 style={{ color: '#3b82f6', marginTop: '30px', marginBottom: '15px' }}>
+            {selectedMatch.teamB?.name || 'Team B'} Drones
+          </h3>
+          {!analysisData.teamBReports || analysisData.teamBReports.length === 0 ? (
+            <p className="no-data">No reports found for Team B</p>
+          ) : (
+            <div className="reports-grid">
+            {analysisData.teamBReports.map(report => (
+            <div key={report._id} className={`drone-report-card ${!report.performance ? 'disconnected' : ''}`}>
+              <div className="report-header">
+                <div className="drone-info">
+                  <span className={`drone-id ${report.droneId.startsWith('R') ? 'red' : 'blue'}`}>
+                    {report.droneId}
+                  </span>
+                  <span className="role-badge">{report.role}</span>
+                </div>
+                {report.performance && report.performance.overallScore > 0 ? (
+                  <div style={{ textAlign: 'center' }}>
+                    <div className="score-display">
+                      {report.performance.overallScore.toFixed(2)}
+                    </div>
+                    <div className="score-label">out of 100</div>
+                  </div>
+                ) : (
+                  <span className="status-badge disconnected">
+                    {report.status === 'not_registered' ? 'NOT REG' : 'OFFLINE'}
+                  </span>
+                )}
+              </div>
+
+              {report.performance ? (
+                <>
+                  <div className="performance-scores">
+                    <div className="score-bar">
+                      <label>Overall</label>
+                      <div className="bar-container">
+                        <div className="bar-fill" style={{
+                          width: `${(report.performance.overallScore / 100).toFixed(2)}%`,
+                          backgroundColor: getScoreColor(report.performance.overallScore / 100)
+                        }} />
+                        <span className="score-value">{(report.performance.overallScore / 100).toFixed(2)}</span>
+                      </div>
+                    </div>
+                    <div className="score-bar">
+                      <label>Aggression</label>
+                      <div className="bar-container">
+                        <div className="bar-fill" style={{
+                          width: `${(report.performance.aggression / 100).toFixed(2)}%`,
+                          backgroundColor: getScoreColor(report.performance.aggression / 100)
+                        }} />
+                        <span className="score-value">{(report.performance.aggression / 100).toFixed(2)}</span>
+                      </div>
+                    </div>
+                    <div className="score-bar">
+                      <label>Consistency</label>
+                      <div className="bar-container">
+                        <div className="bar-fill" style={{
+                          width: `${report.performance.consistency}%`,
+                          backgroundColor: getScoreColor(report.performance.consistency)
+                        }} />
+                        <span className="score-value">{report.performance.consistency.toFixed(2)}</span>
+                      </div>
+                    </div>
+                    <div className="score-bar">
+                      <label>Effectiveness</label>
+                      <div className="bar-container">
+                        <div className="bar-fill" style={{
+                          width: `${(report.performance.effectiveness / 100).toFixed(2)}%`,
+                          backgroundColor: getScoreColor(report.performance.effectiveness / 100)
+                        }} />
+                        <span className="score-value">{(report.performance.effectiveness / 100).toFixed(2)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="metrics-grid">
+                    <div className="metric">
+                      <span className="metric-label">Avg Intensity</span>
+                      <span className="metric-value">{report.metrics.avgIntensity} m/s²</span>
+                    </div>
+                    <div className="metric">
+                      <span className="metric-label">Peak Intensity</span>
+                      <span className="metric-value">{report.metrics.peakIntensity} m/s²</span>
+                    </div>
+                    <div className="metric">
+                      <span className="metric-label">Active Time</span>
+                      <span className="metric-value">{report.metrics.activeTimePercentage}%</span>
+                    </div>
+                  </div>
+
+                  {report.insights?.insights?.length > 0 && (
+                    <div className="insights-section">
+                      <h5>Insights</h5>
+                      <ul className="insights-list">
+                        {report.insights.insights.map((insight, idx) => (
+                          <li key={idx} className={insight.includes('⚠️') ? 'warning' : ''}>
+                            {insight}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {report.insights?.recommendations?.length > 0 && (
+                    <div className="recommendations-section">
+                      <h5>Recommendations</h5>
+                      <ul className="recommendations-list">
+                        {report.insights.recommendations.map((rec, idx) => (
+                          <li key={idx}>{rec}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  <div className="pdf-download-section">
+                    <button
+                      className="pdf-download-button"
+                      onClick={() => downloadPDF(report._id)}
+                    >
+                      📄 Download PDF Report
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="disconnected-message">
+                  <h5>Drone Disconnected</h5>
+                  <p>No telemetry data received during this round</p>
+                </div>
+              )}
+            </div>
+          ))}
+            </div>
+          )}
+        </>
+      ) : (
+        <p className="no-data">No reports available for this round</p>
+      )}
     </div>
   );
 };

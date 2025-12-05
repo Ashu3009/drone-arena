@@ -796,48 +796,58 @@ const styles = {
   },
   title: {
     fontSize: '24px',
-    margin: 0
+    margin: 0,
+    background: 'linear-gradient(135deg, #007bff, #00d4ff)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    backgroundClip: 'text',
+    filter: 'drop-shadow(0 0 10px rgba(0, 123, 255, 0.4))'
   },
   createButton: {
-    backgroundColor: '#4CAF50',
-    color: 'white',
-    border: 'none',
+    background: 'linear-gradient(135deg, rgba(0, 79, 249, 0.3), rgba(0, 123, 255, 0.2))',
+    color: '#00d4ff',
+    border: '1px solid rgba(0, 123, 255, 0.5)',
     borderRadius: '6px',
     padding: '12px 24px',
     fontSize: '14px',
     fontWeight: 'bold',
-    cursor: 'pointer'
+    cursor: 'pointer',
+    boxShadow: '0 0 15px rgba(0, 123, 255, 0.3)',
+    transition: 'all 0.3s ease'
   },
   formModal: {
-    backgroundColor: '#1a1a1a',
+    background: 'rgba(0, 13, 41, 0.4)',
+    backdropFilter: 'blur(15px)',
     borderRadius: '12px',
     padding: '8px',
     marginBottom: '30px',
     maxHeight: '70vh',
     overflowY: 'auto',
-    border: '1px solid #333'
+    border: '1px solid rgba(0, 123, 255, 0.3)',
+    boxShadow: '0 0 30px rgba(0, 123, 255, 0.2)'
   },
   form: {
-    backgroundColor: '#1e1e1e',
+    background: 'rgba(0, 13, 41, 0.3)',
     padding: '24px',
     borderRadius: '8px'
   },
   section: {
     marginBottom: '24px',
     paddingBottom: '20px',
-    borderBottom: '1px solid #333'
+    borderBottom: '1px solid rgba(0, 123, 255, 0.2)'
   },
   sectionTitle: {
     fontSize: '16px',
     fontWeight: 'bold',
     marginTop: 0,
     marginBottom: '16px',
-    color: '#4CAF50'
+    color: '#00d4ff'
   },
   formTitle: {
     marginTop: 0,
     marginBottom: '20px',
-    fontSize: '18px'
+    fontSize: '18px',
+    color: '#e2e8f0'
   },
   formGroup: {
     marginBottom: '16px',
@@ -851,17 +861,18 @@ const styles = {
     display: 'block',
     marginBottom: '6px',
     fontSize: '14px',
-    color: '#ccc'
+    color: '#94a3b8'
   },
   input: {
     width: '100%',
-    backgroundColor: '#2a2a2a',
-    border: '1px solid #444',
+    background: 'rgba(0, 13, 41, 0.5)',
+    border: '1px solid rgba(0, 123, 255, 0.3)',
     borderRadius: '6px',
     padding: '10px',
-    color: '#fff',
+    color: '#e2e8f0',
     fontSize: '14px',
-    boxSizing: 'border-box'
+    boxSizing: 'border-box',
+    transition: 'all 0.3s ease'
   },
   teamsGrid: {
     display: 'grid',
@@ -873,11 +884,11 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     padding: '10px',
-    backgroundColor: '#2a2a2a',
-    border: '1px solid #444',
+    background: 'rgba(0, 13, 41, 0.4)',
+    border: '1px solid rgba(0, 123, 255, 0.3)',
     borderRadius: '6px',
     cursor: 'pointer',
-    transition: 'background-color 0.2s'
+    transition: 'all 0.3s ease'
   },
   checkbox: {
     marginRight: '10px',
@@ -887,7 +898,7 @@ const styles = {
   },
   teamName: {
     fontSize: '14px',
-    color: '#fff'
+    color: '#e2e8f0'
   },
   formActions: {
     display: 'flex',
@@ -895,25 +906,28 @@ const styles = {
     marginTop: '20px'
   },
   submitButton: {
-    backgroundColor: '#4CAF50',
-    color: 'white',
-    border: 'none',
+    background: 'linear-gradient(135deg, rgba(0, 79, 249, 0.3), rgba(0, 123, 255, 0.2))',
+    color: '#00d4ff',
+    border: '1px solid rgba(0, 123, 255, 0.5)',
     borderRadius: '6px',
     padding: '12px 24px',
     fontSize: '14px',
     fontWeight: 'bold',
     cursor: 'pointer',
-    flex: 1
+    flex: 1,
+    boxShadow: '0 0 15px rgba(0, 123, 255, 0.3)',
+    transition: 'all 0.3s ease'
   },
   cancelButton: {
-    backgroundColor: '#666',
-    color: 'white',
-    border: 'none',
+    background: 'rgba(100, 116, 139, 0.3)',
+    color: '#cbd5e1',
+    border: '1px solid rgba(100, 116, 139, 0.5)',
     borderRadius: '6px',
     padding: '12px 24px',
     fontSize: '14px',
     fontWeight: 'bold',
-    cursor: 'pointer'
+    cursor: 'pointer',
+    transition: 'all 0.3s ease'
   },
   tournamentList: {
     display: 'grid',
@@ -922,19 +936,22 @@ const styles = {
   },
   loadingText: {
     textAlign: 'center',
-    color: '#888',
+    color: '#94a3b8',
     padding: '40px'
   },
   emptyText: {
     textAlign: 'center',
-    color: '#888',
+    color: '#94a3b8',
     padding: '20px'
   },
   tournamentCard: {
-    backgroundColor: '#1e1e1e',
+    background: 'rgba(0, 13, 41, 0.3)',
+    backdropFilter: 'blur(15px)',
     borderRadius: '8px',
     padding: '20px',
-    border: '1px solid #333'
+    border: '1px solid rgba(0, 123, 255, 0.3)',
+    boxShadow: '0 0 20px rgba(0, 123, 255, 0.15)',
+    transition: 'all 0.3s ease'
   },
   cardHeader: {
     display: 'flex',
@@ -945,18 +962,20 @@ const styles = {
   cardTitle: {
     margin: 0,
     fontSize: '18px',
-    flex: 1
+    flex: 1,
+    color: '#e2e8f0'
   },
   cardStatus: {
-    backgroundColor: '#4CAF50',
-    color: 'white',
+    background: 'linear-gradient(135deg, rgba(0, 79, 249, 0.3), rgba(0, 123, 255, 0.2))',
+    color: '#00d4ff',
     padding: '4px 12px',
     borderRadius: '12px',
     fontSize: '12px',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    border: '1px solid rgba(0, 123, 255, 0.4)'
   },
   cardDescription: {
-    color: '#aaa',
+    color: '#94a3b8',
     fontSize: '14px',
     marginBottom: '12px'
   },
@@ -968,57 +987,60 @@ const styles = {
     justifyContent: 'space-between',
     fontSize: '13px',
     marginBottom: '6px',
-    color: '#ccc'
+    color: '#cbd5e1'
   },
   infoLabel: {
-    color: '#888',
+    color: '#94a3b8',
     fontWeight: 'bold'
   },
   cardDates: {
     display: 'flex',
     justifyContent: 'space-between',
-    color: '#888',
+    color: '#94a3b8',
     fontSize: '13px',
     marginBottom: '16px',
     paddingTop: '12px',
-    borderTop: '1px solid #333'
+    borderTop: '1px solid rgba(0, 123, 255, 0.2)'
   },
   cardActions: {
     display: 'flex',
     gap: '8px'
   },
   manageButton: {
-    backgroundColor: '#FF9800',
-    color: 'white',
-    border: 'none',
+    background: 'linear-gradient(135deg, rgba(255, 152, 0, 0.3), rgba(255, 152, 0, 0.2))',
+    color: '#ffab00',
+    border: '1px solid rgba(255, 152, 0, 0.5)',
     borderRadius: '4px',
     padding: '8px 16px',
     fontSize: '13px',
     fontWeight: 'bold',
     cursor: 'pointer',
-    flex: 1
+    flex: 1,
+    transition: 'all 0.3s ease'
   },
   editButton: {
-    backgroundColor: '#2196F3',
-    color: 'white',
-    border: 'none',
+    background: 'linear-gradient(135deg, rgba(0, 79, 249, 0.3), rgba(0, 123, 255, 0.2))',
+    color: '#00d4ff',
+    border: '1px solid rgba(0, 123, 255, 0.5)',
     borderRadius: '4px',
     padding: '8px 16px',
     fontSize: '13px',
     fontWeight: 'bold',
     cursor: 'pointer',
-    flex: 1
+    flex: 1,
+    transition: 'all 0.3s ease'
   },
   deleteButton: {
-    backgroundColor: '#ff4444',
-    color: 'white',
-    border: 'none',
+    background: 'linear-gradient(135deg, rgba(244, 67, 54, 0.3), rgba(244, 67, 54, 0.2))',
+    color: '#ff6b6b',
+    border: '1px solid rgba(244, 67, 54, 0.5)',
     borderRadius: '4px',
     padding: '8px 16px',
     fontSize: '13px',
     fontWeight: 'bold',
     cursor: 'pointer',
-    flex: 1
+    flex: 1,
+    transition: 'all 0.3s ease'
   }
 };
 

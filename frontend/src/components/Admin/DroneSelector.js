@@ -7,13 +7,13 @@ const DroneSelector = ({ matchId, roundNumber, teamA, teamB, onRegister }) => {
     { position: 'Forward', pilotId: '', pilotName: '', droneId: '', role: 'Forward' },
     { position: 'Striker', pilotId: '', pilotName: '', droneId: '', role: 'Striker' },
     { position: 'Defender', pilotId: '', pilotName: '', droneId: '', role: 'Defender' },
-    { position: 'Central', pilotId: '', pilotName: '', droneId: '', role: 'Central' }
+    { position: 'Keeper', pilotId: '', pilotName: '', droneId: '', role: 'Keeper' }
   ]);
   const [teamBLineup, setTeamBLineup] = useState([
     { position: 'Forward', pilotId: '', pilotName: '', droneId: '', role: 'Forward' },
     { position: 'Striker', pilotId: '', pilotName: '', droneId: '', role: 'Striker' },
     { position: 'Defender', pilotId: '', pilotName: '', droneId: '', role: 'Defender' },
-    { position: 'Central', pilotId: '', pilotName: '', droneId: '', role: 'Central' }
+    { position: 'Keeper', pilotId: '', pilotName: '', droneId: '', role: 'Keeper' }
   ]);
 
   useEffect(() => {
@@ -292,11 +292,11 @@ const styles = {
     backgroundColor: '#2a4a2a',
     borderRadius: '4px',
     fontSize: '13px',
-    color: '#4CAF50',
+    color: '#00d4ff',
     textAlign: 'center'
   },
   registerButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#00d4ff',
     color: 'white',
     padding: '16px 32px',
     border: 'none',

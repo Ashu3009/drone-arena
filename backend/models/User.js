@@ -89,12 +89,12 @@ const userSchema = new mongoose.Schema({
   playerProfile: {
     preferredRole: {
       type: String,
-      enum: ['Forward', 'Defender', 'Striker', 'Central', null],
+      enum: ['Forward', 'Striker', 'Defender', 'Keeper', null],
       default: null
     },
     alternateRoles: [{
       type: String,
-      enum: ['Forward', 'Defender', 'Striker', 'Central']
+      enum: ['Forward', 'Striker', 'Defender', 'Keeper']
     }],
     skillLevel: {
       type: String,

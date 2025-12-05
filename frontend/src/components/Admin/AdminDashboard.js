@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import TournamentManager from './TournamentManager';
@@ -6,14 +6,27 @@ import AllTournamentsManager from './AllTournamentsManager';
 import SchoolManager from './SchoolManager';
 import TeamManager from './TeamManager';
 import MatchManager from './MatchManager';
-import ReportsManager from './ReportsManager';
+import ReportsViewer from './ReportsViewer';
 import DroneManagement from './DroneManagement';
 import StatsManager from './StatsManager';
+import ESPManagement from './ESPManagement';
+import './AdminDashboard.css';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('tournaments');
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const { admin, logout } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -35,168 +48,151 @@ const AdminDashboard = () => {
       case 'matches':
         return <MatchManager />;
       case 'reports':
-        return <ReportsManager />;
+        return <ReportsViewer />;
       case 'stats':
         return <StatsManager />;
+      case 'esp':
+        return <ESPManagement />;
       default:
         return <TournamentManager />;
     }
   };
 
+  const tabs = [
+    { id: 'tournaments', label: 'Tournaments', icon: '🏆' },
+    { id: 'all-tournaments', label: 'All Tournaments', icon: '📋' },
+    { id: 'schools', label: 'Schools', icon: '🏫' },
+    { id: 'teams', label: 'Teams', icon: '👥' },
+    { id: 'drones', label: 'Drones', icon: '🚁' },
+    { id: 'matches', label: 'Matches', icon: '⚔️' },
+    { id: 'reports', label: 'Reports', icon: '📊' },
+    { id: 'stats', label: 'Stats', icon: '📈' },
+    { id: 'esp', label: 'ESP Devices', icon: '🔌' }
+  ];
+
+  // Bottom nav items (main 4 + hamburger)
+  const bottomNavItems = [
+    { id: 'tournaments', label: 'Home', icon: '🏠' },
+    { id: 'matches', label: 'Matches', icon: '⚔️' },
+    { id: 'reports', label: 'Reports', icon: '📊' },
+    { id: 'menu', label: 'Menu', icon: '☰' }
+  ];
+
+  // Drawer menu items (remaining options)
+  const drawerItems = [
+    { id: 'all-tournaments', label: 'All Tournaments', icon: '📋' },
+    { id: 'schools', label: 'Schools', icon: '🏫' },
+    { id: 'teams', label: 'Teams', icon: '👥' },
+    { id: 'drones', label: 'Drones', icon: '🚁' },
+    { id: 'stats', label: 'Stats', icon: '📈' },
+    { id: 'esp', label: 'ESP Devices', icon: '🔌' }
+  ];
+
+  const handleDrawerItemClick = (tabId) => {
+    setActiveTab(tabId);
+    setDrawerOpen(false);
+  };
+
   return (
-    <div style={styles.container}>
-      {/* Header */}
-      <header style={styles.header}>
-        <div style={styles.headerLeft}>
-          <h1 style={styles.title}>Drone Arena - Admin Dashboard</h1>
-          <p style={styles.welcome}>Welcome, {admin?.username || 'Admin'}</p>
-        </div>
-        <div style={styles.headerRight}>
-          <button onClick={handleLogout} style={styles.logoutButton}>
-            Logout
-          </button>
+    <div className="admin-container">
+      {/* Top Header */}
+      <header className="admin-header">
+        <div className="admin-header-content">
+          <div className="admin-logo">
+            <div className="logo-circle">DA</div>
+            <div className="logo-text">
+              <h1>Drone Arena</h1>
+              <p>Admin Panel</p>
+            </div>
+          </div>
+          <div className="admin-user">
+            <span className="user-name">{admin?.username || 'Admin'}</span>
+            <button onClick={handleLogout} className="logout-btn">
+              <span>Logout</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          </div>
         </div>
       </header>
 
-      {/* Navigation Tabs */}
-      <nav style={styles.nav}>
-        <button
-          style={activeTab === 'tournaments' ? {...styles.navButton, ...styles.navButtonActive} : styles.navButton}
-          onClick={() => setActiveTab('tournaments')}
-        >
-          Tournaments
-        </button>
-        <button
-          style={activeTab === 'all-tournaments' ? {...styles.navButton, ...styles.navButtonActive} : styles.navButton}
-          onClick={() => setActiveTab('all-tournaments')}
-        >
-          All Tournaments
-        </button>
-        <button
-          style={activeTab === 'schools' ? {...styles.navButton, ...styles.navButtonActive} : styles.navButton}
-          onClick={() => setActiveTab('schools')}
-        >
-          Schools
-        </button>
-        <button
-          style={activeTab === 'teams' ? {...styles.navButton, ...styles.navButtonActive} : styles.navButton}
-          onClick={() => setActiveTab('teams')}
-        >
-          Teams
-        </button>
-        <button
-          style={activeTab === 'drones' ? {...styles.navButton, ...styles.navButtonActive} : styles.navButton}
-          onClick={() => setActiveTab('drones')}
-        >
-          Drones
-        </button>
-        <button
-          style={activeTab === 'matches' ? {...styles.navButton, ...styles.navButtonActive} : styles.navButton}
-          onClick={() => setActiveTab('matches')}
-        >
-          Matches
-        </button>
-        <button
-          style={activeTab === 'reports' ? {...styles.navButton, ...styles.navButtonActive} : styles.navButton}
-          onClick={() => setActiveTab('reports')}
-        >
-          Reports
-        </button>
-        <button
-          style={activeTab === 'stats' ? {...styles.navButton, ...styles.navButtonActive} : styles.navButton}
-          onClick={() => setActiveTab('stats')}
-        >
-          Site Stats
-        </button>
-        <a href="/" style={styles.viewPublicLink} target="_blank" rel="noopener noreferrer">
-          View Public Dashboard
-        </a>
-      </nav>
+      {/* Desktop Sidebar Navigation */}
+      {!isMobile && (
+        <nav className="admin-sidebar">
+          {tabs.map(tab => (
+            <button
+              key={tab.id}
+              className={`sidebar-tab ${activeTab === tab.id ? 'active' : ''}`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              <span className="tab-icon">{tab.icon}</span>
+              <span className="tab-label">{tab.label}</span>
+            </button>
+          ))}
+        </nav>
+      )}
 
-      {/* Content Area */}
-      <main style={styles.content}>
-        {renderContent()}
+      {/* Main Content */}
+      <main className={`admin-main ${isMobile ? 'mobile' : 'desktop'}`}>
+        <div className="content-wrapper">
+          {renderContent()}
+        </div>
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      {isMobile && (
+        <>
+          <nav className="admin-bottom-nav">
+            {bottomNavItems.map(item => (
+              <button
+                key={item.id}
+                className={`bottom-nav-btn ${activeTab === item.id ? 'active' : ''}`}
+                onClick={() => {
+                  if (item.id === 'menu') {
+                    setDrawerOpen(true);
+                  } else {
+                    setActiveTab(item.id);
+                  }
+                }}
+              >
+                <span className="nav-icon">{item.icon}</span>
+                <span className="nav-label">{item.label}</span>
+              </button>
+            ))}
+          </nav>
+
+          {/* Side Drawer */}
+          {drawerOpen && (
+            <>
+              {/* Backdrop */}
+              <div className="drawer-backdrop" onClick={() => setDrawerOpen(false)}></div>
+
+              {/* Drawer */}
+              <div className="drawer">
+                <div className="drawer-header">
+                  <h3>Navigation Menu</h3>
+                  <button className="drawer-close" onClick={() => setDrawerOpen(false)}>×</button>
+                </div>
+                <div className="drawer-content">
+                  {drawerItems.map(item => (
+                    <button
+                      key={item.id}
+                      className={`drawer-item ${activeTab === item.id ? 'active' : ''}`}
+                      onClick={() => handleDrawerItemClick(item.id)}
+                    >
+                      <span className="drawer-icon">{item.icon}</span>
+                      <span className="drawer-label">{item.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+        </>
+      )}
     </div>
   );
-};
-
-const styles = {
-  container: {
-    minHeight: '100vh',
-    backgroundColor: '#0a0a0a',
-    color: 'white'
-  },
-  header: {
-    backgroundColor: '#1e1e1e',
-    padding: '20px 40px',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderBottom: '2px solid #333'
-  },
-  headerLeft: {
-    flex: 1
-  },
-  title: {
-    margin: 0,
-    fontSize: '28px',
-    fontWeight: 'bold'
-  },
-  welcome: {
-    margin: '5px 0 0 0',
-    color: '#888',
-    fontSize: '14px'
-  },
-  headerRight: {
-    display: 'flex',
-    gap: '12px'
-  },
-  logoutButton: {
-    backgroundColor: '#ff4444',
-    color: 'white',
-    border: 'none',
-    borderRadius: '6px',
-    padding: '10px 20px',
-    fontSize: '14px',
-    fontWeight: 'bold',
-    cursor: 'pointer',
-    transition: 'background-color 0.2s'
-  },
-  nav: {
-    backgroundColor: '#1e1e1e',
-    padding: '0 40px',
-    display: 'flex',
-    gap: '4px',
-    borderBottom: '1px solid #333',
-    alignItems: 'center'
-  },
-  navButton: {
-    backgroundColor: 'transparent',
-    color: '#888',
-    border: 'none',
-    borderBottom: '3px solid transparent',
-    padding: '16px 24px',
-    fontSize: '15px',
-    fontWeight: '600',
-    cursor: 'pointer',
-    transition: 'all 0.2s'
-  },
-  navButtonActive: {
-    color: '#4CAF50',
-    borderBottomColor: '#4CAF50'
-  },
-  viewPublicLink: {
-    marginLeft: 'auto',
-    color: '#4CAF50',
-    textDecoration: 'none',
-    fontSize: '14px',
-    padding: '16px 24px',
-    fontWeight: '600'
-  },
-  content: {
-    padding: '40px'
-  }
 };
 
 export default AdminDashboard;

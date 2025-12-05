@@ -55,7 +55,7 @@ const teamSchema = new mongoose.Schema({
     },
     role: {
       type: String,
-      enum: ['Forward', 'Defender', 'Striker', 'Central', 'Substitute'],
+      enum: ['Forward', 'Striker', 'Defender', 'Keeper', 'Substitute'],
       required: true
     },
     jerseyNumber: {
