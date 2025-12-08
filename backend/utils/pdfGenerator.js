@@ -102,9 +102,7 @@ const generateReportPDF = (report, match) => {
 
     // Calculate performance score early (needed for Match Context Box)
     // Support both old (performanceScore) and new (performance.overallScore) structure
-    const perfScore = report.performance?.overallScore
-      ? report.performance.overallScore
-      : (report.performanceScore || 0);
+    const perfScore = report.performance?.overallScore ?? report.performanceScore ?? 0;
     const scoreColor = getScoreColor(perfScore);
 
     // Match Context Box
@@ -433,7 +431,7 @@ const getPerformanceRating = (score) => {
 const getKeyHighlights = (report, role) => {
   const highlights = [];
   const ml = report.mlAnalysis || {};
-  const perfScore = report.performance?.overallScore || report.performanceScore || 0;
+  const perfScore = report.performance?.overallScore ?? report.performanceScore ?? 0;
 
   // Performance-based highlights
   if (perfScore >= 85) {
@@ -510,7 +508,7 @@ const getScoreColor = (score) => {
 const getStrengths = (report, role) => {
   const strengths = [];
   const ml = report.mlAnalysis || {};
-  const perfScore = report.performance?.overallScore || report.performanceScore || 0;
+  const perfScore = report.performance?.overallScore ?? report.performanceScore ?? 0;
 
   switch (role) {
     case 'Forward':
@@ -565,7 +563,7 @@ const getStrengths = (report, role) => {
 const getTrainingFocus = (report, role) => {
   const tips = [];
   const ml = report.mlAnalysis || {};
-  const perfScore = report.performance?.overallScore || report.performanceScore || 0;
+  const perfScore = report.performance?.overallScore ?? report.performanceScore ?? 0;
 
   switch (role) {
     case 'Forward':
@@ -620,7 +618,7 @@ const getTrainingFocus = (report, role) => {
 const getRoleRecommendations = (report, role) => {
   const recs = [];
   const ml = report.mlAnalysis || {};
-  const perfScore = report.performance?.overallScore || report.performanceScore || 0;
+  const perfScore = report.performance?.overallScore ?? report.performanceScore ?? 0;
 
   switch (role) {
     case 'Forward':

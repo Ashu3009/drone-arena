@@ -1145,6 +1145,12 @@ const endRound = async (req, res) => {
             recommendations: recommendations
           },
           performanceScore: performanceScore,
+          performance: {
+            overallScore: performanceScore,
+            aggression: Math.round(aggressiveness),
+            consistency: Math.round(stabilityScore),
+            effectiveness: Math.round(efficiency)
+          },
           positionAccuracy: Math.round(stabilityScore),
           status: 'completed'
         });
@@ -1298,6 +1304,12 @@ const endRound = async (req, res) => {
                 recommendations: generatedRecommendations
               },
               performanceScore: metricsForTemplates.performanceScore,
+              performance: {
+                overallScore: metricsForTemplates.performanceScore,
+                aggression: metricsForTemplates.aggressiveness,
+                consistency: metricsForTemplates.stability,
+                effectiveness: metricsForTemplates.efficiency
+              },
               positionAccuracy: metricsForTemplates.stability,
               status: 'completed'
             });

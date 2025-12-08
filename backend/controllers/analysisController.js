@@ -486,6 +486,24 @@ const analyzeRound = async (req, res) => {
           team: droneId.startsWith('R') ? match.teamA.name : match.teamB.name,
           teamId: teamId,
           message: '⚠️ ESP Hardware Not Registered',
+          pilotName: drone.pilotName || 'Unknown',
+          pilotId: drone.pilotId || null,
+          totalDistance: 0,
+          averageSpeed: 0,
+          maxSpeed: 0,
+          positionAccuracy: 0,
+          batteryUsage: {
+            start: 100,
+            end: 100,
+            consumed: 0
+          },
+          mlAnalysis: {
+            aggressiveness: 0,
+            defensiveness: 0,
+            teamwork: 0,
+            efficiency: 0,
+            summary: 'ESP hardware not registered - no performance data available'
+          },
           performance: {
             overallScore: 0,
             aggression: 0,
@@ -520,6 +538,24 @@ const analyzeRound = async (req, res) => {
             droneId: droneId,
             role: espDevice.role,
             message: '⚠️ Connection Lost - No telemetry data received',
+            pilotName: drone.pilotName || 'Unknown',
+            pilotId: drone.pilotId || null,
+            totalDistance: 0,
+            averageSpeed: 0,
+            maxSpeed: 0,
+            positionAccuracy: 0,
+            batteryUsage: {
+              start: 100,
+              end: 100,
+              consumed: 0
+            },
+            mlAnalysis: {
+              aggressiveness: 0,
+              defensiveness: 0,
+              teamwork: 0,
+              efficiency: 0,
+              summary: 'Drone disconnected during match - no telemetry data received'
+            },
             performance: {
               overallScore: 0,
               aggression: 0,
@@ -579,18 +615,34 @@ const analyzeRound = async (req, res) => {
         });
 
         if (savedReport) {
+
+          // ✅ DON'T overwrite completed reports - just return existing data
+          if (savedReport.status === 'completed' && savedReport.performance?.overallScore > 0) {
+            analysis._id = savedReport._id;
+            reports.push(savedReport.toObject());
+            continue; // Skip to next drone
+          }
+  
+          // Update existing report (only if incomplete)
           // Update existing report
           Object.assign(savedReport, {
             tournament: match.tournament,
             team: teamId,
             teamId: teamId,
             role: analysis.role,
+            pilotName: analysis.pilotName || 'Unknown',
+            pilotId: analysis.pilotId || null,
+            totalDistance: analysis.totalDistance || 0,
+            averageSpeed: analysis.averageSpeed || 0,
+            maxSpeed: analysis.maxSpeed || 0,
+            positionAccuracy: analysis.positionAccuracy || 0,
+            batteryUsage: analysis.batteryUsage || { start: 100, end: 100, consumed: 0 },
+            mlAnalysis: analysis.mlAnalysis || { aggressiveness: 0, defensiveness: 0, teamwork: 0, efficiency: 0 },
             performance: analysis.performance,
             metrics: analysis.metrics,
             insights: analysis.insights,
             grade: analysis.grade,
             status: analysis.status || 'completed',
-            performanceScore: undefined
           });
           await savedReport.save();
         } else {
@@ -603,6 +655,14 @@ const analyzeRound = async (req, res) => {
             team: teamId,
             teamId: teamId,
             role: analysis.role,
+            pilotName: analysis.pilotName || 'Unknown',
+            pilotId: analysis.pilotId || null,
+            totalDistance: analysis.totalDistance || 0,
+            averageSpeed: analysis.averageSpeed || 0,
+            maxSpeed: analysis.maxSpeed || 0,
+            positionAccuracy: analysis.positionAccuracy || 0,
+            batteryUsage: analysis.batteryUsage || { start: 100, end: 100, consumed: 0 },
+            mlAnalysis: analysis.mlAnalysis || { aggressiveness: 0, defensiveness: 0, teamwork: 0, efficiency: 0 },
             performance: analysis.performance,
             metrics: analysis.metrics,
             insights: analysis.insights,

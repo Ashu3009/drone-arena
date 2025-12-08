@@ -128,7 +128,7 @@ const droneReportSchema = new mongoose.Schema({
   // Status
   status: {
     type: String,
-    enum: ['generating', 'completed', 'failed'],
+    enum: ['generating', 'completed', 'failed', 'disconnected', 'not_registered'],
     default: 'generating'
   },
 
