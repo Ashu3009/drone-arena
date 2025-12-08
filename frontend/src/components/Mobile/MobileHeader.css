@@ -7,21 +7,20 @@
   right: 0;
   z-index: 200;
   background: linear-gradient(180deg,
-    #FF9933 0%, #FF9933 33%,
-    #FFFFFF 33%, #FFFFFF 66%,
-    #138808 66%, #138808 100%);
+    rgba(26, 10, 46, 0.95) 0%,
+    rgba(26, 10, 46, 0.98) 100%);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 3px solid #FF9933;
+  border-bottom: 3px solid rgba(168, 85, 247, 0.6);
   transition: all 0.3s ease;
   padding-top: env(safe-area-inset-top);
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3), 0 0 20px rgba(168, 85, 247, 0.2);
 }
 
 .mobile-header.scrolled {
-  background: rgba(255, 255, 255, 0.98);
-  border-bottom: 3px solid #FF9933;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  background: rgba(26, 10, 46, 0.98);
+  border-bottom: 3px solid rgba(168, 85, 247, 0.8);
+  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4), 0 0 40px rgba(168, 85, 247, 0.3);
 }
 
 .header-container {
@@ -54,9 +53,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
+  background: linear-gradient(135deg, #A855F7 0%, #EC4899 100%);
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(255, 153, 51, 0.5);
+  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.6), 0 0 20px rgba(168, 85, 247, 0.4);
 }
 
 .drone-icon {
@@ -81,7 +80,7 @@
   left: 50%;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.4) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.6) 0%, transparent 70%);
   transform: translate(-50%, -50%);
   border-radius: 12px;
   animation: pulse-glow 2s ease-in-out infinite;
@@ -107,17 +106,18 @@
 .logo-brand {
   font-size: 1.125rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #A855F7 0%, #EC4899 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   letter-spacing: -0.02em;
   line-height: 1;
+  filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.6));
 }
 
 .logo-tagline {
   font-size: 0.625rem;
-  color: #64748b;
+  color: #C4B5FD;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   font-weight: 600;
@@ -130,7 +130,10 @@
   transform: translateX(-50%);
   font-size: 1rem;
   font-weight: 700;
-  color: #f1f5f9;
+  background: linear-gradient(135deg, #A855F7 0%, #EC4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   opacity: 0;
   transition: opacity 0.3s ease;
   pointer-events: none;
@@ -154,17 +157,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(168, 85, 247, 0.1);
+  border: 1px solid rgba(168, 85, 247, 0.3);
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.2s ease;
   -webkit-tap-highlight-color: transparent;
+  color: #C4B5FD;
 }
 
 .header-action-btn:active {
   transform: scale(0.9);
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(168, 85, 247, 0.2);
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
 }
 
 .action-icon {
@@ -214,10 +219,11 @@
 .hamburger span {
   width: 100%;
   height: 2px;
-  background: #cbd5e1;
+  background: linear-gradient(90deg, #A855F7 0%, #EC4899 100%);
   border-radius: 2px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: center;
+  box-shadow: 0 0 8px rgba(168, 85, 247, 0.5);
 }
 
 .menu-btn.active .hamburger span:nth-child(1) {
@@ -243,8 +249,9 @@
 .progress-bar {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+  background: linear-gradient(90deg, #A855F7 0%, #EC4899 100%);
   transition: width 0.3s ease;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.8);
 }
 
 /* Mobile Menu */
@@ -286,8 +293,9 @@
   width: 280px;
   max-width: 80%;
   height: 100%;
-  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(180deg, #1a0a2e 0%, #0f0520 100%);
+  box-shadow: -4px 0 30px rgba(139, 92, 246, 0.5), 0 0 60px rgba(168, 85, 247, 0.3);
+  border-left: 2px solid rgba(168, 85, 247, 0.4);
   transform: translateX(100%);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
@@ -302,7 +310,8 @@
 /* Menu Header */
 .menu-header {
   padding: 24px 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 2px solid rgba(168, 85, 247, 0.3);
+  background: rgba(168, 85, 247, 0.05);
 }
 
 .menu-user-info {
@@ -332,9 +341,12 @@
 }
 
 .user-name {
-  font-size: 1rem;
+  font-size: 0rem;
   font-weight: 700;
-  color: #f1f5f9;
+  background: linear-gradient(135deg, #E9D5FF 0%, #F5D0FE 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin-bottom: 4px;
   white-space: nowrap;
   overflow: hidden;
@@ -343,7 +355,7 @@
 
 .user-status {
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: #C4B5FD;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -378,14 +390,16 @@
   padding: 14px 20px;
   background: transparent;
   border: none;
-  color: #cbd5e1;
+  color: #E9D5FF;
   cursor: pointer;
   transition: all 0.2s ease;
   -webkit-tap-highlight-color: transparent;
 }
 
 .menu-item:active {
-  background: rgba(59, 130, 246, 0.1);
+  background: rgba(168, 85, 247, 0.2);
+  border-left: 3px solid #A855F7;
+  box-shadow: inset 0 0 20px rgba(168, 85, 247, 0.3);
 }
 
 .menu-icon {
@@ -403,7 +417,7 @@
 
 .menu-arrow {
   font-size: 1.25rem;
-  color: #64748b;
+  color: #A855F7;
   transition: transform 0.2s ease;
 }
 
@@ -412,9 +426,10 @@
 }
 
 .menu-divider {
-  height: 1px;
-  background: rgba(255, 255, 255, 0.1);
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, rgba(168, 85, 247, 0.4) 50%, transparent 100%);
   margin: 8px 20px;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
 }
 
 /* Menu Toggle Switch */
@@ -455,7 +470,8 @@
 }
 
 .menu-toggle input:checked + label {
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #A855F7 0%, #EC4899 100%);
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.6);
 }
 
 .menu-toggle input:checked + label::before {
@@ -466,7 +482,8 @@
 .menu-footer {
   padding: 16px 20px;
   padding-bottom: calc(16px + env(safe-area-inset-bottom));
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 2px solid rgba(168, 85, 247, 0.3);
+  background: rgba(168, 85, 247, 0.05);
 }
 
 .logout-btn {
@@ -567,8 +584,9 @@
   width: 320px;
   max-width: 90%;
   height: 100%;
-  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(180deg, #1a0a2e 0%, #0f0520 100%);
+  box-shadow: -4px 0 30px rgba(139, 92, 246, 0.5), 0 0 60px rgba(168, 85, 247, 0.3);
+  border-left: 2px solid rgba(168, 85, 247, 0.4);
   transform: translateX(100%);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
@@ -586,7 +604,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 24px 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 2px solid rgba(168, 85, 247, 0.3);
+  background: rgba(168, 85, 247, 0.05);
 }
 
 .notifications-title {

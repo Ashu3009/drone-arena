@@ -1,45 +1,100 @@
-/* Public Viewer - Indian Tricolor Theme */
+/* ==========================================
+   VIOLET CYBERPUNK THEME - PUBLIC VIEW
+   ========================================== */
 
+/* Base Container with Violet 3D Background */
 .public-viewer-container {
   min-height: 100vh;
-  background: linear-gradient(180deg, #FFF9F0 0%, #F0F9F0 100%);
-  color: #222222;
+  background: radial-gradient(circle at 50% 50%, #8B5CF6 0%, #4C1D95 30%, #1a0a2e 60%, #000000 100%);
+  position: relative;
+  overflow-x: hidden;
   padding-bottom: 40px;
+}
+
+/* Animated Gradient Orbs with Violet/Magenta Colors */
+.public-viewer-container::before {
+  content: '';
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(168, 85, 247, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(236, 72, 153, 0.25) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, rgba(139, 92, 246, 0.2) 0%, transparent 40%),
+    radial-gradient(circle at 60% 20%, rgba(192, 132, 252, 0.15) 0%, transparent 45%);
+  animation: orbitOrbs 20s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes orbitOrbs {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(5%, 5%) rotate(120deg); }
+  66% { transform: translate(-5%, 3%) rotate(240deg); }
+}
+
+/* Animated 3D Grid Lines */
+.public-viewer-container::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    linear-gradient(rgba(168, 85, 247, 0.15) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(168, 85, 247, 0.15) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: gridMove 25s linear infinite;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.6;
+}
+
+@keyframes gridMove {
+  0% { transform: perspective(600px) rotateX(60deg) translateY(0); }
+  100% { transform: perspective(600px) rotateX(60deg) translateY(60px); }
 }
 
 .loading-public,
 .no-match-public {
   min-height: 100vh;
-  background: linear-gradient(180deg, #FFF9F0 0%, #F0F9F0 100%);
-  color: #222222;
+  background: transparent;
+  color: #E9D5FF;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
+  position: relative;
+  z-index: 10;
 }
 
 .live-update-banner {
-  background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
+  background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
   color: white;
   padding: 16px;
   text-align: center;
-  fontWeight: bold;
+  font-weight: bold;
   font-size: 16px;
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: 0 4px 12px rgba(255, 153, 51, 0.3);
+  box-shadow: 0 4px 30px rgba(139, 92, 246, 0.5), 0 0 20px rgba(236, 72, 153, 0.3);
+  position: relative;
 }
 
+/* Header with Violet Cyberpunk Style */
 .header-public {
-  background: linear-gradient(180deg,
-    #FF9933 0%, #FF9933 33%,
-    #FFFFFF 33%, #FFFFFF 66%,
-    #138808 66%, #138808 100%);
+  background: rgba(76, 29, 149, 0.85);
+  backdrop-filter: blur(20px);
   padding: 20px 40px;
-  border-bottom: 3px solid #FF9933;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-bottom: 2px solid rgba(168, 85, 247, 0.4);
+  box-shadow: 0 4px 30px rgba(139, 92, 246, 0.3), 0 0 20px rgba(168, 85, 247, 0.1);
+  position: relative;
+  z-index: 10;
 }
 
 .header-content-public {
@@ -53,29 +108,30 @@
   margin: 0;
   font-size: 32px;
   font-weight: bold;
-  background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
+  background: linear-gradient(135deg, #A855F7 0%, #EC4899 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.5));
 }
 
 .live-badge-public {
-  background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
+  background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
   color: white;
   padding: 6px 16px;
   border-radius: 20px;
   font-size: 14px;
   font-weight: bold;
-  box-shadow: 0 2px 8px rgba(255, 153, 51, 0.4);
-  animation: pulse-indian 2s infinite;
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.6), 0 0 40px rgba(236, 72, 153, 0.4);
+  animation: pulse-violet 2s infinite;
 }
 
-@keyframes pulse-indian {
+@keyframes pulse-violet {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(255, 153, 51, 0.7);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.7), 0 0 40px rgba(236, 72, 153, 0.5);
   }
   50% {
-    box-shadow: 0 0 0 8px rgba(255, 153, 51, 0);
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.9), 0 0 60px rgba(236, 72, 153, 0.7);
   }
 }
 
@@ -88,25 +144,28 @@
 
 .tournament-public {
   margin: 0;
-  color: #000080;
+  color: #E9D5FF;
   font-size: 15px;
   font-weight: 700;
+  text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
 }
 
 .match-number-public {
-  background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
+  background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
   color: white;
   padding: 4px 14px;
   border-radius: 14px;
   font-size: 13px;
   font-weight: bold;
-  box-shadow: 0 2px 6px rgba(255, 153, 51, 0.3);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
 }
 
-/* Combined Match + Timer Display Section */
+/* Match Display Section */
 .match-display-section {
   padding: 0 40px;
   margin-bottom: 25px;
+  position: relative;
+  z-index: 10;
 }
 
 .match-info-public {
@@ -114,12 +173,25 @@
   justify-content: space-around;
   align-items: center;
   padding: 30px;
-  background: #FFFFFF;
+  background: rgba(26, 10, 46, 0.8);
+  backdrop-filter: blur(10px);
   margin-bottom: 15px;
   border-radius: 16px;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
-  border: 2px solid #FF9933;
-  border-bottom: 4px solid #138808;
+  box-shadow: 0 0 30px rgba(139, 92, 246, 0.3), 0 4px 6px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(168, 85, 247, 0.3);
+  border-bottom: 4px solid rgba(236, 72, 153, 0.5);
+  animation: border-glow-pulse 4s ease-in-out infinite;
+}
+
+@keyframes border-glow-pulse {
+  0%, 100% {
+    border-color: rgba(168, 85, 247, 0.3);
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.3), 0 4px 6px rgba(0, 0, 0, 0.3);
+  }
+  50% {
+    border-color: rgba(168, 85, 247, 0.7);
+    box-shadow: 0 0 50px rgba(139, 92, 246, 0.6), 0 0 70px rgba(236, 72, 153, 0.4);
+  }
 }
 
 .team-public {
@@ -131,16 +203,34 @@
   font-size: 28px;
   margin: 0 0 20px 0;
   font-weight: bold;
-  color: #222222;
+  color: #E9D5FF;
+  text-shadow: 0 0 15px rgba(168, 85, 247, 0.6);
+  transition: all 0.3s ease;
+}
+
+.team-name-public:hover {
+  text-shadow: 0 0 25px rgba(168, 85, 247, 1), 0 0 40px rgba(236, 72, 153, 0.8);
+  transform: scale(1.05);
 }
 
 .score-display-public {
   font-size: 72px;
   font-weight: bold;
-  background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
+  background: linear-gradient(135deg, #A855F7 0%, #EC4899 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.8));
+  animation: score-glow-pulse 3s ease-in-out infinite;
+}
+
+@keyframes score-glow-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.8));
+  }
+  50% {
+    filter: drop-shadow(0 0 35px rgba(168, 85, 247, 1)) drop-shadow(0 0 50px rgba(236, 72, 153, 0.8));
+  }
 }
 
 .vs-section-public {
@@ -154,10 +244,11 @@
 .vs-public {
   font-size: 32px;
   font-weight: bold;
-  background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
+  background: linear-gradient(135deg, #A855F7 0%, #EC4899 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.6));
 }
 
 .round-info-public {
@@ -166,56 +257,73 @@
   align-items: center;
   gap: 8px;
   font-size: 16px;
-  color: #666666;
+  color: #C4B5FD;
 }
 
 .round-status-public {
-  background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
+  background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
   color: white;
   padding: 6px 16px;
   border-radius: 16px;
   font-size: 13px;
   font-weight: bold;
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.6);
+  animation: badge-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes badge-pulse {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.6);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(139, 92, 246, 1), 0 0 45px rgba(236, 72, 153, 0.8);
+    transform: scale(1.05);
+  }
 }
 
 .timer-section-public,
 .arena-section-public {
   padding: 0 40px;
   margin-bottom: 30px;
+  position: relative;
+  z-index: 10;
 }
 
 .section-title-public {
   font-size: 24px;
   margin-bottom: 20px;
   padding-bottom: 12px;
-  border-bottom: 3px solid #FF9933;
-  color: #222222;
+  border-bottom: 3px solid rgba(168, 85, 247, 0.5);
+  color: #E9D5FF;
   font-weight: 800;
+  text-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
 }
 
 .leaderboard-section-public {
   padding: 0 40px;
+  position: relative;
+  z-index: 10;
 }
 
 .footer-public {
   text-align: center;
   padding: 40px;
   margin-top: 40px;
-  border-top: 2px solid #FF9933;
+  border-top: 2px solid rgba(168, 85, 247, 0.3);
+  position: relative;
+  z-index: 10;
 }
 
 .admin-link-public {
-  background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
+  background: linear-gradient(135deg, #A855F7 0%, #EC4899 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   text-decoration: none;
   font-size: 14px;
   font-weight: bold;
-}
-
-.timer-section-public {
-  /* Timer is now inside match-display-section */
+  filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.5));
 }
 
 /* Desktop Optimization for 1920x1080 */
@@ -268,7 +376,6 @@
     margin-bottom: 20px;
   }
 
-  /* Compact timer for desktop */
   .timer-section-public {
     margin-bottom: 20px;
   }
@@ -281,7 +388,6 @@
     margin: 0 auto;
   }
 
-  /* Make header + match + timer fit in viewport (1920x1080) */
   .header-public {
     padding: 10px 60px;
   }
@@ -301,30 +407,139 @@
   }
 }
 
-/* Responsive */
+/* Responsive - Enhanced Mobile View - FORCE APPLY */
 @media (max-width: 768px) {
-  .header-public {
-    padding: 20px;
+  .public-viewer-container {
+    background: #00FF00 !important; /* BRIGHT GREEN - TEST FOR MOBILE */
   }
 
-  .match-info-public {
-    flex-direction: column;
-    gap: 24px;
-    margin: 20px;
-    padding: 24px;
+  .header-public {
+    padding: 20px !important;
+    background: rgba(76, 29, 149, 0.9) !important;
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4) !important;
   }
 
   .title-public {
-    font-size: 24px;
+    font-size: 24px !important;
+    background: linear-gradient(135deg, #A855F7 0%, #EC4899 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.6)) !important;
+  }
+
+  .live-badge-public {
+    background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%) !important;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.7) !important;
+  }
+
+  .match-info-public {
+    flex-direction: column !important;
+    gap: 24px !important;
+    margin: 20px !important;
+    padding: 24px !important;
+    background: rgba(26, 10, 46, 0.9) !important;
+    border: 2px solid rgba(168, 85, 247, 0.5) !important;
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.5) !important;
+  }
+
+  .team-name-public {
+    font-size: 24px !important;
+    color: #E9D5FF !important;
+    text-shadow: 0 0 15px rgba(168, 85, 247, 0.7) !important;
   }
 
   .score-display-public {
-    font-size: 48px;
+    font-size: 56px !important;
+    background: linear-gradient(135deg, #A855F7 0%, #EC4899 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.9)) !important;
+    animation: score-glow-pulse 3s ease-in-out infinite !important;
+  }
+
+  .vs-public {
+    font-size: 28px !important;
+    background: linear-gradient(135deg, #A855F7 0%, #EC4899 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.6)) !important;
+  }
+
+  .round-status-public {
+    background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%) !important;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.8) !important;
+    animation: badge-pulse 2.5s ease-in-out infinite !important;
+  }
+
+  .section-title-public {
+    font-size: 20px !important;
+    background: linear-gradient(135deg, #A855F7 0%, #EC4899 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    border-bottom: 3px solid rgba(168, 85, 247, 0.5) !important;
+    filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.5)) !important;
   }
 
   .timer-section-public,
   .arena-section-public,
   .leaderboard-section-public {
-    padding: 0 20px;
+    padding: 0 20px !important;
+  }
+
+  /* Touch-friendly mobile interactions */
+  .match-info-public:active {
+    transform: scale(0.98) !important;
+    box-shadow: 0 0 40px rgba(168, 85, 247, 0.7) !important;
+  }
+}
+
+/* Extra small mobile screens - FORCE APPLY */
+@media (max-width: 480px) {
+  .public-viewer-container {
+    padding-bottom: 30px !important;
+  }
+
+  .header-public {
+    padding: 15px !important;
+  }
+
+  .title-public {
+    font-size: 20px !important;
+  }
+
+  .live-badge-public {
+    font-size: 12px !important;
+    padding: 5px 12px !important;
+  }
+
+  .match-info-public {
+    margin: 15px !important;
+    padding: 20px !important;
+  }
+
+  .team-name-public {
+    font-size: 20px !important;
+  }
+
+  .score-display-public {
+    font-size: 48px !important;
+  }
+
+  .vs-public {
+    font-size: 24px !important;
+  }
+
+  .section-title-public {
+    font-size: 18px !important;
+  }
+
+  .timer-section-public,
+  .arena-section-public,
+  .leaderboard-section-public {
+    padding: 0 15px !important;
   }
 }

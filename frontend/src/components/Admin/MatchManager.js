@@ -170,19 +170,33 @@ const MatchManager = () => {
     }
   };
 
-  const handleEndRound = async (matchId, roundNumber) => {
-    if (!window.confirm(`End Round ${roundNumber}? This will trigger ML analysis.`)) return;
+  const handleEndRound = async (matchId, roundNumber, isAuto = false) => {
+    // Skip confirmation for auto-end
+    if (!isAuto && !window.confirm(`End Round ${roundNumber}? This will trigger ML analysis.`)) return;
 
     setLoading(true);
     try {
       const response = await endRound(matchId);
       if (response.success) {
-        alert(`Round ${roundNumber} ended successfully!`);
+        // Skip alert for auto-end
+        if (!isAuto) {
+          alert(`Round ${roundNumber} ended successfully!`);
+        }
+
+        // Auto-collapse the expanded round section
+        setExpandedRounds(prev => {
+          const newState = { ...prev };
+          delete newState[`${matchId}-${roundNumber}`];
+          return newState;
+        });
+
         loadData();
       }
     } catch (error) {
       console.error('Error ending round:', error);
-      alert(error.response?.data?.message || 'Failed to end round');
+      if (!isAuto) {
+        alert(error.response?.data?.message || 'Failed to end round');
+      }
     } finally {
       setLoading(false);
     }
@@ -691,6 +705,7 @@ const MatchManager = () => {
                           onPause={handlePauseTimer}
                           onResume={handleResumeTimer}
                           onReset={handleResetTimer}
+                          onEndRound={handleEndRound}
                         />
                       )}
 

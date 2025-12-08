@@ -17,14 +17,14 @@ const Leaderboard = ({ tournamentId }) => {
       const response = await getMatches();
       if (response.success) {
         const matches = tournamentId
-          ? response.data.filter(m => m.tournament?._id === tournamentId)
+          ? response.data.filter(m => String(m.tournament?._id) === String(tournamentId))
           : response.data;
 
         // Calculate team standings
         const teamStats = {};
 
         matches.forEach(match => {
-          if (match.status === 'completed') {
+          if (match.status === 'completed' || match.status === 'in_progress') {
             const teamAId = match.teamA?._id;
             const teamBId = match.teamB?._id;
             const teamAName = match.teamA?.name || 'Team A';

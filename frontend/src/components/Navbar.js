@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import logo from '../assets/logo.png';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -38,7 +39,7 @@ const Navbar = () => {
         <div className="navbar-container">
           {/* Logo/Brand */}
           <Link to="/" className="navbar-brand" onClick={closeMenu}>
-            <span className="brand-icon">🚁</span>
+            <img src={logo} alt="DroneNova Logo" className="brand-icon" />
             <span className="brand-text">DroneNova</span>
           </Link>
 

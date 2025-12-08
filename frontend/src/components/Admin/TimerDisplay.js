@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
-const TimerDisplay = ({ round, matchId, roundDuration, onPause, onResume, onReset }) => {
+const TimerDisplay = ({ round, matchId, roundDuration, onPause, onResume, onReset, onEndRound }) => {
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [autoEnded, setAutoEnded] = useState(false);
   const MAX_TIME = (roundDuration || 3) * 60; // Convert minutes to seconds
 
   useEffect(() => {
@@ -10,20 +11,28 @@ const TimerDisplay = ({ round, matchId, roundDuration, onPause, onResume, onRese
         const now = Date.now();
         const start = new Date(round.startTime).getTime();
         const elapsed = Math.floor((now - start) / 1000);
-        setElapsedTime(elapsed);
 
-        // Auto end when time is up
+        // Auto end when time is up - check BEFORE setting state
         if (elapsed >= MAX_TIME) {
           clearInterval(interval);
-          alert(`${roundDuration || 3} minutes completed! Please end the round.`);
+          setElapsedTime(MAX_TIME); // Set to exactly MAX_TIME
+
+          if (!autoEnded && onEndRound) {
+            setAutoEnded(true);
+            console.log(`Round ${round.roundNumber} auto-ended at ${MAX_TIME} seconds`);
+            onEndRound(matchId, round.roundNumber, true); // isAuto = true
+          }
+          return; // Early exit
         }
+
+        setElapsedTime(elapsed);
       }, 1000);
 
       return () => clearInterval(interval);
     } else if (round.timerStatus === 'paused') {
       setElapsedTime(round.elapsedTime);
     }
-  }, [round]);
+  }, [round, MAX_TIME, roundDuration, matchId, onEndRound]);
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -31,8 +40,8 @@ const TimerDisplay = ({ round, matchId, roundDuration, onPause, onResume, onRese
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const remaining = MAX_TIME - elapsedTime;
-  const percentage = (elapsedTime / MAX_TIME) * 100;
+  const remaining = Math.max(0, MAX_TIME - elapsedTime); // Never negative
+  const percentage = Math.min(100, (elapsedTime / MAX_TIME) * 100); // Cap at 100%
 
   return (
     <div style={styles.container}>

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { getCurrentMatch } from '../../services/api';
-import { initSocket, joinMatch, leaveMatch, onRoundStarted, onScoreUpdated, onRoundEnded, onMatchCompleted, onTelemetry, onTimerPaused, onTimerResumed, onTimerReset, removeAllListeners } from '../../services/socket';
+import { initSocket, joinMatch, leaveMatch, onRoundStarted, onScoreUpdated, onRoundEnded, onMatchCompleted, onTelemetry, onCurrentMatchUpdated, onTimerPaused, onTimerResumed, onTimerReset, removeAllListeners } from '../../services/socket';
 // import Arena3D from './Arena3D';
 
 import DroneView3D from '../DroneView3D';
 import Leaderboard from './Leaderboard';
 import TimerDisplayPublic from './TimerDisplayPublic';
+import AnimatedScore from './AnimatedScore';
 import './PublicViewer.css';
 
 const PublicViewer = () => {
@@ -159,6 +160,13 @@ const PublicViewer = () => {
       setTimeout(() => setLiveUpdate(null), 2000);
     });
 
+    onCurrentMatchUpdated((data) => {
+      console.log('🔄 Current match changed event received:', data);
+      setLiveUpdate('🔄 Match updated!');
+      setTimeout(() => setLiveUpdate(null), 2000);
+      loadCurrentMatch(); // Reload current match data
+    });
+
     // Cleanup when component unmounts
     return () => {
       console.log('🧹 Cleaning up socket listeners');
@@ -214,7 +222,7 @@ const PublicViewer = () => {
       {/* Compact Header */}
       <header className="header-public">
         <div className="header-content-public">
-          <h1 className="title-public">DroneNova - Live Match</h1>
+          <h1 className="title-public">DroneSoccer - Live Match</h1>
           <div className="live-badge-public">LIVE</div>
         </div>
         <div className="tournament-match-info">
@@ -229,20 +237,24 @@ const PublicViewer = () => {
         <div className="match-info-public">
           <div className="team-public">
             <h2 className="team-name-public">{currentMatch.teamA?.name || 'Team A'}</h2>
-            <div className="score-display-public">{currentMatch.finalScoreA || 0}</div>
+            <div className="score-display-public">
+              <AnimatedScore value={currentMatch.finalScoreA || 0} duration={800} />
+            </div>
           </div>
 
           <div className="vs-section-public">
             <span className="vs-public">VS</span>
             <div className="round-info-public">
-              <span>Round {currentMatch.currentRound || 1} / 3</span>
+              <span>Round {currentMatch.currentRound || 1} / {currentMatch.rounds?.length || 3}</span>
               {activeRound && <span className="round-status-public">IN PROGRESS</span>}
             </div>
           </div>
 
           <div className="team-public">
             <h2 className="team-name-public">{currentMatch.teamB?.name || 'Team B'}</h2>
-            <div className="score-display-public">{currentMatch.finalScoreB || 0}</div>
+            <div className="score-display-public">
+              <AnimatedScore value={currentMatch.finalScoreB || 0} duration={800} />
+            </div>
           </div>
         </div>
 
