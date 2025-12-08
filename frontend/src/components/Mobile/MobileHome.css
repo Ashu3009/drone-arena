@@ -1,9 +1,11 @@
-/* Mobile Home Page Styles */
+/* Mobile Home Page Styles - Violet Cyberpunk Theme */
 
 .mobile-home {
   min-height: 100vh;
-  background: linear-gradient(180deg, #FFF9F0 0%, #F0F9F0 100%);
+  background: radial-gradient(circle at 50% 50%, #A855F7 0%, #7C3AED 20%, #5B21B6 40%, #2D1B69 70%, #1a0a2e 100%);
   padding-bottom: 80px; /* Space for bottom nav */
+  position: relative;
+  overflow-x: hidden;
 }
 
 /* Loading */
@@ -19,11 +21,12 @@
 .spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid #E5E7EB;
-  border-top-color: #FF9933;
+  border: 3px solid rgba(168, 85, 247, 0.2);
+  border-top-color: #A855F7;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   margin-bottom: 16px;
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
 }
 
 @keyframes spin {
@@ -45,13 +48,19 @@
   right: 0;
   bottom: 0;
   background-image:
-    linear-gradient(30deg, #1e40af 12%, transparent 12.5%, transparent 87%, #1e40af 87.5%, #1e40af),
-    linear-gradient(150deg, #1e40af 12%, transparent 12.5%, transparent 87%, #1e40af 87.5%, #1e40af),
-    linear-gradient(30deg, #1e40af 12%, transparent 12.5%, transparent 87%, #1e40af 87.5%, #1e40af),
-    linear-gradient(150deg, #1e40af 12%, transparent 12.5%, transparent 87%, #1e40af 87.5%, #1e40af);
+    linear-gradient(30deg, #A855F7 12%, transparent 12.5%, transparent 87%, #A855F7 87.5%, #A855F7),
+    linear-gradient(150deg, #A855F7 12%, transparent 12.5%, transparent 87%, #A855F7 87.5%, #A855F7),
+    linear-gradient(30deg, #A855F7 12%, transparent 12.5%, transparent 87%, #A855F7 87.5%, #A855F7),
+    linear-gradient(150deg, #A855F7 12%, transparent 12.5%, transparent 87%, #A855F7 87.5%, #A855F7);
   background-size: 80px 140px;
   background-position: 0 0, 0 0, 40px 70px, 40px 70px;
-  opacity: 0.05;
+  opacity: 0.08;
+  animation: patternMove 30s linear infinite;
+}
+
+@keyframes patternMove {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(140px); }
 }
 
 .hero-content {
@@ -62,12 +71,13 @@
 .hero-title {
   font-size: 2.5rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #A855F7 0%, #EC4899 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   margin-bottom: 8px;
   letter-spacing: -0.02em;
+  filter: drop-shadow(0 0 15px rgba(168, 85, 247, 0.6));
 }
 
 .hero-subtitle {
@@ -90,8 +100,12 @@
 .section-title {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #f1f5f9;
+  background: linear-gradient(135deg, #E9D5FF 0%, #F5D0FE 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin: 0;
+  text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
 }
 
 .status-badge {
@@ -138,13 +152,26 @@
 }
 
 .match-card {
-  background: #FFFFFF;
+  background: rgba(91, 33, 182, 0.4);
+  backdrop-filter: blur(15px);
   border-radius: 16px;
   padding: 20px;
   margin: 0 20px;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
-  border: 2px solid #FF9933;
-  border-bottom: 4px solid #138808;
+  box-shadow: 0 0 30px rgba(139, 92, 246, 0.4), 0 4px 6px rgba(0, 0, 0, 0.2);
+  border: 2px solid rgba(168, 85, 247, 0.5);
+  border-bottom: 4px solid rgba(236, 72, 153, 0.7);
+  animation: border-glow-pulse 4s ease-in-out infinite;
+}
+
+@keyframes border-glow-pulse {
+  0%, 100% {
+    border-color: rgba(168, 85, 247, 0.4);
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.3), 0 4px 6px rgba(0, 0, 0, 0.3);
+  }
+  50% {
+    border-color: rgba(168, 85, 247, 0.7);
+    box-shadow: 0 0 50px rgba(139, 92, 246, 0.6), 0 0 70px rgba(236, 72, 153, 0.4);
+  }
 }
 
 /* Tournament Header - Prominent */
@@ -154,9 +181,10 @@
   gap: 8px;
   padding: 12px 16px;
   margin: -20px -20px 16px -20px;
-  background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
+  background: linear-gradient(135deg, #A855F7 0%, #EC4899 100%);
   border-radius: 14px 14px 0 0;
   border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
 }
 
 .tournament-icon {
@@ -184,7 +212,7 @@
 .match-number {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #1e1f21;
+  color: #eeeff0;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -212,10 +240,12 @@
   align-items: center;
   gap: 12px;
   padding: 16px;
-  background: #F8F9FA;
+  background: rgba(124, 58, 237, 0.35);
+  backdrop-filter: blur(15px);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+  border: 2px solid rgba(168, 85, 247, 0.4);
 }
 
 .team-color-bar {
@@ -234,11 +264,12 @@
 .team-name {
   font-size: 1.125rem;
   font-weight: 700;
-  color: #f1f5f9;
+  color: #F3E8FF;
   margin: 0 0 8px 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-shadow: 0 0 10px rgba(168, 85, 247, 0.6);
 }
 
 .team-members {
@@ -279,7 +310,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #A855F7 0%, #EC4899 100%);
   color: white;
   font-weight: 700;
 }
@@ -290,10 +321,21 @@
   color: #f1f5f9;
   min-width: 48px;
   text-align: right;
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #A855F7 0%, #EC4899 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.8));
+  animation: score-glow-pulse 3s ease-in-out infinite;
+}
+
+@keyframes score-glow-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.8));
+  }
+  50% {
+    filter: drop-shadow(0 0 35px rgba(168, 85, 247, 1)) drop-shadow(0 0 50px rgba(236, 72, 153, 0.8));
+  }
 }
 
 /* VS Divider */
@@ -308,7 +350,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #A855F7 0%, #EC4899 100%);
   color: white;
   display: flex;
   align-items: center;
@@ -316,7 +358,17 @@
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.05em;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.6), 0 0 20px rgba(168, 85, 247, 0.4);
+  animation: pulse-violet 2s infinite;
+}
+
+@keyframes pulse-violet {
+  0%, 100% {
+    box-shadow: 0 4px 12px rgba(168, 85, 247, 0.6), 0 0 20px rgba(168, 85, 247, 0.4);
+  }
+  50% {
+    box-shadow: 0 6px 20px rgba(168, 85, 247, 0.9), 0 0 40px rgba(236, 72, 153, 0.6);
+  }
 }
 
 /* Final Score Banner */
@@ -379,11 +431,12 @@
 .no-match-card {
   margin: 0 20px;
   padding: 48px 20px;
-  background: #FFFFFF;
+  background: rgba(91, 33, 182, 0.35);
+  backdrop-filter: blur(15px);
   border-radius: 16px;
   text-align: center;
-  border: 2px dashed #FF9933;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  border: 2px dashed rgba(168, 85, 247, 0.7);
+  box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
 }
 
 .no-match-icon {
@@ -395,8 +448,9 @@
 .no-match-title {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #f1f5f9;
+  color: #F3E8FF;
   margin: 0 0 8px 0;
+  text-shadow: 0 0 10px rgba(168, 85, 247, 0.6);
 }
 
 .no-match-text {

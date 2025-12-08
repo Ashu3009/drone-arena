@@ -4,63 +4,69 @@
  */
 
 :root {
-  /* Indian Flag Colors */
-  --india-saffron: #a75d96;
-  --india-white: #7f6892;
-  --india-green: #2d517d;
-  --ashok-chakra: #000080;
+  /* Violet Cyberpunk Colors 🚀 */
+  --india-saffron: #A855F7;
+  --india-white: #4C1D95;
+  --india-green: #EC4899;
+  --ashok-chakra: #8B5CF6;
 
-  /* Gradient Combinations */
-  --tricolor-gradient: linear-gradient(135deg, #FF9933 0%, #FFFFFF 50%, #138808 100%);
-  --saffron-gradient: linear-gradient(135deg, #FF9933 0%, #FFB366 100%);
-  --green-gradient: linear-gradient(135deg, #0F6B06 0%, #138808 100%);
+  /* Cyberpunk Gradient Combinations */
+  --tricolor-gradient: linear-gradient(135deg, #A855F7 0%, #8B5CF6 50%, #EC4899 100%);
+  --saffron-gradient: linear-gradient(135deg, #A855F7 0%, #C084FC 100%);
+  --green-gradient: linear-gradient(135deg, #EC4899 0%, #F472B6 100%);
 
-  /* Light Theme Background */
-  --bg-primary: #FFFFFF;
-  --bg-secondary: #F5F5F5;
-  --bg-tertiary: #FFF9F0;
+  /* Dark Cyberpunk Backgrounds */
+  --bg-primary: rgba(26, 10, 46, 0.95);
+  --bg-secondary: rgba(76, 29, 149, 0.3);
+  --bg-tertiary: radial-gradient(circle at 50% 50%, #8B5CF6 0%, #4C1D95 30%, #1a0a2e 60%, #000000 100%);
 
-  /* Text Colors */
-  --text-primary: #222222;
-  --text-secondary: #666666;
-  --text-tertiary: #999999;
+  /* Neon Text Colors */
+  --text-primary: #F3E8FF;
+  --text-secondary: #DDD6FE;
+  --text-tertiary: #C4B5FD;
 
-  /* Card Shadows - Material Design */
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
-  --shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.25);
+  /* 3D Cyberpunk Shadows with Glow */
+  --shadow-sm: 0 2px 8px rgba(168, 85, 247, 0.3), 0 0 12px rgba(168, 85, 247, 0.1);
+  --shadow-md: 0 4px 16px rgba(168, 85, 247, 0.4), 0 0 24px rgba(168, 85, 247, 0.2);
+  --shadow-lg: 0 8px 32px rgba(139, 92, 246, 0.5), 0 0 48px rgba(168, 85, 247, 0.3);
+  --shadow-xl: 0 12px 48px rgba(139, 92, 246, 0.6), 0 0 60px rgba(168, 85, 247, 0.4);
 
-  /* Elevation Shadows (Android Material) */
-  --elevation-1: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-  --elevation-2: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
-  --elevation-3: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
-  --elevation-4: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
-  --elevation-5: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
+  /* 3D Elevation Shadows (Neon Glow) */
+  --elevation-1: 0 2px 8px rgba(168, 85, 247, 0.3), 0 0 12px rgba(168, 85, 247, 0.15);
+  --elevation-2: 0 4px 16px rgba(168, 85, 247, 0.4), 0 0 24px rgba(168, 85, 247, 0.2);
+  --elevation-3: 0 8px 32px rgba(139, 92, 246, 0.5), 0 0 48px rgba(168, 85, 247, 0.3);
+  --elevation-4: 0 12px 48px rgba(139, 92, 246, 0.6), 0 0 64px rgba(168, 85, 247, 0.4);
+  --elevation-5: 0 16px 64px rgba(139, 92, 246, 0.7), 0 0 80px rgba(168, 85, 247, 0.5);
 }
 
 /* Global Light Theme Override */
 .mobile-home,
 .mobile-leaderboard,
 .mobile-tournaments {
-  background: linear-gradient(180deg, #FFF9F0 0%, #F0F9F0 100%) !important;
+  background: radial-gradient(circle at 50% 50%, #A855F7 0%, #7C3AED 20%, #5B21B6 40%, #2D1B69 70%, #1a0a2e 100%) !important;
   color: var(--text-primary);
+  position: relative;
+  overflow-x: hidden;
 }
 
 /* Hero Section - Tricolor Header */
 .hero-section {
-  position: relative;
-  background: linear-gradient(180deg,
-    var(--india-saffron) 0%,
-    var(--india-saffron) 0%,
-    var(--india-white) 0%,
-    var(--india-white) 0%,
-    var(--india-green) 0%,
-    var(--india-green) 0%) !important;
-  padding: 48px 20px 32px;
-  text-align: center;
-  overflow: hidden;
-  box-shadow: var(--elevation-2);
+    position: relative;
+    background: linear-gradient(180deg,
+        rgba(168, 85, 247, 0.25) 0%,
+        rgba(124, 58, 237, 0.35) 50%,
+        rgba(91, 33, 182, 0.45) 100%) !important;
+    padding: 48px 20px 32px;
+    text-align: center;
+    overflow: hidden;
+    border: 2px solid rgba(168, 85, 247, 0.5);
+    border-radius: 20px;
+    box-shadow:
+        0 8px 32px rgba(139, 92, 246, 0.5),
+        0 0 60px rgba(168, 85, 247, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(15px);
 }
 
 .hero-pattern {
@@ -131,8 +137,28 @@
 
 /* Team Sections */
 .team-section {
-  background: #F8F9FA !important;
-  box-shadow: var(--elevation-1) !important;
+    position: relative;
+    background: linear-gradient(135deg,
+        rgba(124, 58, 237, 0.35) 0%,
+        rgba(91, 33, 182, 0.45) 100%) !important;
+    backdrop-filter: blur(15px) !important;
+    border-radius: 16px !important;
+    border: 2px solid rgba(168, 85, 247, 0.6) !important;
+    border-left: 4px solid rgba(168, 85, 247, 0.9) !important;
+    box-shadow:
+        0 4px 16px rgba(139, 92, 246, 0.5),
+        0 0 30px rgba(168, 85, 247, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+    transition: all 0.3s ease;
+}
+
+.team-section:hover {
+    border-color: rgba(168, 85, 247, 0.8) !important;
+    box-shadow: 
+        0 6px 24px rgba(139, 92, 246, 0.6),
+        0 0 50px rgba(168, 85, 247, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+    transform: translateY(-2px);
 }
 
 .team-name {
@@ -163,7 +189,7 @@
 }
 
 .nav-item.active .nav-label {
-  color: var(--india-saffron) !important;
+  color: #fbf9fd !important;
 }
 
 .nav-item.active .icon-emoji {
@@ -172,21 +198,29 @@
 
 .active-dot {
   background: var(--india-saffron) !important;
-  box-shadow: 0 0 8px rgba(255, 153, 51, 0.8) !important;
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.8), 0 0 40px rgba(168, 85, 247, 0.5) !important;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.8), 0 0 40px rgba(168, 85, 247, 0.5);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(168, 85, 247, 1), 0 0 60px rgba(236, 72, 153, 0.7);
+    transform: scale(1.1);
+  }
 }
 
 /* Header - Tricolor Top Bar */
 .mobile-header {
-  background: linear-gradient(180deg,
-    var(--india-saffron) 0%,
-    var(--india-saffron) 33%,
-    var(--india-white) 33%,
-    var(--india-white) 66%,
-    var(--india-green) 66%,
-    var(--india-green) 100%) !important;
-  border-bottom: 2px solid var(--india-saffron) !important;
-  box-shadow: var(--elevation-2) !important;
+    background: linear-gradient(180deg, rgba(26, 10, 46, 0.95) 0%, rgba(26, 10, 46, 0.98) 100%) !important;
+    backdrop-filter: blur(20px) !important;
+    border-bottom: 3px solid rgba(168, 85, 247, 0.6) !important;
+    box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3), 0 0 20px rgba(168, 85, 247, 0.2) !important;
 }
+
 
 .mobile-header.scrolled {
   background: rgba(255, 255, 255, 0.98) !important;
@@ -280,7 +314,11 @@ button:active,
 
 /* Menu Content */
 .menu-content {
-  background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%) !important;
+  background: linear-gradient(180deg,
+    rgba(91, 33, 182, 0.95) 0%,
+    rgba(124, 58, 237, 0.90) 100%) !important;
+  border: 2px solid rgba(168, 85, 247, 0.5) !important;
+  box-shadow: 0 0 40px rgba(139, 92, 246, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
 }
 
 .user-avatar {
@@ -294,10 +332,12 @@ button:active,
 
 /* Tournament Tags */
 .tournament-tag {
-  background: linear-gradient(135deg, rgba(255, 153, 51, 0.1) 0%, rgba(19, 136, 8, 0.1) 100%) !important;
-  border: 2px solid var(--india-saffron) !important;
-  color: var(--india-green) !important;
+  background: rgba(168, 85, 247, 0.15) !important;
+  border: 2px solid rgba(168, 85, 247, 0.6) !important;
+  color: #E9D5FF !important;
   font-weight: 700 !important;
+  text-shadow: 0 0 10px rgba(168, 85, 247, 0.5) !important;
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.2) !important;
 }
 
 /* Progress Bars */
@@ -314,28 +354,34 @@ button:active,
 }
 
 .nav-ripple {
-  background: radial-gradient(circle, rgba(255, 153, 51, 0.4) 0%, transparent 70%) !important;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.4) 0%, transparent 70%) !important;
 }
 
 /* Feature Items */
 .feature-item {
-  background: var(--bg-primary) !important;
-  box-shadow: var(--elevation-1) !important;
-  border-left: 4px solid var(--india-saffron) !important;
+  background: rgba(124, 58, 237, 0.3) !important;
+  backdrop-filter: blur(15px) !important;
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4), 0 0 24px rgba(168, 85, 247, 0.25) !important;
+  border-left: 4px solid rgba(168, 85, 247, 0.9) !important;
+  border: 2px solid rgba(168, 85, 247, 0.4) !important;
+  border-radius: 12px !important;
 }
 
 .feature-title {
-  color: var(--text-primary) !important;
+  color: #E9D5FF !important;
+  font-weight: 700 !important;
+  text-shadow: 0 0 10px rgba(168, 85, 247, 0.4) !important;
 }
 
 .feature-description {
-  color: var(--text-secondary) !important;
+  color: #C4B5FD !important;
+  font-weight: 500 !important;
 }
 
 /* Responsive Text Colors */
 @media (max-width: 768px) {
   body {
-    background: var(--bg-tertiary) !important;
+    background: radial-gradient(circle at 50% 50%, #A855F7 0%, #7C3AED 20%, #5B21B6 40%, #2D1B69 70%, #1a0a2e 100%) !important;
     color: var(--text-primary) !important;
   }
 }

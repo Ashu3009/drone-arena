@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useUserAuth } from '../../context/UserAuthContext';
+import logo from '../../assets/logo.png';
 import './MobileHeader.css';
 
 const MobileHeader = () => {
@@ -89,12 +90,12 @@ const MobileHeader = () => {
           {/* Logo */}
           <div className="header-logo" onClick={() => navigate('/mobile')}>
             <div className="logo-icon">
-              <span className="drone-icon">🚁</span>
+              <img src={logo} alt="DroneNova" className="drone-icon-img" />
               <div className="logo-pulse"></div>
             </div>
             <div className="logo-text">
-              <span className="logo-brand">DroneNova</span>
-              <span className="logo-tagline">Arena Combat</span>
+              <span className="logo-brand"></span>
+              <span className="logo-tagline"></span>
             </div>
           </div>
 

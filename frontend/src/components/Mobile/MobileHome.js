@@ -89,8 +89,8 @@ const MobileHome = () => {
       {/* Hero Section - Always visible */}
       <div className="hero-section">
         <div className="hero-content">
-          <h1 className="hero-title">DroneNova</h1>
-          <p className="hero-subtitle">Live Drone Combat Arena</p>
+          <h1 className="hero-title">DroneSoccer</h1>
+          <p className="hero-subtitle">League</p>
         </div>
         <div className="hero-pattern"></div>
       </div>
