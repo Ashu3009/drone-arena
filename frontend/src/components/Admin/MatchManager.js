@@ -129,6 +129,11 @@ const MatchManager = () => {
         setShowCreateForm(false);
         setFormData({ tournament: '', teamA: '', teamB: '' });
         loadData();
+
+        // Auto-scroll to top to show newly created match
+        setTimeout(() => {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 100);
       }
     } catch (error) {
       console.error('Error creating match:', error);
@@ -221,8 +226,7 @@ const MatchManager = () => {
   };
 
   const handleDeleteMatch = async (matchId) => {
-    if (!window.confirm('Delete this match? This cannot be undone.')) return;
-
+    // No confirmation popup - direct delete
     setLoading(true);
     try {
       const response = await deleteMatch(matchId);

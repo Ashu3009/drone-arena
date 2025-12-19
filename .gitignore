@@ -44,3 +44,4 @@ nul
 # Testing
 /coverage
 .nyc_output
+.vercel

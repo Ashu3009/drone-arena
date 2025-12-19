@@ -161,15 +161,18 @@
     padding: 12px !important;
   }
 
-  /* Filter section - Stack vertically */
+  /* Filter section - Horizontal layout with compact buttons */
   [style*="display"][style*="flex"][style*="flexWrap"] {
-    flex-direction: column !important;
-    gap: 10px !important;
+    gap: 6px !important;
+    padding: 8px !important;
   }
 
-  button {
-    width: 100% !important;
-    font-size: 12px !important;
+  [style*="display"][style*="flex"][style*="flexWrap"] button {
+    width: auto !important;
+    min-width: fit-content !important;
+    padding: 6px 10px !important;
+    font-size: 11px !important;
+    flex-shrink: 0 !important;
   }
 
   /* Card padding */

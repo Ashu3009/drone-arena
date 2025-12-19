@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getCurrentMatch, getSiteStats } from '../../services/api';
 import TimerDisplayPublic from '../Public/TimerDisplayPublic';
 import './MobileHome.css';
+import droneIcon from '../../assets/drone.png';
 
 const MobileHome = () => {
   const [currentMatch, setCurrentMatch] = useState(null);
@@ -277,7 +278,7 @@ const MobileHome = () => {
             <div className="stat-label">Active Teams</div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon">🚁</div>
+            <div className="stat-icon"><img src={droneIcon} alt="drone" style={{width: '40px', height: '40px'}} /></div>
             <div className="stat-value">{stats.activeDrones || 16}</div>
             <div className="stat-label">Active Drones</div>
           </div>

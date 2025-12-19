@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getSiteStatsDetails, overrideSiteStats, resetSiteStats } from '../../services/api';
+import droneIcon from '../../assets/drone.png';
 
 const StatsManager = () => {
   const [statsDetails, setStatsDetails] = useState(null);
@@ -206,7 +207,7 @@ const StatsManager = () => {
 
             {/* Active Drones */}
             <tr style={styles.tr}>
-              <td style={styles.td}>🚁 Active Drones</td>
+              <td style={styles.td}><img src={droneIcon} alt="drone" style={{width: '16px', height: '16px', verticalAlign: 'middle', marginRight: '6px'}} /> Active Drones</td>
               <td style={styles.td}>{statsDetails.autoCalculated.activeDrones}</td>
               <td style={styles.td}>
                 <input

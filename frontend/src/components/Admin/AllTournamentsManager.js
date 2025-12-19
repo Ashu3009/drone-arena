@@ -311,9 +311,11 @@ const AllTournamentsManager = () => {
               Clear Filters
             </button>
           </div>
-        ) : (
-          <table className="tournaments-table">
-            <thead>
+          ) : (
+          <>
+            {/* Desktop Table */}
+            <table className="tournaments-table">
+              <thead>
               <tr>
                 <th>Banner</th>
                 <th>Tournament Name</th>
@@ -393,6 +395,104 @@ const AllTournamentsManager = () => {
               ))}
             </tbody>
           </table>
+
+          {/* Mobile Card Layout */}
+          <div className="tournaments-mobile-cards">
+            {filteredTournaments.map(tournament => (
+              <div key={tournament._id} className="tournament-mobile-card">
+                {/* Card Header: Banner + Name + Location */}
+                <div className="tournament-mobile-card-header">
+                  <div className="tournament-mobile-card-banner">
+                    {tournament.media?.bannerImage ? (
+                      <img
+                        src={getImageUrl(tournament.media.bannerImage)}
+                        alt={tournament.name}
+                        className="tournament-banner-thumb"
+                      />
+                    ) : (
+                      <img
+                        src={defaultBanner}
+                        alt="Default Banner"
+                        className="tournament-banner-thumb"
+                      />
+                    )}
+                  </div>
+                  <div className="tournament-mobile-card-info">
+                    <h4 className="tournament-mobile-card-title">{tournament.name}</h4>
+                    <p className="tournament-mobile-card-location">
+                      {tournament.location?.city}, {tournament.location?.state}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Card Details Grid */}
+                <div className="tournament-mobile-card-details">
+                  <div className="tournament-mobile-card-detail">
+                    <span className="tournament-mobile-card-label">Date</span>
+                    <span className="tournament-mobile-card-value">
+                      {new Date(tournament.startDate).toLocaleDateString()}
+                    </span>
+                  </div>
+
+                  <div className="tournament-mobile-card-detail">
+                    <span className="tournament-mobile-card-label">Teams</span>
+                    <span className="tournament-mobile-card-value">
+                      {tournament.currentTeams || 0}/{tournament.maxTeams}
+                    </span>
+                  </div>
+
+                  <div className="tournament-mobile-card-detail">
+                    <span className="tournament-mobile-card-label">Status</span>
+                    <span
+                      className="status-badge tournament-mobile-card-value"
+                      style={{backgroundColor: getStatusColor(tournament.status)}}
+                    >
+                      {tournament.status || 'Upcoming'}
+                    </span>
+                  </div>
+
+                  <div className="tournament-mobile-card-detail">
+                    <span className="tournament-mobile-card-label">Prize Pool</span>
+                    <span className="tournament-mobile-card-value">
+                      {tournament.prizePool?.totalAmount > 0
+                        ? `${tournament.prizePool.currency} ${tournament.prizePool.totalAmount.toLocaleString()}`
+                        : '-'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Card Actions */}
+                <div className="tournament-mobile-card-actions">
+                  <button
+                    className="view-public-btn"
+                    onClick={() => handleViewPublic(tournament._id)}
+                    title="View public page"
+                  >
+                    👁️ View
+                  </button>
+
+                  {tournament.status !== 'completed' && (
+                    <button
+                      className="complete-btn"
+                      onClick={() => handleCompleteTournament(tournament)}
+                      title="Mark as completed"
+                    >
+                      ✓ Complete
+                    </button>
+                  )}
+
+                  <button
+                    className="delete-btn"
+                    onClick={() => handleDeleteClick(tournament)}
+                    title="Delete tournament"
+                  >
+                    🗑️ Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
         )}
       </div>
 

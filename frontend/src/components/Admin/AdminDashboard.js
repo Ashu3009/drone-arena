@@ -11,6 +11,7 @@ import DroneManagement from './DroneManagement';
 import StatsManager from './StatsManager';
 import ESPManagement from './ESPManagement';
 import './AdminDashboard.css';
+import droneIcon from '../../assets/drone.png';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('tournaments');
@@ -63,7 +64,7 @@ const AdminDashboard = () => {
     { id: 'all-tournaments', label: 'All Tournaments', icon: '📋' },
     { id: 'schools', label: 'Schools', icon: '🏫' },
     { id: 'teams', label: 'Teams', icon: '👥' },
-    { id: 'drones', label: 'Drones', icon: '🚁' },
+    { id: 'drones', label: 'Drones', icon: 'drone' },
     { id: 'matches', label: 'Matches', icon: '⚔️' },
     { id: 'reports', label: 'Reports', icon: '📊' },
     { id: 'stats', label: 'Stats', icon: '📈' },
@@ -83,7 +84,7 @@ const AdminDashboard = () => {
     { id: 'all-tournaments', label: 'All Tournaments', icon: '📋' },
     { id: 'schools', label: 'Schools', icon: '🏫' },
     { id: 'teams', label: 'Teams', icon: '👥' },
-    { id: 'drones', label: 'Drones', icon: '🚁' },
+    { id: 'drones', label: 'Drones', icon: 'drone' },
     { id: 'stats', label: 'Stats', icon: '📈' },
     { id: 'esp', label: 'ESP Devices', icon: '🔌' }
   ];
@@ -126,7 +127,9 @@ const AdminDashboard = () => {
               className={`sidebar-tab ${activeTab === tab.id ? 'active' : ''}`}
               onClick={() => setActiveTab(tab.id)}
             >
-              <span className="tab-icon">{tab.icon}</span>
+              <span className="tab-icon">
+                {tab.icon === 'drone' ? <img src={droneIcon} alt="drone" style={{width: '20px', height: '20px'}} /> : tab.icon}
+              </span>
               <span className="tab-label">{tab.label}</span>
             </button>
           ))}
@@ -156,7 +159,9 @@ const AdminDashboard = () => {
                   }
                 }}
               >
-                <span className="nav-icon">{item.icon}</span>
+                <span className="nav-icon">
+                  {item.icon === 'drone' ? <img src={droneIcon} alt="drone" style={{width: '24px', height: '24px'}} /> : item.icon}
+                </span>
                 <span className="nav-label">{item.label}</span>
               </button>
             ))}
@@ -181,7 +186,9 @@ const AdminDashboard = () => {
                       className={`drawer-item ${activeTab === item.id ? 'active' : ''}`}
                       onClick={() => handleDrawerItemClick(item.id)}
                     >
-                      <span className="drawer-icon">{item.icon}</span>
+                      <span className="drawer-icon">
+                        {item.icon === 'drone' ? <img src={droneIcon} alt="drone" style={{width: '24px', height: '24px'}} /> : item.icon}
+                      </span>
                       <span className="drawer-label">{item.label}</span>
                     </button>
                   ))}

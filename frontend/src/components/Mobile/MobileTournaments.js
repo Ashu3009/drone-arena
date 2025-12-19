@@ -116,34 +116,36 @@ const MobileTournaments = () => {
         >
           Past ({tournaments.filter(t => t.status === 'completed').length})
         </button>
-      </div>
 
-      {/* Date Filter - Styled like filter tabs */}
-      {selectedDate && (
-        <div className="date-filter-section">
-          <div className="date-filter-header">
-            <span className="date-icon">📅</span>
-            <span className="date-label">Selected Date: {formatDate(selectedDate)}</span>
-            <button
-              className="clear-date-btn-new"
-              onClick={() => setSelectedDate('')}
-              title="Clear date filter"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      )}
+        {/* Date Picker Button */}
+        <label
+          className={`filter-tab date-picker-btn ${selectedDate ? 'active' : ''}`}
+          title="Filter by date"
+        >
+          <span className="date-icon">📅</span>
+          <span className="date-text">
+            {selectedDate
+              ? new Date(selectedDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+              : 'Date'}
+          </span>
+          <input
+            type="date"
+            className="hidden-date-input"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+          />
+        </label>
 
-      {/* Date Picker */}
-      <div className="date-picker-section">
-        <label className="date-picker-label">📅 Filter by Date</label>
-        <input
-          type="date"
-          className="date-picker-input"
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
-        />
+        {/* Clear Date Button */}
+        {selectedDate && (
+          <button
+            className="filter-tab clear-date"
+            onClick={() => setSelectedDate('')}
+            title="Clear date"
+          >
+            ✕
+          </button>
+        )}
       </div>
 
       {/* Tournaments List */}

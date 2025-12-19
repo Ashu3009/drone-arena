@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { getSocket, onTelemetry } from '../services/socket';
 import './DroneView3D.css';
+import droneIcon from '../assets/drone.png';
 
 const DroneView3D = ({ matchId }) => {
   const [dronePositions, setDronePositions] = useState({});
@@ -120,7 +121,7 @@ const DroneView3D = ({ matchId }) => {
   return (
     <div className="drone-view-container">
       <div className="drone-view-header">
-        <h3 className="drone-view-title">🚁 Drone Soccer Arena - 20ft × 10ft</h3>
+        <h3 className="drone-view-title"><img src={droneIcon} alt="drone" style={{width: '24px', height: '24px', verticalAlign: 'middle', marginRight: '8px'}} /> Drone Soccer Arena - 20ft × 10ft</h3>
         <div className="drone-view-status-bar">
           <span className={connected ? 'status-live' : 'status-offline'}>
             {connected ? '🟢 LIVE' : '🔴 OFFLINE'}
@@ -166,7 +167,7 @@ const DroneView3D = ({ matchId }) => {
           <strong>📏 Arena:</strong> 20ft × 10ft (6.1m × 3.05m)
         </div>
         <div className="drone-view-info-card">
-          <strong>🚁 Drone Size:</strong> 6" radius (0.15m)
+          <strong><img src={droneIcon} alt="drone" style={{width: '16px', height: '16px', verticalAlign: 'middle', marginRight: '4px'}} /> Drone Size:</strong> 6" radius (0.15m)
         </div>
         <div className="drone-view-info-card">
           <strong>🎯 Scoring:</strong> 2 Rings (Pass drones through)

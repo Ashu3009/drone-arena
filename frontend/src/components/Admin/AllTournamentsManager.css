@@ -553,6 +553,99 @@
       overflow-x: auto;
     }
 
+  
+      /* Hide table, show cards on mobile */
+  .tournaments-table {
+    display: none;
+  }
+
+  /* Mobile Card Layout */
+  .tournaments-mobile-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .tournament-mobile-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  }
+
+  .tournament-mobile-card-header {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+    align-items: flex-start;
+  }
+
+  .tournament-mobile-card-banner {
+    flex-shrink: 0;
+  }
+
+  .tournament-mobile-card-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .tournament-mobile-card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #00d4ff;
+    margin: 0 0 4px 0;
+    word-wrap: break-word;
+  }
+
+  .tournament-mobile-card-location {
+    font-size: 0.85rem;
+    color: #9ca3af;
+    margin: 0;
+  }
+
+  .tournament-mobile-card-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 12px 0;
+  }
+
+  .tournament-mobile-card-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .tournament-mobile-card-label {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .tournament-mobile-card-value {
+    font-size: 0.9rem;
+    color: #e2e8f0;
+    font-weight: 500;
+  }
+
+  .tournament-mobile-card-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .tournament-mobile-card-actions button {
+    flex: 1;
+    min-width: 120px;
+  }
+
+
     .tournaments-table {
       min-width: 100%;
       font-size: 0.7rem;

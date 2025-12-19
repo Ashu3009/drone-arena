@@ -5,6 +5,7 @@ import { useUserAuth } from '../../context/UserAuthContext';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 import './UserAuth.css';
+import droneIcon from '../../assets/drone.png';
 
 const UserLogin = () => {
   const navigate = useNavigate();
@@ -133,7 +134,7 @@ const UserLogin = () => {
         <div className="user-auth-card">
           {/* Header */}
           <div className="auth-header">
-            <h1 className="auth-title">🚁 Welcome Back!</h1>
+            <h1 className="auth-title"><img src={droneIcon} alt="drone" style={{width: '32px', height: '32px', verticalAlign: 'middle', marginRight: '10px'}} /> Welcome Back!</h1>
             <p className="auth-subtitle">Login to your DroneNova Arena account</p>
           </div>
 
