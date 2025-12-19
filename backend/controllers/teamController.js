@@ -207,7 +207,8 @@ exports.uploadMemberPhoto = async (req, res) => {
     }
 
     // Update member photo path
-    team.members[index].photo = `/uploads/teams/members/${req.file.filename}`;
+    // Use req.file.path for Cloudinary (full URL) or local path
+    team.members[index].photo = req.file.path;
     await team.save();
 
     res.json({

@@ -7,8 +7,20 @@ import {
   setTournamentWinners,
   getTournamentById
 } from '../../services/api';
+import defaultBanner from '../../assets/logo.png';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || '${BACKEND_URL}';
+
+// Helper function to get full image URL
+const getImageUrl = (path) => {
+  if (!path) return '';
+  // If already a full URL (starts with http:// or https://), return as-is
+  if (path.startsWith('http://') || path.startsWith('https://')) {
+    return path;
+  }
+  // Otherwise, prepend BACKEND_URL
+  return `${BACKEND_URL}${path}`;
+};
 
 const TournamentManagement = ({ tournament: initialTournament, teams, onClose, onUpdate }) => {
   const [tournament, setTournament] = useState(initialTournament);
@@ -215,12 +227,21 @@ const TournamentManagement = ({ tournament: initialTournament, teams, onClose, o
             <div>
               <h3 style={styles.sectionTitle}>Tournament Banner</h3>
 
-              {tournament.media?.bannerImage && (
+              {tournament.media?.bannerImage ? (
                 <div style={styles.currentBanner}>
                   <p style={styles.label}>Current Banner:</p>
                   <img
-                    src={`${BACKEND_URL}${tournament.media.bannerImage}`}
+                    src={getImageUrl(tournament.media.bannerImage)}
                     alt="Current Banner"
+                    style={styles.bannerPreview}
+                  />
+                </div>
+              ) : (
+                <div style={styles.currentBanner}>
+                  <p style={styles.label}>Default Banner:</p>
+                  <img
+                    src={defaultBanner}
+                    alt="Default Banner"
                     style={styles.bannerPreview}
                   />
                 </div>
@@ -261,7 +282,7 @@ const TournamentManagement = ({ tournament: initialTournament, teams, onClose, o
                     {tournament.media.gallery.map((image, index) => (
                       <div key={index} style={styles.galleryItem}>
                         <img
-                          src={`${BACKEND_URL}${image}`}
+                          src={getImageUrl(image)}
                           alt={`Gallery ${index + 1}`}
                           style={styles.galleryImage}
                         />
@@ -372,7 +393,7 @@ const TournamentManagement = ({ tournament: initialTournament, teams, onClose, o
                   <div style={styles.motPreview}>
                     {tournament.manOfTheTournament.photo && (
                       <img
-                        src={`${BACKEND_URL}${tournament.manOfTheTournament.photo}`}
+                        src={getImageUrl(tournament.manOfTheTournament.photo)}
                         alt={tournament.manOfTheTournament.playerName}
                         style={styles.motPhotoPreview}
                       />

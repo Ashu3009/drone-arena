@@ -33,15 +33,28 @@ exports.getAllTournaments = async (req, res) => {
 exports.getTournamentById = async (req, res) => {
   try {
     const tournament = await Tournament.findById(req.params.id)
-      .populate('registeredTeams', 'name location teamType members')
-      .populate('winners.champion', 'name location')
-      .populate('winners.runnerUp', 'name location')
-      .populate('winners.thirdPlace', 'name location')
-      .populate('manOfTheTournament.team', 'name location')
-      .populate('awards.bestForward.team', 'name')
-      .populate('awards.bestCenter.team', 'name')
-      .populate('awards.bestDefender.team', 'name')
-      .populate('awards.bestKeeper.team', 'name');
+  .populate({
+    path: 'registeredTeams',
+    select: 'name location teamType members captain'
+  })
+  .populate({
+    path: 'winners.champion',
+    select: 'name location teamType members captain'
+  })
+  .populate({
+    path: 'winners.runnerUp',
+    select: 'name location teamType members captain'
+  })
+  .populate({
+    path: 'winners.thirdPlace',
+    select: 'name location teamType members captain'
+  })
+  .populate('manOfTheTournament.team', 'name location')
+  .populate('awards.bestForward.team', 'name')
+  .populate('awards.bestStriker.team', 'name')
+  .populate('awards.bestDefender.team', 'name')
+  .populate('awards.bestKeeper.team', 'name');
+
 
     if (!tournament) {
       return res.status(404).json({
@@ -216,7 +229,7 @@ exports.updateTournament = async (req, res) => {
     const tournament = await Tournament.findByIdAndUpdate(
       req.params.id,
       req.body,
-      { new: true, runValidators: true }
+      { new: true, runValidators: false }
     ).populate('registeredTeams', 'name location teamType');
 
     if (!tournament) {
@@ -1394,11 +1407,56 @@ const calculateTournamentAwards = async (tournamentId) => {
     console.log('✅ Awards calculated and saved:');
     console.log(`   🏆 Man of the Tournament: ${manOfTheTournament?.playerName || 'N/A'}`);
     console.log(`   ⚡ Best Forward: ${awards.bestForward?.playerName || 'N/A'}`);
-    console.log(`   🎯 Best Center: ${awards.bestCenter?.playerName || 'N/A'}`);
+    // ✅ REPLACE WITH:
+    console.log(`   🎯 Best Striker: ${awards.bestStriker?.playerName || 'N/A'}`);
     console.log(`   🛡️  Best Defender: ${awards.bestDefender?.playerName || 'N/A'}`);
     console.log(`   🥅 Best Keeper: ${awards.bestKeeper?.playerName || 'N/A'}`);
 
   } catch (error) {
     console.error('❌ Error calculating tournament awards:', error);
+  }
+};
+
+// @desc    Recalculate tournament awards (Man of Tournament + Best Players)
+// @route   POST /api/tournaments/:id/recalculate-awards
+// @access  Private (Admin)
+exports.recalculateAwards = async (req, res) => {
+  try {
+    const tournament = await Tournament.findById(req.params.id);
+
+    if (!tournament) {
+      return res.status(404).json({
+        success: false,
+        message: 'Tournament not found'
+      });
+    }
+
+    console.log(`🔄 Recalculating awards for tournament: ${tournament.name}`);
+
+    // Call the internal function to calculate awards
+    await calculateTournamentAwards(req.params.id);
+
+    // Fetch updated tournament with awards
+    const updatedTournament = await Tournament.findById(req.params.id)
+      .populate('manOfTheTournament.team', 'name location')
+      .populate('awards.bestForward.team', 'name')
+      .populate('awards.bestStriker.team', 'name')
+      .populate('awards.bestDefender.team', 'name')
+      .populate('awards.bestKeeper.team', 'name');
+
+    res.json({
+      success: true,
+      message: 'Tournament awards recalculated successfully',
+      data: {
+        manOfTheTournament: updatedTournament.manOfTheTournament,
+        awards: updatedTournament.awards
+      }
+    });
+  } catch (error) {
+    console.error('❌ Error recalculating awards:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
   }
 };

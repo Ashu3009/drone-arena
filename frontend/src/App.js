@@ -18,6 +18,7 @@ import ForgotPassword from './components/Auth/ForgotPassword';
 import ResetPassword from './components/Auth/ResetPassword';
 
 // Public Components
+import PublicReportsViewer from './components/Public/PublicReportsViewer';
 import PublicViewer from './components/Public/PublicViewer';
 import TournamentDetail from './components/Public/TournamentDetail';
 import TournamentsList from './components/Public/TournamentsList';
@@ -115,6 +116,7 @@ function App() {
             </Route>
 
             {/* Public User Auth Routes */}
+            <Route path="/reports" element={<PublicReportsViewer />} />
             <Route path="/signup" element={<UserSignup />} />
             <Route path="/login" element={<UserLogin />} />
             <Route path="/verify-email/:token" element={<EmailVerification />} />

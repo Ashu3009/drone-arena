@@ -468,26 +468,44 @@ const analyzeRound = async (req, res) => {
       telemetryMap[doc.droneId] = doc;
     });
 
-    // Analyze each registered drone
+    // ✅ Combine registered drones + drones with telemetry
+    const allDroneIds = new Set();
+
+    // Add registered drones
+    registeredDrones.forEach(drone => {
+      allDroneIds.add(drone.droneId);
+    });
+
+    // Add drones that sent telemetry (even if not registered)
+    telemetryDocs.forEach(doc => {
+      allDroneIds.add(doc.droneId);
+    });
+
+    console.log('📋 Registered drones:', registeredDrones.map(d => d.droneId));
+    console.log('📡 Telemetry drones:', telemetryDocs.map(d => d.droneId));
+    console.log('🎯 All drones to analyze:', Array.from(allDroneIds));
+
+    // Analyze each drone
     const reports = [];
-    for (const drone of registeredDrones) {
-      const droneId = drone.droneId; // Extract droneId string from drone object
+    for (const droneId of allDroneIds) {
+      // Find drone in registered list
+      const registeredDrone = registeredDrones.find(d => d.droneId === droneId);
       const espDevice = await ESPDevice.findOne({ droneId });
 
       let analysis;
       let teamId = droneId.startsWith('R') ? match.teamA._id : match.teamB._id;
 
       if (!espDevice) {
-        // Drone registered but no ESP device found
+        // Drone sent telemetry but no ESP device found
         analysis = {
           status: 'not_registered',
           droneId: droneId,
-          role: drone.role || 'Unknown',
+          role: registeredDrone?.role || 'Unknown',
           team: droneId.startsWith('R') ? match.teamA.name : match.teamB.name,
           teamId: teamId,
           message: '⚠️ ESP Hardware Not Registered',
-          pilotName: drone.pilotName || 'Unknown',
-          pilotId: drone.pilotId || null,
+          pilotName: registeredDrone?.pilotName || 'Unknown',
+          pilotId: registeredDrone?.pilotId || null,
           totalDistance: 0,
           averageSpeed: 0,
           maxSpeed: 0,
@@ -538,9 +556,8 @@ const analyzeRound = async (req, res) => {
             droneId: droneId,
             role: espDevice.role,
             message: '⚠️ Connection Lost - No telemetry data received',
-            pilotName: drone.pilotName || 'Unknown',
-            pilotId: drone.pilotId || null,
-            totalDistance: 0,
+            pilotName: registeredDrone?.pilotName || 'Unknown',  // ✅ 
+            pilotId: registeredDrone?.pilotId || null,            // ✅            totalDistance: 0,
             averageSpeed: 0,
             maxSpeed: 0,
             positionAccuracy: 0,
@@ -618,8 +635,11 @@ const analyzeRound = async (req, res) => {
 
           // ✅ DON'T overwrite completed reports - just return existing data
           if (savedReport.status === 'completed' && savedReport.performance?.overallScore > 0) {
-            analysis._id = savedReport._id;
-            reports.push(savedReport.toObject());
+            // Use existing report data but ensure teamId is set
+            const existingReport = savedReport.toObject();
+            existingReport.team = droneId.startsWith('R') ? match.teamA._id : match.teamB._id;
+            existingReport.teamId = droneId.startsWith('R') ? match.teamA._id : match.teamB._id;
+            reports.push(existingReport);
             continue; // Skip to next drone
           }
   
@@ -627,8 +647,8 @@ const analyzeRound = async (req, res) => {
           // Update existing report
           Object.assign(savedReport, {
             tournament: match.tournament,
-            team: teamId,
-            teamId: teamId,
+            team: droneId.startsWith('R') ? match.teamA._id : match.teamB._id,
+            teamId: droneId.startsWith('R') ? match.teamA._id : match.teamB._id,
             role: analysis.role,
             pilotName: analysis.pilotName || 'Unknown',
             pilotId: analysis.pilotId || null,
@@ -652,8 +672,8 @@ const analyzeRound = async (req, res) => {
             tournament: match.tournament,
             roundNumber: parseInt(roundNumber),
             droneId: droneId,
-            team: teamId,
-            teamId: teamId,
+            team: droneId.startsWith('R') ? match.teamA._id : match.teamB._id,
+            teamId: droneId.startsWith('R') ? match.teamA._id : match.teamB._id,
             role: analysis.role,
             pilotName: analysis.pilotName || 'Unknown',
             pilotId: analysis.pilotId || null,

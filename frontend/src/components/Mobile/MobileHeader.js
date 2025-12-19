@@ -196,6 +196,16 @@ const MobileHeader = () => {
 
             <button
               className="menu-item"
+              onClick={() => handleMenuItemClick('/reports')}
+            >
+              <span className="menu-icon">📊</span>
+              <span className="menu-label">Reports</span>
+              <span className="menu-arrow">›</span>
+            </button>
+
+
+            <button
+              className="menu-item"
               onClick={() => handleMenuItemClick('/mobile/profile')}
             >
               <span className="menu-icon">👤</span>

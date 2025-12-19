@@ -80,7 +80,9 @@ const TournamentManager = () => {
     try {
       const response = await getTournaments();
       if (response.success) {
-        setTournaments(response.data);
+        // Filter: Only show upcoming and ongoing tournaments (hide completed)
+        const activeTournaments = response.data.filter(t => t.status !== 'completed');
+        setTournaments(activeTournaments);
       }
     } catch (error) {
       console.error('Error loading tournaments:', error);
@@ -116,11 +118,18 @@ const TournamentManager = () => {
 
     setLoading(true);
     try {
+      // Format dates to ensure endDate is not before startDate
+      const dataToSend = {
+        ...formData,
+        startDate: new Date(formData.startDate + 'T00:00:00.000Z').toISOString(),
+        endDate: new Date(formData.endDate + 'T23:59:59.999Z').toISOString()
+      };
+
       let response;
       if (editingTournament) {
-        response = await updateTournament(editingTournament._id, formData);
+        response = await updateTournament(editingTournament._id, dataToSend);
       } else {
-        response = await createTournament(formData);
+        response = await createTournament(dataToSend);
       }
 
       if (response.success) {
@@ -137,24 +146,24 @@ const TournamentManager = () => {
   };
 
   const handleDelete = async (tournamentId) => {
-    if (!window.confirm('Are you sure you want to delete this tournament?')) {
-      return;
-    }
-
+    // No confirmation popup - just mark as completed
     setLoading(true);
     try {
-      const response = await deleteTournament(tournamentId);
+      const response = await updateTournament(tournamentId, { status: 'completed' });
       if (response.success) {
-        alert('Tournament deleted!');
-        loadTournaments();
+        alert('Tournament marked as completed and archived!');
+        loadTournaments(); // Will refresh and hide the completed tournament
+      } else {
+        alert('Failed to archive tournament: ' + response.message);
       }
     } catch (error) {
-      console.error('Error deleting tournament:', error);
-      alert(error.response?.data?.message || 'Failed to delete tournament');
+      console.error('Error archiving tournament:', error);
+      alert(error.response?.data?.message || 'Failed to archive tournament');
     } finally {
       setLoading(false);
     }
   };
+
 
   const handleEdit = (tournament) => {
     setEditingTournament(tournament);

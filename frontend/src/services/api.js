@@ -577,6 +577,48 @@ export const downloadReportPDF = async (reportId, pilotName, roundNumber) => {
   }
 };
 
+// ==================== PUBLIC REPORTS ====================
+
+// Get public team aggregate reports for a tournament (no auth needed)
+export const getPublicTeamReports = async (tournamentId) => {
+  const response = await axios.get(`${API_BASE_URL}/reports/public/tournaments/${tournamentId}/teams`);
+  return response.data;
+};
+
+// Get public pilot aggregate reports for a tournament (no auth needed)
+export const getPublicPilotReports = async (tournamentId) => {
+  const response = await axios.get(`${API_BASE_URL}/reports/public/tournaments/${tournamentId}/pilots`);
+  return response.data;
+};
+
+// Download public PDF report (no auth needed)
+export const downloadPublicReportPDF = async (reportId, pilotName, roundNumber) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/reports/public/${reportId}/pdf`, {
+      responseType: 'blob',
+      headers: {
+        'Accept': 'application/pdf'
+      }
+    });
+
+    // Create blob URL and trigger download
+    const blob = new Blob([response.data], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Report_${pilotName.replace(/\s+/g, '_')}_Round${roundNumber}_${Date.now()}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    return { success: true };
+  } catch (error) {
+    console.error('Public PDF Download Error:', error);
+    throw new Error(error.response?.data?.message || 'Failed to download PDF');
+  }
+};
+
 // ==================== SITE STATS ====================
 
 // Get site statistics (public)
@@ -708,6 +750,11 @@ const apiService = {
   getMatchReports,
   getReportById,
   downloadReportPDF,
+
+  // Public Reports (No auth needed)
+  getPublicTeamReports,
+  getPublicPilotReports,
+  downloadPublicReportPDF,
 
   // Site Stats
   getSiteStats,

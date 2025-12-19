@@ -16,7 +16,8 @@ const {
   addTeamsToTournament,
   removeTeamFromTournament,
   filterTournaments,
-  generateTournamentFinalReport
+  generateTournamentFinalReport,
+  recalculateAwards
 } = require('../controllers/tournamentController');
 const { protect } = require('../middleware/auth');
 const { uploadBanner: uploadBannerMulter, uploadGallery: uploadGalleryMulter, uploadMOT } = require('../config/multer');
@@ -47,6 +48,9 @@ router.delete('/:id/remove-team/:teamId', protect, removeTeamFromTournament);
 
 // Tournament Final Report
 router.post('/:id/generate-final-report', protect, generateTournamentFinalReport);
+
+// Recalculate Awards (Man of Tournament + Best Players)
+router.post('/:id/recalculate-awards', recalculateAwards); // Temporarily public for testing
 
 module.exports = router;
 

@@ -6,8 +6,11 @@ frontend/node_modules/
 # Production build
 frontend/build/
 
-# Environment variables
+# Environment variables - NEVER push to git (contains secrets!)
 backend/.env
+backend/.env.local
+backend/.env.development
+backend/.env.production
 ml-service/.env
 .env
 

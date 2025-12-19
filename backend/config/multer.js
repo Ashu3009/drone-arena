@@ -1,52 +1,7 @@
 const multer = require('multer');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('./cloudinary');
 const path = require('path');
-const fs = require('fs');
-
-// Create uploads directory if it doesn't exist
-const uploadDir = path.join(__dirname, '../uploads');
-const tournamentsDir = path.join(uploadDir, 'tournaments');
-const galleryDir = path.join(tournamentsDir, 'gallery');
-const teamsDir = path.join(uploadDir, 'teams');
-const membersDir = path.join(teamsDir, 'members');
-
-[uploadDir, tournamentsDir, galleryDir, teamsDir, membersDir].forEach(dir => {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-});
-
-// Configure storage for banner images
-const bannerStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, tournamentsDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, 'banner-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
-
-// Configure storage for gallery images
-const galleryStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, galleryDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, 'gallery-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
-
-// Configure storage for Man of Tournament photo
-const motStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, tournamentsDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, 'mot-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
 
 // File filter to accept only images
 const imageFilter = (req, file, cb) => {
@@ -61,39 +16,68 @@ const imageFilter = (req, file, cb) => {
   }
 };
 
-// Configure multer for different upload types
+// Banner Storage - Cloudinary
+const bannerStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'drone-arena/tournaments/banners',
+    allowed_formats: ['jpg', 'png', 'jpeg', 'gif', 'webp'],
+    transformation: [{ width: 1200, height: 400, crop: 'limit', quality: 'auto' }]
+  }
+});
+
+// Gallery Storage - Cloudinary
+const galleryStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'drone-arena/tournaments/gallery',
+    allowed_formats: ['jpg', 'png', 'jpeg', 'gif', 'webp'],
+    transformation: [{ width: 1000, height: 1000, crop: 'limit', quality: 'auto' }]
+  }
+});
+
+// Man of Tournament Photo Storage - Cloudinary
+const motStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'drone-arena/tournaments/mot',
+    allowed_formats: ['jpg', 'png', 'jpeg'],
+    transformation: [{ width: 500, height: 500, crop: 'fill', gravity: 'face', quality: 'auto' }]
+  }
+});
+
+// Team Member Photo Storage - Cloudinary
+const memberPhotoStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'drone-arena/teams/members',
+    allowed_formats: ['jpg', 'png', 'jpeg'],
+    transformation: [{ width: 300, height: 300, crop: 'fill', gravity: 'face', quality: 'auto' }]
+  }
+});
+
+// Configure multer instances
 const uploadBanner = multer({
   storage: bannerStorage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: imageFilter
 });
 
 const uploadGallery = multer({
   storage: galleryStorage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB per file
+  limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: imageFilter
 });
 
 const uploadMOT = multer({
   storage: motStorage,
-  limits: { fileSize: 3 * 1024 * 1024 }, // 3MB limit for profile photo
+  limits: { fileSize: 3 * 1024 * 1024 },
   fileFilter: imageFilter
-});
-
-// Configure storage for team member photos
-const memberPhotoStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, membersDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, 'member-' + uniqueSuffix + path.extname(file.originalname));
-  }
 });
 
 const uploadMemberPhoto = multer({
   storage: memberPhotoStorage,
-  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB limit per member photo
+  limits: { fileSize: 2 * 1024 * 1024 },
   fileFilter: imageFilter
 });
 

@@ -11,7 +11,17 @@ const {
 } = require('../controllers/droneReportController');
 const { protect } = require('../middleware/auth');
 
-// Admin-protected routes
+// ========================================
+// PUBLIC ROUTES (No authentication needed)
+// ========================================
+router.get('/public/tournaments/:tournamentId/teams', getTournamentTeamAggregates);
+router.get('/public/tournaments/:tournamentId/pilots', getTournamentPilotAggregates);
+router.get('/public/:reportId/pdf', downloadReportPDF);
+router.get('/public/:reportId', getReportById);
+
+// ========================================
+// ADMIN-PROTECTED ROUTES
+// ========================================
 router.get('/tournaments', protect, getReportsByTournament);
 router.get('/tournaments/:tournamentId/teams', protect, getTournamentTeamAggregates);
 router.get('/tournaments/:tournamentId/pilots', protect, getTournamentPilotAggregates);

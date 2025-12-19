@@ -3,8 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import { getTournaments } from '../../services/api';
 import indiaCitiesData from '../../data/india-cities.json';
 import './TournamentsList.css';
+import defaultBanner from '../../assets/logo.png';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
+// Helper function to get full image URL
+const getImageUrl = (path) => {
+  if (!path) return '';
+  // If already a full URL (starts with http:// or https://), return as-is
+  if (path.startsWith('http://') || path.startsWith('https://')) {
+    return path;
+  }
+  // Otherwise, prepend BACKEND_URL
+  return `${BACKEND_URL}${path}`;
+};
 
 const TournamentsList = () => {
   const navigate = useNavigate();
@@ -253,14 +265,16 @@ const TournamentsList = () => {
             >
               {tournament.media?.bannerImage ? (
                 <img
-                  src={`${BACKEND_URL}${tournament.media.bannerImage}`}
+                  src={getImageUrl(tournament.media.bannerImage)}
                   alt={tournament.name}
                   className="tournament-card-banner"
                 />
               ) : (
-                <div className="tournament-card-banner-placeholder">
-                  🎯⚽
-                </div>
+                <img
+                  src={defaultBanner}
+                  alt="Default Tournament Banner"
+                  className="tournament-card-banner"
+                />
               )}
               <div className="tournament-card-content">
                 <div className="tournament-card-header">

@@ -108,7 +108,8 @@ const tournamentSchema = new mongoose.Schema({
         totalMatches: { type: Number, default: 0 }
       }
     },
-    bestCenter: {
+    // ✅ REPLACE WITH THIS:
+    bestStriker: {
       playerName: { type: String, trim: true },
       team: { type: mongoose.Schema.Types.ObjectId, ref: 'Team' },
       photo: { type: String },

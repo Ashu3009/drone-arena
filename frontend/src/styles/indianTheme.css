@@ -7,13 +7,13 @@
   /* Violet Cyberpunk Colors 🚀 */
   --india-saffron: #A855F7;
   --india-white: #4C1D95;
-  --india-green: #EC4899;
+  --india-green: #6366F1;
   --ashok-chakra: #8B5CF6;
 
   /* Cyberpunk Gradient Combinations */
-  --tricolor-gradient: linear-gradient(135deg, #A855F7 0%, #8B5CF6 50%, #EC4899 100%);
+  --tricolor-gradient: linear-gradient(135deg, #A855F7 0%, #8B5CF6 50%, #6366F1 100%);
   --saffron-gradient: linear-gradient(135deg, #A855F7 0%, #C084FC 100%);
-  --green-gradient: linear-gradient(135deg, #EC4899 0%, #F472B6 100%);
+  --green-gradient: linear-gradient(135deg, #6366F1 0%, #818CF8 100%);
 
   /* Dark Cyberpunk Backgrounds */
   --bg-primary: rgba(26, 10, 46, 0.95);
@@ -208,7 +208,7 @@
     transform: scale(1);
   }
   50% {
-    box-shadow: 0 0 30px rgba(168, 85, 247, 1), 0 0 60px rgba(236, 72, 153, 0.7);
+    box-shadow: 0 0 30px rgba(168, 85, 247, 1), 0 0 60px rgba(99, 102, 241, 0.7);
     transform: scale(1.1);
   }
 }
@@ -252,7 +252,7 @@ button,
 .tournament-action-btn,
 .sort-btn.active,
 .filter-tab.active {
-  background: linear-gradient(135deg, var(--india-saffron) 0%, var(--india-green) 100%) !important;
+  background: linear-gradient(135deg, var(--india-saffron) 0%, #0c6ed5 100%) !important;
   color: white !important;
   border: none !important;
   box-shadow: var(--elevation-2) !important;

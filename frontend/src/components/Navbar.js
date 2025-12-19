@@ -40,43 +40,8 @@ const Navbar = () => {
           {/* Logo/Brand */}
           <Link to="/" className="navbar-brand" onClick={closeMenu}>
             <img src={logo} alt="DroneNova Logo" className="brand-icon" />
-            <span className="brand-text">DroneNova</span>
+            <span className="brand-text">DroneNova India</span>
           </Link>
-
-          {/* Desktop Navigation Links */}
-          <div className="nav-links-desktop">
-            <Link
-              to="/"
-              className={`nav-link ${isActive('/') ? 'nav-link-active' : ''}`}
-            >
-              Live Match
-            </Link>
-
-            <Link
-              to="/tournaments"
-              className={`nav-link ${isActive('/tournaments') || location.pathname.startsWith('/tournament/') ? 'nav-link-active' : ''}`}
-            >
-              Tournaments
-            </Link>
-
-            {isAuthenticated ? (
-              <>
-                <Link
-                  to="/admin/dashboard"
-                  className={`nav-link ${isActive('/admin/dashboard') ? 'nav-link-active' : ''}`}
-                >
-                  Admin Dashboard
-                </Link>
-                <button onClick={handleLogout} className="logout-button">
-                  Logout
-                </button>
-              </>
-            ) : (
-              <Link to="/admin/login" className="login-button">
-                Admin Login
-              </Link>
-            )}
-          </div>
 
           {/* Hamburger Menu Button */}
           <button
@@ -107,6 +72,15 @@ const Navbar = () => {
           >
             Tournaments
           </Link>
+
+          <Link
+            to="/reports"
+            className={`nav-link ${isActive('/reports') ? 'nav-link-active' : ''}`}
+            onClick={closeMenu}
+          >
+            📊 Reports
+          </Link>
+
 
           {isAuthenticated ? (
             <>
