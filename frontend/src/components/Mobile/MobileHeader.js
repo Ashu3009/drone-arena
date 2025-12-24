@@ -142,6 +142,15 @@ const MobileHeader = () => {
         <div className="menu-overlay" onClick={() => setMenuOpen(false)}></div>
 
         <div className="menu-content">
+          {/* Close Button */}
+          <button
+            className="menu-close-btn"
+            onClick={() => setMenuOpen(false)}
+            aria-label="Close menu"
+          >
+            ✕
+          </button>
+
           {/* Menu Header */}
           <div className="menu-header">
             <div className="menu-user-info">

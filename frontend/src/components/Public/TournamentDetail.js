@@ -244,12 +244,12 @@ const TournamentDetail = () => {
         >
           Awards
         </button>
-        <button
+        {/* <button
           onClick={() => setActiveTab('reports')}
           className={activeTab === 'reports' ? 'tournament-detail-tab-active' : 'tournament-detail-tab'}
         >
           📊 Reports
-        </button>
+        </button> */}
         <button
           onClick={() => setActiveTab('gallery')}
           className={activeTab === 'gallery' ? 'tournament-detail-tab-active' : 'tournament-detail-tab'}
@@ -675,13 +675,13 @@ const TournamentDetail = () => {
           </div>
         )}
 
-        {/* REPORTS TAB */}
-        {activeTab === 'reports' && (
+        {/* REPORTS TAB - DISABLED (NOT WORKING YET) */}
+        {false && activeTab === 'reports' && (
           <div>
             <h2 className="tournament-detail-section-title">📊 Performance Reports</h2>
 
             {!selectedMatchForReports ? (
-              /* Match Selection */
+              // Match Selection
               <div>
                 <p className="tournament-reports-description">Select a match to view performance reports</p>
                 {matches.filter(m => m.status === 'completed').length === 0 ? (
@@ -718,7 +718,7 @@ const TournamentDetail = () => {
                 )}
               </div>
             ) : !selectedRoundForReports ? (
-              /* Round Selection */
+              // Round Selection
               <div>
                 <button className="tournament-back-button" onClick={goBackToMatchSelection}>
                   ← Back to Matches
@@ -746,7 +746,7 @@ const TournamentDetail = () => {
                 </div>
               </div>
             ) : (
-              /* Round Reports Display */
+              // Round Reports Display
               <div>
                 <button className="tournament-back-button" onClick={goBackToRoundSelection}>
                   ← Back to Rounds
@@ -927,9 +927,9 @@ const TournamentDetail = () => {
       </div>
 
 
-      
 
-      
+
+
       {/* Team Detail Modal */}
       {showTeamModal && selectedTeam && (
         <div className="tournament-team-modal-overlay" onClick={handleCloseTeamModal}>

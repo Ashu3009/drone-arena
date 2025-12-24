@@ -45,7 +45,7 @@
 }
 
 .sort-btn {
-  flex-shrink: 0;
+  /* flex-shrink: ; */
   padding: 8px 16px;
   background: #FFFFFF;
   border: 2px solid #FF9933;

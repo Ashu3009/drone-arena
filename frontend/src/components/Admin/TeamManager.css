@@ -119,7 +119,8 @@
   }
 
   /* Buttons full width */
-  button {
+  .tournament-card button,
+  .card-actions button {
     width: 100% !important;
     font-size: 12px !important;
   }

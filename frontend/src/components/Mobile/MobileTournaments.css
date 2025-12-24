@@ -561,31 +561,37 @@
 
 /* Responsive */
 @media (max-width: 480px) {
-  /* Filter Tabs - Mobile Optimized */
   .filter-tabs {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 0 10px;
-  width: 100%;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-}
-
+    display: flex;
+    gap: 6px;
+    padding: 0 10px 16px 10px;
+    width: 100%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    /* justify-content: space-between; HATA DO */
+  }
+  
+  .filter-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  
   .filter-tab {
-  flex: 1 1 0;           /* equal width sabko */
-  min-width: 0;          /* shrink hone do */
-  max-width: 25%;        /* max 25% width */
-  padding: 6px 8px;
-  font-size: 0.65rem;
-  border-radius: 16px;
-  text-align: center;
-  white-space: nowrap;
-}
-
+    flex: 0 0 calc(25% - 6px);   /* 4 buttons fit, shrink nahi, grow nahi */
+    padding: 6px 4px;
+    font-size: 0.58rem;
+    border-radius: 16px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    scroll-snap-align: start;
+  }
+  
   .filter-tab.active {
     transform: scale(1.02);
   }
+
 
   /* Date Picker Button - Mobile */
   .date-picker-btn .date-text {
