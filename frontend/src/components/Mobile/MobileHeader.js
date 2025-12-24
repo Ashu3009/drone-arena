@@ -94,8 +94,8 @@ const MobileHeader = () => {
               <div className="logo-pulse"></div>
             </div>
             <div className="logo-text">
-              <span className="logo-brand"></span>
-              <span className="logo-tagline"></span>
+              <span className="logo-brand">DroneNova</span>
+              <span className="logo-tagline">India</span>
             </div>
           </div>
 

@@ -229,8 +229,8 @@
 }
 
 .logo-icon {
-  background: linear-gradient(135deg, var(--india-saffron) 0%, var(--india-green) 100%) !important;
-  box-shadow: 0 4px 12px rgba(255, 153, 51, 0.5) !important;
+  background: linear-gradient(135deg, var(--india-saffron) 0%, var(--india-green) 100%);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.5);
 }
 
 .logo-brand {

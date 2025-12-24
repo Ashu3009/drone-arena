@@ -320,7 +320,18 @@ const TournamentManager = () => {
                   <input
                     type="number"
                     value={formData.maxTeams}
-                    onChange={(e) => setFormData({ ...formData, maxTeams: parseInt(e.target.value) || 16 })}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setFormData({
+                        ...formData,
+                        maxTeams: value === '' ? '' : parseInt(value) || 2
+                      });
+                    }}
+                    onBlur={(e) => {
+                      if (e.target.value === '' || parseInt(e.target.value) < 2) {
+                        setFormData({ ...formData, maxTeams: 2 });
+                      }
+                    }}
                     style={styles.input}
                     min="2"
                     max="32"
