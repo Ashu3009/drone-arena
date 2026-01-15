@@ -27,6 +27,9 @@ app.use(cors({
     'https://drone-arena-frontend.vercel.app',
     'https://drone-arena-frontend-ashus-projects-831330bf.vercel.app',
     'http://localhost:3000',
+    'https://localhost',           // Capacitor ke liye
+    'capacitor://localhost',       // Capacitor ke liye
+    'http://localhost',  
     'http://10.93.182.196:3000'
   ],
   credentials: true,

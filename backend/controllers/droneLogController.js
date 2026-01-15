@@ -187,7 +187,7 @@ const getMatchLogs = async (req, res) => {
 const clearMatchLogs = async (req, res) => {
   try {
     const { matchId } = req.params;
-    
+
     const result = await DroneTelemetry.deleteMany({ match: matchId });
     
     res.json({
