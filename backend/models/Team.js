@@ -13,6 +13,13 @@ const teamSchema = new mongoose.Schema({
     ref: 'School',
     default: null // OPTIONAL: null = independent/corporate team
   },
+
+    teamSize: {
+    type: String,
+    enum: ['2v2', '4v4'],
+    default: '4v4'
+  },
+
   teamType: {
     type: String,
     enum: ['School', 'Corporate', 'Independent'],

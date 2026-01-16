@@ -54,7 +54,7 @@ exports.getTeamById = async (req, res) => {
 // @route   POST /api/teams
 exports.createTeam = async (req, res) => {
   try {
-    const { name, school, teamType, location, color, captainName, members, droneIds } = req.body;
+    const { name, school, teamType, teamSize, location, color, captainName, members, droneIds } = req.body;
 
     // Validation
     if (!name) {
@@ -84,6 +84,7 @@ exports.createTeam = async (req, res) => {
       name,
       school: school || null, // Optional
       teamType: teamType || 'School',
+      teamSize: teamSize || '4v4',
       location,
       color: color || '#3B82F6',
       captain: captainName,

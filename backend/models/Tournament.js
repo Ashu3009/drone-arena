@@ -60,11 +60,22 @@ const tournamentSchema = new mongoose.Schema({
 
   // Tournament Settings
   settings: {
+
+    teamFormat: {
+      type: String,
+      enum: ['2v2', '4v4'],
+      default: '4v4'
+    },
+
     matchType: {
       type: String,
       enum: ['Best of 2', 'Best of 3'],
       default: 'Best of 2'
     },
+  
+  
+
+
     hasTiebreaker: {
       type: Boolean,
       default: true  // Round 3 if draw in Best of 2

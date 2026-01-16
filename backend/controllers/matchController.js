@@ -111,8 +111,8 @@ const getAllMatches = async (req, res) => {
     
     const matches = await Match.find(filter)
       .populate('tournament', 'name')
-      .populate('teamA', 'name color members')
-      .populate('teamB', 'name color members')
+      .populate('teamA', 'name color members teamSize')
+      .populate('teamB', 'name color members teamSize')
       .populate('winner', 'name')
       .sort({ createdAt: -1 });
     
@@ -137,8 +137,8 @@ const getMatchById = async (req, res) => {
     
     const match = await Match.findById(matchId)
       .populate('tournament', 'name')
-      .populate('teamA', 'name color members')
-      .populate('teamB', 'name color members')
+      .populate('teamA', 'name color members teamSize')
+      .populate('teamB', 'name color members teamSize')
       .populate('winner', 'name');
     
     if (!match) {
@@ -297,8 +297,8 @@ const startRound = async (req, res) => {
     console.log('🎬 Starting round for match:', matchId);
 
     const match = await Match.findById(matchId)
-      .populate('teamA', 'name color members')
-      .populate('teamB', 'name color members');
+      .populate('teamA', 'name color members teamSize')
+      .populate('teamB', 'name color members teamSize');
     
     if (!match) {
       return res.status(404).json({
@@ -1334,8 +1334,8 @@ const endRound = async (req, res) => {
     console.log(`   - Team B Score: ${activeRound.teamBScore}`);
     console.log('=====================================\n');
 
-    await match.populate('teamA', 'name color members');
-    await match.populate('teamB', 'name color members');
+    await match.populate('teamA', 'name color members teamSize');
+    await match.populate('teamB', 'name color members teamSize');
 
     // ✅ Emit Socket.io event for round completion
     if (global.io) {
@@ -1385,8 +1385,8 @@ const completeMatch = async (req, res) => {
     const { matchId } = req.params;
     
     const match = await Match.findById(matchId)
-      .populate('teamA', 'name color')
-      .populate('teamB', 'name color');
+      .populate('teamA', 'name color teamSize')
+      .populate('teamB', 'name color teamSize');
     
     if (!match) {
       return res.status(404).json({
@@ -1577,8 +1577,8 @@ const setCurrentMatch = async (req, res) => {
       { new: true }
     )
       .populate('tournament', 'name')
-      .populate('teamA', 'name color members')
-      .populate('teamB', 'name color members');
+      .populate('teamA', 'name color members teamSize')
+      .populate('teamB', 'name color members teamSize');
 
     if (!match) {
       return res.status(404).json({
@@ -1622,8 +1622,8 @@ const getCurrentMatch = async (req, res) => {
   try {
     const match = await Match.findOne({ isCurrentMatch: true })
       .populate('tournament', 'name')
-      .populate('teamA', 'name color members')
-      .populate('teamB', 'name color members')
+      .populate('teamA', 'name color members teamSize')
+      .populate('teamB', 'name color members teamSize')
       .populate('winner', 'name');
 
     if (!match) {

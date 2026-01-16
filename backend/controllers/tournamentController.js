@@ -35,7 +35,7 @@ exports.getTournamentById = async (req, res) => {
     const tournament = await Tournament.findById(req.params.id)
   .populate({
     path: 'registeredTeams',
-    select: 'name location teamType members captain'
+    select: 'name location teamType teamSize members captain'
   })
   .populate({
     path: 'winners.champion',
