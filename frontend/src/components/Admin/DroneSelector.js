@@ -3,18 +3,26 @@ import { getAllDrones } from '../../services/api';
 
 const DroneSelector = ({ matchId, roundNumber, teamA, teamB, onRegister }) => {
   const [allDrones, setAllDrones] = useState([]);
-  const [teamALineup, setTeamALineup] = useState([
-    { position: 'Forward', pilotId: '', pilotName: '', droneId: '', role: 'Forward' },
-    { position: 'Striker', pilotId: '', pilotName: '', droneId: '', role: 'Striker' },
-    { position: 'Defender', pilotId: '', pilotName: '', droneId: '', role: 'Defender' },
-    { position: 'Keeper', pilotId: '', pilotName: '', droneId: '', role: 'Keeper' }
-  ]);
-  const [teamBLineup, setTeamBLineup] = useState([
-    { position: 'Forward', pilotId: '', pilotName: '', droneId: '', role: 'Forward' },
-    { position: 'Striker', pilotId: '', pilotName: '', droneId: '', role: 'Striker' },
-    { position: 'Defender', pilotId: '', pilotName: '', droneId: '', role: 'Defender' },
-    { position: 'Keeper', pilotId: '', pilotName: '', droneId: '', role: 'Keeper' }
-  ]);
+
+  // Dynamic lineup based on team size (2v2 or 4v4)
+  const getInitialLineup = (team) => {
+    const is2v2 = team?.teamSize === '2v2';
+    if (is2v2) {
+      return [
+        { position: 'Striker', pilotId: '', pilotName: '', droneId: '', role: 'Striker' },
+        { position: 'Defender', pilotId: '', pilotName: '', droneId: '', role: 'Defender' }
+      ];
+    }
+    return [
+      { position: 'Forward', pilotId: '', pilotName: '', droneId: '', role: 'Forward' },
+      { position: 'Striker', pilotId: '', pilotName: '', droneId: '', role: 'Striker' },
+      { position: 'Defender', pilotId: '', pilotName: '', droneId: '', role: 'Defender' },
+      { position: 'Keeper', pilotId: '', pilotName: '', droneId: '', role: 'Keeper' }
+    ];
+  };
+
+  const [teamALineup, setTeamALineup] = useState(() => getInitialLineup(teamA));
+  const [teamBLineup, setTeamBLineup] = useState(() => getInitialLineup(teamB));
 
   useEffect(() => {
     loadDrones();

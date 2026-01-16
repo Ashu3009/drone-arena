@@ -64,7 +64,16 @@ const MatchManager = () => {
       try {
         const response = await getTournamentById(formData.tournament);
         if (response.success && response.data.registeredTeams) {
-          setAvailableTeams(response.data.registeredTeams);
+          // Get tournament's team format (2v2 or 4v4)
+          const tournamentFormat = response.data.settings?.teamFormat || '4v4';
+
+          // Filter teams that match the tournament format
+          // Old teams without teamSize field are treated as '4v4' (default)
+          const filteredTeams = response.data.registeredTeams.filter(
+            team => (team.teamSize || '4v4') === tournamentFormat
+          );
+
+          setAvailableTeams(filteredTeams);
           // Reset team selection when tournament changes
           setFormData(prev => ({ ...prev, teamA: '', teamB: '' }));
         }

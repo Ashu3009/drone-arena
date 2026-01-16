@@ -55,6 +55,7 @@ const TournamentManager = () => {
     },
     registeredTeams: [],
     settings: {
+      teamFormat: '4v4',
       matchType: 'Best of 2',
       hasTiebreaker: true,
       roundDuration: 3
@@ -179,7 +180,8 @@ const TournamentManager = () => {
       organizer: tournament.organizer || { name: '', email: '', phone: '' },
       registration: tournament.registration || { isOpen: true, deadline: '', fee: 0 },
       registeredTeams: tournament.registeredTeams?.map(t => t._id || t) || [],
-      settings: tournament.settings || { matchType: 'Best of 2', hasTiebreaker: true, roundDuration: 3 }
+      settings: tournament.settings || { teamFormat: '4v4', matchType: 'Best of 2', hasTiebreaker: true, roundDuration: 3 }
+      
     });
     setShowCreateForm(true);
   };
@@ -199,7 +201,7 @@ const TournamentManager = () => {
       organizer: { name: '', email: '', phone: '' },
       registration: { isOpen: true, deadline: '', fee: 0 },
       registeredTeams: [],
-      settings: { matchType: 'Best of 2', hasTiebreaker: true, roundDuration: 3 }
+      settings: { teamFormat: '4v4', matchType: 'Best of 2', hasTiebreaker: true, roundDuration: 3 }
     });
   };
 
@@ -421,12 +423,31 @@ const TournamentManager = () => {
                 />
               </div>
             </div>
-
             {/* Match Settings */}
             <div style={styles.section}>
+
+
+            
+
               <h4 style={styles.sectionTitle}>Match Settings</h4>
 
               <div style={styles.formRow}>
+
+                  <div style={styles.formGroup}>
+                  <label style={styles.label}>Team Format</label>
+                  <select
+                    value={formData.settings.teamFormat}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      settings: { ...formData.settings, teamFormat: e.target.value }
+                    })}
+                    style={styles.input}
+                  >
+                    <option value="4v4">4v4 (4 players per team)</option>
+                    <option value="2v2">2v2 (2 players per team)</option>
+                  </select>
+                </div>
+
                 <div style={styles.formGroup}>
                   <label style={styles.label}>Match Type</label>
                   <select
@@ -484,7 +505,7 @@ const TournamentManager = () => {
                 {teams.length === 0 ? (
                   <p style={styles.emptyText}>No teams available. Create teams first.</p>
                 ) : (
-                  teams.map(team => (
+                  teams.filter(team => (team.teamSize || '4v4') === formData.settings.teamFormat).map(team => (
                     <label key={team._id} style={styles.teamCheckbox}>
                       <input
                         type="checkbox"

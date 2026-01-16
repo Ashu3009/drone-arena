@@ -1,0 +1,1 @@
+console.log('Checking for wide elements...'); document.querySelectorAll('*').forEach(el => { if(el.scrollWidth > window.innerWidth) { console.log(el.className, 'scrollWidth:', el.scrollWidth, 'innerWidth:', window.innerWidth); } });

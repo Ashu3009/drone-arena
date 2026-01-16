@@ -8,10 +8,14 @@ const TeamManager = () => {
   const [loading, setLoading] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingTeam, setEditingTeam] = useState(null);
+
+  
+
   const [formData, setFormData] = useState({
     name: '',
     school: '', // Optional
     teamType: 'School',
+    teamSize: '4v4',
     location: {
       city: '',
       state: '',
@@ -121,11 +125,13 @@ const TeamManager = () => {
       name: formData.name,
       school: formData.school || null,
       teamType: formData.teamType,
+      teamSize: formData.teamSize,  // 👈 YE ADD KARO
       location: formData.location,
       captain: formData.captain,
       color: formData.color,
       members: membersData
     };
+
 
     setLoading(true);
     try {
@@ -214,6 +220,7 @@ const TeamManager = () => {
       name: '',
       school: '',
       teamType: 'School',
+      teamSize: '4v4',
       location: {
         city: '',
         state: '',
@@ -278,6 +285,34 @@ const TeamManager = () => {
               <option value="Independent">Independent</option>
             </select>
           </div>
+
+
+          <div style={styles.formGroup}>
+          <label style={styles.label}>Team Size *</label>
+          <select
+            value={formData.teamSize}
+            onChange={(e) => {
+              const newSize = e.target.value;
+              const newMembers = newSize === '2v2' 
+                ? [
+                    { name: '', role: 'Striker', photo: null, photoFile: null, jerseyNumber: '' },
+                    { name: '', role: 'Defender', photo: null, photoFile: null, jerseyNumber: '' }
+                  ]
+                : [
+                    { name: '', role: 'Forward', photo: null, photoFile: null, jerseyNumber: '' },
+                    { name: '', role: 'Striker', photo: null, photoFile: null, jerseyNumber: '' },
+                    { name: '', role: 'Defender', photo: null, photoFile: null, jerseyNumber: '' },
+                    { name: '', role: 'Keeper', photo: null, photoFile: null, jerseyNumber: '' }
+                  ];
+              setFormData({ ...formData, teamSize: newSize, members: newMembers });
+            }}
+            style={styles.input}
+          >
+            <option value="4v4">4v4 (Forward, Striker, Defender, Keeper)</option>
+            <option value="2v2">2v2 (Striker, Defender)</option>
+          </select>
+        </div>
+
 
           {formData.teamType === 'School' && (
             <div style={styles.formGroup}>
@@ -359,7 +394,7 @@ const TeamManager = () => {
             <h4 style={styles.sectionTitle}>Team Members</h4>
             <p style={styles.helperText}>Upload photo (optional), enter name, select role, and add jersey number (optional) for each member</p>
 
-            {formData.members.slice(0, 4).map((member, index) => (
+            {formData.members.slice(0, formData.teamSize === '2v2' ? 2 : 4).map((member, index) => (
               <div key={index} style={styles.memberRow}>
                 <div style={styles.memberNumber}>#{index + 1}</div>
 

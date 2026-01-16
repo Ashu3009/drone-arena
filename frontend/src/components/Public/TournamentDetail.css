@@ -2,13 +2,23 @@
    VIOLET CYBERPUNK THEME - TOURNAMENT DETAIL
    ========================================== */
 
-.tournament-detail-container {
+/* .tournament-detail-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
   min-height: 100vh;
   background: radial-gradient(circle at 50% 50%, #8B5CF6 0%, #4C1D95 30%, #1a0a2e 60%, #000000 100%);
   position: relative;
+} */
+
+.tournament-detail-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  background: radial-gradient(circle at 50% 50%, #8B5CF6 0%, #4C1D95 30%, #1a0a2e 60%, #000000 100%);
+  overflow-x: hidden; /* YE ADD KARO */
+  width: 100%; /* YE BHI ADD KARO */
 }
 
 /* Animated background effects */
@@ -838,6 +848,7 @@
   filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.5));
 }
 
+
 .tournament-organizer-contact {
   font-size: 16px;
   color: #C4B5FD;
@@ -845,12 +856,14 @@
   text-shadow: 0 0 5px rgba(168, 85, 247, 0.3);
 }
 
+
 /* Gallery */
 .tournament-gallery-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 16px;
 }
+
 
 .tournament-gallery-item {
   border-radius: 8px;
@@ -885,7 +898,7 @@
   color: #C4B5FD;
   text-shadow: 0 0 5px rgba(168, 85, 247, 0.3);
 }
-
+ 
 /* Team Modal */
 .tournament-team-modal-overlay {
   position: fixed;
@@ -1109,6 +1122,84 @@
 
 /* Mobile screens - Enhanced touch interactions */
 @media (max-width: 480px) {
+
+  /* Team Modal - Mobile Fix */
+
+  /* Mobile overflow fix */
+  body {
+    overflow-x: hidden;
+    width: 100%;
+  }
+
+  .tournament-detail-container {
+    overflow-x: hidden;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Fix wide elements */
+  .tournament-detail-header-content,
+  .tournament-detail-section,
+  .tournament-teams-grid,
+  .tournament-awards-grid,
+  .tournament-gallery-grid {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+
+  .tournament-team-modal-content {
+    padding: 15px !important;
+    max-height: 85vh;
+  }
+
+  .tournament-team-modal-title {
+    font-size: 20px;
+    margin-bottom: 16px;
+  }
+
+  .tournament-team-modal-info {
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+
+  .tournament-members-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)) !important;
+    gap: 12px;
+  }
+
+  .tournament-member-card {
+    padding: 12px;
+  }
+
+  .tournament-member-photo {
+    width: 70px !important;
+    height: 70px !important;
+  }
+
+  .tournament-member-photo-placeholder {
+    width: 70px !important;
+    height: 70px !important;
+    font-size: 28px;
+  }
+
+  .tournament-member-name {
+    font-size: 12px;
+  }
+
+  .tournament-member-role {
+    font-size: 10px;
+  }
+
+  .tournament-team-modal-close-button {
+    width: 32px;
+    height: 32px;
+    font-size: 24px;
+    top: 10px;
+    right: 10px;
+  }
+
+
   .tournament-detail-container {
     padding: 12px;
   }
@@ -1688,4 +1779,44 @@
   .tournament-team-stat-box .stat-number {
     font-size: 22px;
   }
+
+
+  @media (max-width: 480px) {
+  /* Team members container - 2 columns grid */
+  .team-members-grid,
+  .tournament-team-modal-content .team-members,
+  .team-members {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+    overflow-x: hidden !important;
+    padding: 0 10px !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 4px;
+  }
+  
+  /* Member card size */
+  .team-member-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex-shrink: 0 !important;
+  }
+  
+  /* Member image smaller */
+  .team-member-card img,
+  .member-avatar {
+    width: 70px !important;
+    height: 70px !important;
+  }
+  
+  /* Text smaller */
+  .member-name {
+    font-size: 0.8rem !important;
+  }
+  
+  .member-role {
+    font-size: 0.65rem !important;
+  }
+}
 }
