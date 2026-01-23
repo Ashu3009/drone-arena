@@ -1,6 +1,27 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+// Dynamic API URL - uses current hostname for network compatibility
+const getApiBaseUrl = () => {
+  // If env variable is set and not localhost, use it
+  if (process.env.REACT_APP_API_URL && !process.env.REACT_APP_API_URL.includes('localhost')) {
+    return process.env.REACT_APP_API_URL;
+  }
+
+  // Dynamic: use current hostname with backend port
+  const hostname = window.location.hostname;
+  const protocol = window.location.protocol;
+
+  // If accessing via localhost, use localhost
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return 'http://localhost:5000/api';
+  }
+
+  // Otherwise use the same hostname (network IP) with backend port
+  return `${protocol}//${hostname}:5000/api`;
+};
+
+const API_BASE_URL = getApiBaseUrl();
+console.log('🌐 API Base URL:', API_BASE_URL);
 
 // ==================== AXIOS INTERCEPTOR FOR AUTH ====================
 // Add token to all requests (supports both admin and user tokens)

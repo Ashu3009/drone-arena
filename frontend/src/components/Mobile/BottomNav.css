@@ -1,260 +1,137 @@
-/* Bottom Navigation Bar Styles */
+/* ========================================
+   Bottom Navigation - PhonePe Style
+   ======================================== */
+
+@import './MobileTheme.css';
 
 .bottom-nav {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 300;
-  background: linear-gradient(180deg, rgba(26, 10, 46, 0.98) 0%, rgba(26, 10, 46, 1) 100%);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-top: 3px solid rgba(168, 85, 247, 0.6);
-  box-shadow: 0 -8px 32px rgba(139, 92, 246, 0.3), 0 0 20px rgba(168, 85, 247, 0.2);
+  z-index: var(--z-fixed);
+  background: var(--white);
+  border-top: 1px solid var(--neutral-200);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
 }
 
 .bottom-nav-container {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  padding: 8px 16px;
-  max-width: 600px;
+  padding: var(--space-2) var(--space-4);
+  max-width: 500px;
   margin: 0 auto;
 }
 
-/* Navigation Items */
+/* Navigation Item */
 .nav-item {
   position: relative;
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 8px 12px;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-2);
   background: transparent;
   border: none;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   -webkit-tap-highlight-color: transparent;
-  overflow: hidden;
+  transition: all var(--transition-fast);
 }
 
 .nav-item:active {
   transform: scale(0.95);
 }
 
-/* Ripple Effect */
-.nav-ripple {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(168, 85, 247, 0.4) 0%, transparent 70%);
-  transform: translate(-50%, -50%);
-  animation: ripple-expand 0.6s ease-out forwards;
-}
-
-@keyframes ripple-expand {
-  to {
-    width: 100px;
-    height: 100px;
-    opacity: 0;
-  }
-}
-
-/* Icon Container */
+/* Icon */
 .nav-icon {
-  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 28px;
+  height: 28px;
+  color: var(--neutral-400);
+  transition: color var(--transition-fast);
 }
 
 .nav-item.active .nav-icon {
-  transform: translateY(-4px);
-}
-
-.icon-emoji {
-  font-size: 1.5rem;
-  transition: all 0.3s ease;
-  position: relative;
-  z-index: 2;
-}
-
-.nav-item.active .icon-emoji {
-  filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.6));
-  animation: icon-bounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-@keyframes icon-bounce {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.2);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-/* Icon Glow */
-.icon-glow {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 40px;
-  height: 40px;
-  background: radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, transparent 70%);
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  animation: glow-pulse 2s ease-in-out infinite;
-  z-index: 1;
-}
-
-@keyframes glow-pulse {
-  0%, 100% {
-    opacity: 0.5;
-    transform: translate(-50%, -50%) scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1.1);
-  }
+  color: var(--primary-600);
 }
 
 /* Label */
 .nav-label {
-  font-size: 0.625rem;
-  font-weight: 600;
-  color: #DDD6FE;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  transition: all 0.3s ease;
-  white-space: nowrap;
+  font-size: var(--font-xs);
+  font-weight: var(--font-medium);
+  color: var(--neutral-500);
+  transition: color var(--transition-fast);
 }
 
 .nav-item.active .nav-label {
-  color: #A855F7;
-  font-weight: 700;
-  text-shadow: 0 0 10px rgba(168, 85, 247, 0.6);
+  color: var(--primary-600);
+  font-weight: var(--font-semibold);
 }
 
-/* Active Dot Indicator */
-.active-dot {
+/* Active Indicator */
+.nav-indicator {
   position: absolute;
-  top: 4px;
-  width: 4px;
-  height: 4px;
-  background: #A855F7;
-  border-radius: 50%;
-  box-shadow: 0 0 8px rgba(168, 85, 247, 0.8);
-  animation: dot-appear 0.3s ease-out forwards;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 3px;
+  background: var(--primary-600);
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
 }
 
-@keyframes dot-appear {
-  from {
-    opacity: 0;
-    transform: scale(0);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* Safe Area for devices with notches */
+/* Safe Area */
 .bottom-nav-safe-area {
-  height: env(safe-area-inset-bottom);
-  background: rgba(26, 10, 46, 1);
+  height: var(--safe-area-bottom);
+  background: var(--white);
 }
 
 /* Responsive */
-@media (max-width: 480px) {
+@media (max-width: 360px) {
   .bottom-nav-container {
-    padding: 6px 8px;
-  }
-
-  .nav-item {
-    padding: 6px 8px;
+    padding: var(--space-1) var(--space-2);
   }
 
   .nav-icon {
-    width: 32px;
-    height: 32px;
+    width: 24px;
+    height: 24px;
   }
 
-  .icon-emoji {
-    font-size: 1.25rem;
+  .nav-icon svg {
+    width: 20px;
+    height: 20px;
   }
 
   .nav-label {
-    font-size: 0.5625rem;
+    font-size: 0.625rem;
   }
 }
 
-/* Tablet and larger */
+/* Hide on tablet and larger */
 @media (min-width: 768px) {
   .bottom-nav {
     display: none;
   }
 }
 
-/* Smooth transitions for theme changes */
-@media (prefers-color-scheme: dark) {
-  .bottom-nav {
-    background: linear-gradient(180deg, rgba(26, 10, 46, 0.98) 0%, rgba(26, 10, 46, 1) 100%);
-  }
-}
-
-@media (prefers-color-scheme: light) {
-  .bottom-nav {
-    background: linear-gradient(180deg, rgba(26, 10, 46, 0.95) 0%, rgba(26, 10, 46, 1) 100%);
-    border-top-color: rgba(168, 85, 247, 0.6);
-  }
-
-  .nav-label {
-    color: #DDD6FE;
-  }
-
-  .nav-item.active .nav-label {
-    color: #A855F7;
-  }
-}
-
 /* Accessibility */
 @media (prefers-reduced-motion: reduce) {
-  .nav-item,
-  .nav-icon,
-  .icon-emoji,
-  .nav-label {
-    animation: none;
+  .nav-item {
     transition: none;
-  }
-
-  .nav-ripple,
-  .icon-glow,
-  .active-dot {
-    display: none;
   }
 }
 
-/* Hover effects for desktop (when visible) */
+/* Hover for desktop testing */
 @media (hover: hover) {
   .nav-item:hover:not(.active) .nav-icon {
-    transform: translateY(-2px);
+    color: var(--primary-400);
   }
 
   .nav-item:hover:not(.active) .nav-label {
-    color: #A855F7;
-  }
-
-  .nav-item:hover:not(.active) .icon-emoji {
-    filter: drop-shadow(0 0 6px rgba(168, 85, 247, 0.4));
+    color: var(--primary-400);
   }
 }

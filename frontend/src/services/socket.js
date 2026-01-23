@@ -1,6 +1,26 @@
 import io from 'socket.io-client';
 
-const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || 'http://localhost:5000';
+// Dynamic Socket URL - uses current hostname for network compatibility
+const getSocketUrl = () => {
+  // If env variable is set and not localhost, use it
+  if (process.env.REACT_APP_SOCKET_URL && !process.env.REACT_APP_SOCKET_URL.includes('localhost')) {
+    return process.env.REACT_APP_SOCKET_URL;
+  }
+
+  // Dynamic: use current hostname with backend port
+  const hostname = window.location.hostname;
+  const protocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
+
+  // If accessing via localhost, use localhost
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return 'http://localhost:5000';
+  }
+
+  // Otherwise use the same hostname (network IP) with backend port
+  return `${protocol}//${hostname}:5000`;
+};
+
+const SOCKET_URL = getSocketUrl();
 
 let socket = null;
 

@@ -1,0 +1,199 @@
+/**
+ * Public Mobile Theme - Marketing & Brand Colors
+ * Clean, professional theme for public viewers
+ */
+
+:root {
+  /* Brand Colors - Purple Theme (PhonePe style) */
+  --pub-primary-900: #3D1F6B;
+  --pub-primary-800: #5B259F;
+  --pub-primary-700: #6B2DB8;
+  --pub-primary-600: #7B3FC7;
+  --pub-primary-500: #8B52D6;
+  --pub-primary-400: #9B65E5;
+  --pub-primary-300: #B584ED;
+  --pub-primary-200: #CFA3F5;
+  --pub-primary-100: #E9D5FB;
+  --pub-primary-50: #F5EBFF;
+
+  /* Neutral Colors */
+  --pub-neutral-900: #1A1A1A;
+  --pub-neutral-800: #2E2E2E;
+  --pub-neutral-700: #424242;
+  --pub-neutral-600: #565656;
+  --pub-neutral-500: #6B6B6B;
+  --pub-neutral-400: #9E9E9E;
+  --pub-neutral-300: #BDBDBD;
+  --pub-neutral-200: #E0E0E0;
+  --pub-neutral-100: #F0F0F0;
+  --pub-neutral-50: #FAFAFE;
+
+  /* Semantic Colors */
+  --pub-success-600: #16A34A;
+  --pub-success-500: #22C55E;
+  --pub-error-600: #DC2626;
+  --pub-error-500: #EF4444;
+  --pub-warning-600: #D97706;
+  --pub-warning-500: #F59E0B;
+  --pub-info-600: #2563EB;
+  --pub-info-500: #3B82F6;
+
+  /* Live Match Colors */
+  --pub-live-red: #FF3B30;
+  --pub-live-glow: rgba(255, 59, 48, 0.3);
+
+  /* Spacing Scale */
+  --pub-space-1: 4px;
+  --pub-space-2: 8px;
+  --pub-space-3: 12px;
+  --pub-space-4: 16px;
+  --pub-space-5: 20px;
+  --pub-space-6: 24px;
+  --pub-space-8: 32px;
+  --pub-space-10: 40px;
+  --pub-space-12: 48px;
+  --pub-space-16: 64px;
+
+  /* Typography Scale */
+  --pub-font-xs: 0.75rem;      /* 12px */
+  --pub-font-sm: 0.875rem;     /* 14px */
+  --pub-font-base: 1rem;       /* 16px */
+  --pub-font-lg: 1.125rem;     /* 18px */
+  --pub-font-xl: 1.25rem;      /* 20px */
+  --pub-font-2xl: 1.5rem;      /* 24px */
+  --pub-font-3xl: 1.875rem;    /* 30px */
+  --pub-font-4xl: 2.25rem;     /* 36px */
+
+  /* Border Radius */
+  --pub-radius-sm: 4px;
+  --pub-radius-md: 8px;
+  --pub-radius-lg: 12px;
+  --pub-radius-xl: 16px;
+  --pub-radius-2xl: 24px;
+  --pub-radius-full: 9999px;
+
+  /* Shadows */
+  --pub-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --pub-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --pub-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --pub-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.12);
+  --pub-shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+
+  /* Transitions */
+  --pub-transition-fast: 150ms ease-in-out;
+  --pub-transition-base: 200ms ease-in-out;
+  --pub-transition-slow: 300ms ease-in-out;
+
+  /* Z-index Scale */
+  --pub-z-base: 1;
+  --pub-z-dropdown: 100;
+  --pub-z-sticky: 200;
+  --pub-z-fixed: 300;
+  --pub-z-modal-backdrop: 400;
+  --pub-z-modal: 500;
+  --pub-z-popover: 600;
+  --pub-z-tooltip: 700;
+}
+
+/* Minimal Animations (only essential ones) */
+@keyframes pub-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pub-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes pub-fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pub-slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pub-livePulse {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 var(--pub-live-glow);
+  }
+  50% {
+    opacity: 0.8;
+    box-shadow: 0 0 0 8px rgba(255, 59, 48, 0);
+  }
+}
+
+/* Base Reset for Public Mobile */
+.public-mobile-view {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--pub-neutral-50);
+  color: var(--pub-neutral-900);
+  min-height: 100vh;
+}
+
+/* Utility Classes */
+.pub-container {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0 var(--pub-space-4);
+}
+
+.pub-card {
+  background: white;
+  border-radius: var(--pub-radius-lg);
+  box-shadow: var(--pub-shadow-card);
+  border: 1px solid var(--pub-neutral-200);
+}
+
+.pub-btn-primary {
+  background: var(--pub-primary-600);
+  color: white;
+  padding: var(--pub-space-3) var(--pub-space-6);
+  border-radius: var(--pub-radius-lg);
+  border: none;
+  font-weight: 600;
+  font-size: var(--pub-font-base);
+  cursor: pointer;
+  transition: var(--pub-transition-base);
+}
+
+.pub-btn-primary:active {
+  background: var(--pub-primary-700);
+  transform: scale(0.98);
+}
+
+.pub-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pub-space-2);
+  padding: var(--pub-space-2) var(--pub-space-3);
+  background: var(--pub-live-red);
+  color: white;
+  border-radius: var(--pub-radius-full);
+  font-size: var(--pub-font-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  animation: pub-livePulse 2s ease-in-out infinite;
+}
+
+.pub-live-dot {
+  width: 6px;
+  height: 6px;
+  background: white;
+  border-radius: 50%;
+  animation: pub-pulse 1.5s ease-in-out infinite;
+}

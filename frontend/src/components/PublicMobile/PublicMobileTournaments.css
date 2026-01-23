@@ -1,0 +1,375 @@
+/* ============================================ */
+/* TOURNAMENTS CONTAINER */
+/* ============================================ */
+.pub-tournaments-container {
+  min-height: 100vh;
+  background: #f8f9fa;
+  padding: 16px;
+  padding-bottom: 100px;
+}
+
+/* ============================================ */
+/* HEADER */
+/* ============================================ */
+.pub-tournaments-header {
+  text-align: center;
+  padding: 20px 16px;
+  margin: -16px -16px 20px -16px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.pub-page-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+}
+
+.pub-page-subtitle {
+  font-size: 14px;
+  color: #64748b !important;
+  margin: 0;
+}
+
+/* ============================================ */
+/* FILTER TABS */
+/* ============================================ */
+.pub-filter-section {
+  margin-bottom: 20px;
+}
+
+.pub-filter-tabs-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: #ffffff;
+  padding: 12px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.pub-filter-tabs {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+}
+
+.pub-filter-tab {
+  flex: 1;
+  padding: 10px 16px;
+  background: #f1f5f9;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pub-filter-tab.active {
+  background: #FF9933;
+  color: #ffffff;
+}
+
+.pub-filter-tab:active {
+  transform: scale(0.98);
+}
+
+/* ============================================ */
+/* FILTER ICON BUTTON */
+/* ============================================ */
+.pub-filter-icon-btn {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  background: #f1f5f9;
+  border: none;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  color: #64748b;
+}
+
+.pub-filter-icon-btn.active {
+  background: #FF9933;
+  color: #ffffff;
+}
+
+.pub-filter-icon-btn:active {
+  transform: scale(0.95);
+}
+
+.pub-filter-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  background: #dc2626;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+}
+
+/* ============================================ */
+/* EXPANDABLE FILTERS PANEL */
+/* ============================================ */
+.pub-extra-filters-panel {
+  margin-top: 12px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  animation: pub-slideDown 0.3s ease;
+}
+
+@keyframes pub-slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.pub-filter-dropdowns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.pub-filter-select {
+  padding: 10px 12px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pub-filter-select:focus {
+  outline: none;
+  border-color: #FF9933;
+}
+
+.pub-clear-all-btn {
+  width: 100%;
+  padding: 8px 16px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #dc2626;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pub-clear-all-btn:active {
+  background: #fef2f2;
+  transform: scale(0.98);
+}
+
+/* ============================================ */
+/* TOURNAMENTS LIST */
+/* ============================================ */
+.pub-tournaments-content {
+  padding-bottom: 20px;
+}
+
+.pub-tournaments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pub-tournament-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.pub-tournament-card:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* ============================================ */
+/* STATUS BADGE */
+/* ============================================ */
+.pub-status-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pub-status-badge.upcoming {
+  background: rgba(59, 130, 246, 0.15);
+  color: #2563eb;
+}
+
+.pub-status-badge.live {
+  background: rgba(239, 68, 68, 0.15);
+  color: #dc2626;
+}
+
+.pub-status-badge.completed {
+  background: rgba(34, 197, 94, 0.15);
+  color: #16a34a;
+}
+
+.pub-live-dot {
+  width: 6px;
+  height: 6px;
+  background: #dc2626;
+  border-radius: 50%;
+  animation: pub-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pub-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+/* ============================================ */
+/* TOURNAMENT BODY */
+/* ============================================ */
+.pub-tournament-body {
+  padding-top: 8px;
+}
+
+.pub-tournament-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 12px 0;
+  padding-right: 80px; /* Space for badge */
+}
+
+.pub-tournament-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pub-info-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.pub-info-row svg {
+  flex-shrink: 0;
+  color: #94a3b8;
+}
+
+.pub-info-row span {
+  color: #475569 !important;
+  font-weight: 500;
+}
+
+/* ============================================ */
+/* NO TOURNAMENTS */
+/* ============================================ */
+.pub-no-tournaments {
+  text-align: center;
+  padding: 60px 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.pub-no-tournaments svg {
+  color: #cbd5e1;
+  margin-bottom: 16px;
+}
+
+.pub-no-tournaments h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #334155;
+  margin: 0 0 8px 0;
+}
+
+.pub-no-tournaments p {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+}
+
+/* ============================================ */
+/* LOADING STATE */
+/* ============================================ */
+.pub-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.pub-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f1f5f9;
+  border-top-color: #FF9933;
+  border-radius: 50%;
+  animation: pub-spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes pub-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.pub-loading p {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+}
+
+/* ============================================ */
+/* RESPONSIVE */
+/* ============================================ */
+@media (max-width: 360px) {
+  .pub-tournament-name {
+    font-size: 16px;
+  }
+
+  .pub-filter-tab {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+}

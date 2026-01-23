@@ -29,8 +29,10 @@ app.use(cors({
     'http://localhost:3000',
     'https://localhost',           // Capacitor ke liye
     'capacitor://localhost',       // Capacitor ke liye
-    'http://localhost',  
-    'http://10.93.182.196:3000'
+    'http://localhost',
+    'http://10.139.117.196:3000',  // Current LAN IP
+    'http://192.168.0.176:3000',   // Old IP (for compatibility)
+    'http://10.93.182.196:3000'    // Old IP (for compatibility)
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],

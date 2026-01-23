@@ -1,11 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { getTeams, getCurrentMatch, getMatches, getTournamentById } from '../../services/api';
+import {
+  MedalGoldIcon,
+  MedalSilverIcon,
+  MedalBronzeIcon,
+  LocationIcon,
+  UsersIcon,
+  SwordsIcon,
+  CalendarIcon,
+  TargetIcon,
+  AlertIcon,
+  TrophyIcon,
+} from './icons';
 import './MobileLeaderboard.css';
 
 const MobileLeaderboard = () => {
   const [teams, setTeams] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [sortBy, setSortBy] = useState('wins'); // wins, totalMatches, winRate
+  const [sortBy, setSortBy] = useState('wins');
   const [currentTournament, setCurrentTournament] = useState(null);
   const [tournamentStats, setTournamentStats] = useState(null);
   const [teamStats, setTeamStats] = useState([]);
@@ -16,34 +28,23 @@ const MobileLeaderboard = () => {
 
   const fetchCurrentTournamentData = async () => {
     try {
-      // 1. Get current match to find tournament
       const currentMatchResponse = await getCurrentMatch();
-      console.log('Current Match Response:', currentMatchResponse);
 
       if (currentMatchResponse.data && currentMatchResponse.data.tournament) {
         const tournamentId = currentMatchResponse.data.tournament._id;
 
-        // 2. Fetch tournament details
         const tournamentResponse = await getTournamentById(tournamentId);
         setCurrentTournament(tournamentResponse.data);
-        console.log('Tournament:', tournamentResponse.data);
 
-        // 3. Fetch all matches for this tournament
         const matchesResponse = await getMatches({ tournamentId });
         const tournamentMatches = matchesResponse.data || [];
-        console.log('Tournament Matches:', tournamentMatches.length);
 
-        // 4. Calculate team stats for this tournament
         const stats = calculateTournamentTeamStats(tournamentMatches);
-        console.log('Team Stats:', stats);
         setTeamStats(stats);
 
-        // 5. Calculate tournament-level stats
         const tStats = calculateTournamentStats(tournamentResponse.data, tournamentMatches);
         setTournamentStats(tStats);
       } else {
-        console.log('No current match found');
-        // Fallback: get last completed tournament
         const teamsResponse = await getTeams();
         setTeams(teamsResponse.data || []);
       }
@@ -58,9 +59,8 @@ const MobileLeaderboard = () => {
   const calculateTournamentTeamStats = (matches) => {
     const statsMap = {};
 
-    matches.forEach(match => {
+    matches.forEach((match) => {
       if (match.teamA && match.teamB) {
-        // Initialize team stats if not exists
         if (!statsMap[match.teamA._id]) {
           statsMap[match.teamA._id] = {
             team: match.teamA,
@@ -69,7 +69,7 @@ const MobileLeaderboard = () => {
             draws: 0,
             totalMatches: 0,
             points: 0,
-            winRate: 0
+            winRate: 0,
           };
         }
         if (!statsMap[match.teamB._id]) {
@@ -80,11 +80,10 @@ const MobileLeaderboard = () => {
             draws: 0,
             totalMatches: 0,
             points: 0,
-            winRate: 0
+            winRate: 0,
           };
         }
 
-        // Count stats for completed matches only
         if (match.status === 'completed' && match.finalScoreA !== undefined && match.finalScoreB !== undefined) {
           statsMap[match.teamA._id].totalMatches++;
           statsMap[match.teamB._id].totalMatches++;
@@ -107,8 +106,7 @@ const MobileLeaderboard = () => {
       }
     });
 
-    // Calculate win rates
-    Object.values(statsMap).forEach(stat => {
+    Object.values(statsMap).forEach((stat) => {
       if (stat.totalMatches > 0) {
         stat.winRate = Math.round((stat.wins / stat.totalMatches) * 100);
       }
@@ -118,7 +116,7 @@ const MobileLeaderboard = () => {
   };
 
   const calculateTournamentStats = (tournament, matches) => {
-    const completedMatches = matches.filter(m => m.status === 'completed').length;
+    const completedMatches = matches.filter((m) => m.status === 'completed').length;
     const totalMatches = matches.length;
     const remainingMatches = totalMatches - completedMatches;
     const progress = totalMatches > 0 ? Math.round((completedMatches / totalMatches) * 100) : 0;
@@ -128,7 +126,7 @@ const MobileLeaderboard = () => {
       totalMatches,
       completedMatches,
       remainingMatches,
-      progress
+      progress,
     };
   };
 
@@ -156,18 +154,18 @@ const MobileLeaderboard = () => {
     return { value: team.wins || 0, label: 'Wins' };
   };
 
-  const getRankBadge = (rank) => {
-    if (rank === 1) return { emoji: '🥇', color: '#fbbf24' };
-    if (rank === 2) return { emoji: '🥈', color: '#94a3b8' };
-    if (rank === 3) return { emoji: '🥉', color: '#f59e0b' };
-    return { emoji: rank, color: '#64748b' };
+  const getRankIcon = (rank) => {
+    if (rank === 1) return <MedalGoldIcon size={20} />;
+    if (rank === 2) return <MedalSilverIcon size={20} />;
+    if (rank === 3) return <MedalBronzeIcon size={20} />;
+    return null;
   };
 
   if (loading) {
     return (
       <div className="mobile-leaderboard">
         <div className="loading-container">
-          <div className="spinner"></div>
+          <div className="spinner" />
           <p>Loading leaderboard...</p>
         </div>
       </div>
@@ -175,63 +173,43 @@ const MobileLeaderboard = () => {
   }
 
   const sortedTeams = getSortedTeams();
-  console.log('Sorted Teams for Podium:', sortedTeams.length, sortedTeams);
-
-  // Debug team names
-  if (sortedTeams.length > 0) {
-    console.log('Team 1 Name:', sortedTeams[0]?.team?.name);
-    if (sortedTeams[1]) console.log('Team 2 Name:', sortedTeams[1]?.team?.name);
-    if (sortedTeams[2]) console.log('Team 3 Name:', sortedTeams[2]?.team?.name);
-  }
 
   return (
     <div className="mobile-leaderboard">
       {/* Header */}
       <div className="leaderboard-header">
         <h1 className="page-title">Leaderboard</h1>
-        {currentTournament && (
-          <p className="page-subtitle">{currentTournament.name}</p>
-        )}
+        {currentTournament && <p className="page-subtitle">{currentTournament.name}</p>}
       </div>
 
       {/* Sort Options */}
-      <div className="sort-options">
-        <button
-          className={`sort-btn ${sortBy === 'wins' ? 'active' : ''}`}
-          onClick={() => setSortBy('wins')}
-        >
-          Most Wins
-        </button>
-        <button
-          className={`sort-btn ${sortBy === 'winRate' ? 'active' : ''}`}
-          onClick={() => setSortBy('winRate')}
-        >
-          Win Rate
-        </button>
-        <button
-          className={`sort-btn ${sortBy === 'totalMatches' ? 'active' : ''}`}
-          onClick={() => setSortBy('totalMatches')}
-        >
-          Most Active
-        </button>
+      <div className="sort-section">
+        <div className="sort-options">
+          <button className={`sort-btn ${sortBy === 'wins' ? 'active' : ''}`} onClick={() => setSortBy('wins')}>
+            Most Wins
+          </button>
+          <button className={`sort-btn ${sortBy === 'winRate' ? 'active' : ''}`} onClick={() => setSortBy('winRate')}>
+            Win Rate
+          </button>
+          <button className={`sort-btn ${sortBy === 'totalMatches' ? 'active' : ''}`} onClick={() => setSortBy('totalMatches')}>
+            Most Active
+          </button>
+        </div>
       </div>
 
-      {/* Top 3 Podium - Shows available teams (1, 2, or 3) */}
+      {/* Top 3 Podium */}
       {sortedTeams.length > 0 && (
         <div className="podium-section">
           <div className="podium-container">
             {/* 2nd Place */}
             <div className={`podium-item second ${!sortedTeams[1] ? 'empty' : ''}`}>
-              <div className="podium-rank">
-                <span className="rank-emoji">🥈</span>
-                <span className="rank-number">2nd</span>
+              <div className="podium-medal">
+                <MedalSilverIcon size={32} />
               </div>
+              <div className="podium-rank-label">2nd</div>
               {sortedTeams[1] ? (
                 <>
-                  <div
-                    className="podium-team-color"
-                    style={{ backgroundColor: sortedTeams[1].team?.color || '#94a3b8' }}
-                  ></div>
+                  <div className="podium-team-color" style={{ backgroundColor: sortedTeams[1].team?.color || '#94a3b8' }} />
                   <div className="podium-team-name">{sortedTeams[1].team?.name}</div>
                   <div className="podium-stats">
                     <div className="podium-stat-value">{getPodiumStat(sortedTeams[1]).value}</div>
@@ -240,22 +218,19 @@ const MobileLeaderboard = () => {
                 </>
               ) : (
                 <div className="podium-placeholder">
-                  <div className="placeholder-icon">❓</div>
-                  <div className="placeholder-text">Awaiting Team</div>
+                  <AlertIcon size={24} />
+                  <span>Awaiting</span>
                 </div>
               )}
             </div>
 
             {/* 1st Place */}
             <div className="podium-item first">
-              <div className="podium-rank">
-                <span className="rank-emoji">🥇</span>
-                <span className="rank-number">1st</span>
+              <div className="podium-medal">
+                <MedalGoldIcon size={40} />
               </div>
-              <div
-                className="podium-team-color"
-                style={{ backgroundColor: sortedTeams[0]?.team?.color || '#fbbf24' }}
-              ></div>
+              <div className="podium-rank-label">1st</div>
+              <div className="podium-team-color" style={{ backgroundColor: sortedTeams[0]?.team?.color || '#fbbf24' }} />
               <div className="podium-team-name">{sortedTeams[0]?.team?.name || 'Champion'}</div>
               <div className="podium-stats">
                 <div className="podium-stat-value">{getPodiumStat(sortedTeams[0]).value}</div>
@@ -265,16 +240,13 @@ const MobileLeaderboard = () => {
 
             {/* 3rd Place */}
             <div className={`podium-item third ${!sortedTeams[2] ? 'empty' : ''}`}>
-              <div className="podium-rank">
-                <span className="rank-emoji">🥉</span>
-                <span className="rank-number">3rd</span>
+              <div className="podium-medal">
+                <MedalBronzeIcon size={32} />
               </div>
+              <div className="podium-rank-label">3rd</div>
               {sortedTeams[2] ? (
                 <>
-                  <div
-                    className="podium-team-color"
-                    style={{ backgroundColor: sortedTeams[2].team?.color || '#f59e0b' }}
-                  ></div>
+                  <div className="podium-team-color" style={{ backgroundColor: sortedTeams[2].team?.color || '#f59e0b' }} />
                   <div className="podium-team-name">{sortedTeams[2].team?.name}</div>
                   <div className="podium-stats">
                     <div className="podium-stat-value">{getPodiumStat(sortedTeams[2]).value}</div>
@@ -283,8 +255,8 @@ const MobileLeaderboard = () => {
                 </>
               ) : (
                 <div className="podium-placeholder">
-                  <div className="placeholder-icon">❓</div>
-                  <div className="placeholder-text">Awaiting Team</div>
+                  <AlertIcon size={24} />
+                  <span>Awaiting</span>
                 </div>
               )}
             </div>
@@ -298,31 +270,25 @@ const MobileLeaderboard = () => {
         <div className="rankings-list">
           {sortedTeams.map((team, index) => {
             const rank = index + 1;
-            const badge = getRankBadge(rank);
 
             return (
               <div key={team.team?._id || index} className={`ranking-card ${rank <= 3 ? 'top-three' : ''}`}>
                 {/* Rank */}
-                <div className="ranking-rank" style={{ color: badge.color }}>
-                  {typeof badge.emoji === 'string' && badge.emoji.includes('🥇') ? (
-                    <span className="rank-medal">{badge.emoji}</span>
-                  ) : (
-                    <span className="rank-number">{rank}</span>
-                  )}
+                <div className="ranking-rank">
+                  {rank <= 3 ? getRankIcon(rank) : <span className="rank-number">{rank}</span>}
                 </div>
 
                 {/* Team Color Bar */}
-                <div
-                  className="ranking-color-bar"
-                  style={{ backgroundColor: team.team?.color || '#64748b' }}
-                ></div>
+                <div className="ranking-color-bar" style={{ backgroundColor: team.team?.color || '#64748b' }} />
 
                 {/* Team Info */}
                 <div className="ranking-info">
                   <h3 className="ranking-team-name">{team.team?.name}</h3>
                   <div className="ranking-location">
-                    <span className="location-icon">📍</span>
-                    {team.team?.location?.city || 'Unknown'}, {team.team?.location?.state || 'Unknown'}
+                    <LocationIcon size={12} />
+                    <span>
+                      {team.team?.location?.city || 'Unknown'}, {team.team?.location?.state || 'Unknown'}
+                    </span>
                   </div>
                 </div>
 
@@ -342,7 +308,7 @@ const MobileLeaderboard = () => {
                   </div>
                   <div className="stat-item win-rate">
                     <div className="stat-value">{team.winRate || 0}%</div>
-                    <div className="stat-label">Win Rate</div>
+                    <div className="stat-label">Rate</div>
                   </div>
                 </div>
               </div>
@@ -351,33 +317,41 @@ const MobileLeaderboard = () => {
         </div>
       </div>
 
-      {/* Current Tournament Stats */}
+      {/* Tournament Stats */}
       {currentTournament && tournamentStats && (
         <div className="stats-summary">
-          <div className="tournament-stats-header">
-            <h2 className="section-title">Tournament Statistics</h2>
-            <div className="tournament-name-badge">{currentTournament.name}</div>
+          <div className="stats-header">
+            <TrophyIcon size={18} />
+            <h2 className="section-title">Tournament Stats</h2>
           </div>
           <div className="summary-grid">
             <div className="summary-card">
-              <div className="summary-icon">👥</div>
+              <div className="summary-icon">
+                <UsersIcon size={24} />
+              </div>
               <div className="summary-value">{tournamentStats.totalTeams}</div>
-              <div className="summary-label">Registered Teams</div>
+              <div className="summary-label">Teams</div>
             </div>
             <div className="summary-card">
-              <div className="summary-icon">⚔️</div>
+              <div className="summary-icon">
+                <SwordsIcon size={24} />
+              </div>
               <div className="summary-value">{tournamentStats.completedMatches}</div>
-              <div className="summary-label">Matches Played</div>
+              <div className="summary-label">Played</div>
             </div>
             <div className="summary-card">
-              <div className="summary-icon">📅</div>
+              <div className="summary-icon">
+                <CalendarIcon size={24} />
+              </div>
               <div className="summary-value">{tournamentStats.remainingMatches}</div>
-              <div className="summary-label">Matches Remaining</div>
+              <div className="summary-label">Remaining</div>
             </div>
             <div className="summary-card">
-              <div className="summary-icon">🎯</div>
+              <div className="summary-icon">
+                <TargetIcon size={24} />
+              </div>
               <div className="summary-value">{tournamentStats.progress}%</div>
-              <div className="summary-label">Tournament Progress</div>
+              <div className="summary-label">Progress</div>
             </div>
           </div>
         </div>

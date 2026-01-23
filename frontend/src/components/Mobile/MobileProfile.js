@@ -1,16 +1,36 @@
-// frontend/src/components/Mobile/MobileProfile.js - Mobile User Profile Page
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserAuth } from '../../context/UserAuthContext';
+import {
+  LockIcon,
+  CheckIcon,
+  GamepadIcon,
+  CrownIcon,
+  TrophyIcon,
+  TargetIcon,
+  GoalIcon,
+  MedalIcon,
+  StarIcon,
+  InfoIcon,
+  EmailIcon,
+  PhoneIcon,
+  LocationIcon,
+  CalendarIcon,
+  ShieldCheckIcon,
+  AlertIcon,
+  ActivityIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+  EditIcon,
+  SettingsIcon,
+  LogOutIcon
+} from './icons';
 import './MobileProfile.css';
 
 const MobileProfile = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated, loading, logout } = useUserAuth();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-
-  // Removed auto-redirect - allow guest viewing
-  // Users can browse the app without login, profile shows login prompt
 
   const handleLogout = async () => {
     await logout();
@@ -22,7 +42,7 @@ const MobileProfile = () => {
     return (
       <div className="mobile-profile">
         <div className="profile-loading">
-          <div className="loading-spinner-large"></div>
+          <div className="loading-spinner-large" />
           <p>Loading profile...</p>
         </div>
       </div>
@@ -33,7 +53,9 @@ const MobileProfile = () => {
     return (
       <div className="mobile-profile">
         <div className="profile-not-logged-in">
-          <div className="not-logged-icon">🔒</div>
+          <div className="not-logged-icon">
+            <LockIcon size={64} />
+          </div>
           <h2>Not Logged In</h2>
           <p>Please login to view your profile</p>
           <button className="login-redirect-btn" onClick={() => navigate('/login')}>
@@ -48,7 +70,7 @@ const MobileProfile = () => {
     <div className="mobile-profile">
       {/* Profile Header */}
       <div className="profile-header">
-        <div className="profile-header-bg"></div>
+        <div className="profile-header-bg" />
         <div className="profile-avatar-section">
           {user.photo ? (
             <img src={user.photo} alt={user.name} className="profile-avatar" />
@@ -59,38 +81,58 @@ const MobileProfile = () => {
           )}
           {user.emailVerified && (
             <div className="verified-badge" title="Email Verified">
-              ✓
+              <CheckIcon size={16} color="white" />
             </div>
           )}
         </div>
         <h1 className="profile-name">{user.name}</h1>
         <p className="profile-email">{user.email}</p>
         <div className="profile-role-badge">
-          {user.role === 'player' && '🎮 Player'}
-          {user.role === 'team_captain' && '👑 Team Captain'}
-          {user.role === 'tournament_organizer' && '🏆 Organizer'}
+          {user.role === 'player' && (
+            <>
+              <GamepadIcon size={16} /> Player
+            </>
+          )}
+          {user.role === 'team_captain' && (
+            <>
+              <CrownIcon size={16} /> Team Captain
+            </>
+          )}
+          {user.role === 'tournament_organizer' && (
+            <>
+              <TrophyIcon size={16} /> Organizer
+            </>
+          )}
         </div>
       </div>
 
       {/* Profile Stats */}
       <div className="profile-stats">
         <div className="stat-card">
-          <div className="stat-icon">🎯</div>
+          <div className="stat-icon">
+            <TargetIcon size={28} />
+          </div>
           <div className="stat-value">{user.stats?.matchesPlayed || 0}</div>
           <div className="stat-label">Matches</div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon">⚽</div>
+          <div className="stat-icon">
+            <GoalIcon size={28} />
+          </div>
           <div className="stat-value">{user.stats?.totalGoals || 0}</div>
           <div className="stat-label">Goals</div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon">🎖️</div>
+          <div className="stat-icon">
+            <MedalIcon size={28} />
+          </div>
           <div className="stat-value">{user.stats?.totalAssists || 0}</div>
           <div className="stat-label">Assists</div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon">⭐</div>
+          <div className="stat-icon">
+            <StarIcon size={28} />
+          </div>
           <div className="stat-value">
             {user.stats?.avgPerformance ? user.stats.avgPerformance.toFixed(1) : '0.0'}
           </div>
@@ -101,14 +143,14 @@ const MobileProfile = () => {
       {/* Profile Info */}
       <div className="profile-info-section">
         <h2 className="section-title">
-          <span className="title-icon">ℹ️</span>
+          <InfoIcon size={20} />
           Personal Information
         </h2>
 
         <div className="info-card">
           <div className="info-item">
             <div className="info-label">
-              <span className="info-icon">📧</span>
+              <EmailIcon size={16} />
               Email
             </div>
             <div className="info-value">{user.email}</div>
@@ -117,7 +159,7 @@ const MobileProfile = () => {
           {user.phone && (
             <div className="info-item">
               <div className="info-label">
-                <span className="info-icon">📱</span>
+                <PhoneIcon size={16} />
                 Phone
               </div>
               <div className="info-value">{user.phone}</div>
@@ -127,7 +169,7 @@ const MobileProfile = () => {
           {user.location?.city && (
             <div className="info-item">
               <div className="info-label">
-                <span className="info-icon">📍</span>
+                <LocationIcon size={16} />
                 Location
               </div>
               <div className="info-value">
@@ -139,7 +181,7 @@ const MobileProfile = () => {
 
           <div className="info-item">
             <div className="info-label">
-              <span className="info-icon">📅</span>
+              <CalendarIcon size={16} />
               Member Since
             </div>
             <div className="info-value">
@@ -152,25 +194,29 @@ const MobileProfile = () => {
 
           <div className="info-item">
             <div className="info-label">
-              <span className="info-icon">🔐</span>
+              <ShieldCheckIcon size={16} />
               Account Status
             </div>
             <div className="info-value">
               {user.emailVerified ? (
-                <span className="status-verified">✅ Verified</span>
+                <span className="status-verified">
+                  <CheckCircleIcon size={16} /> Verified
+                </span>
               ) : (
-                <span className="status-unverified">⚠️ Unverified</span>
+                <span className="status-unverified">
+                  <AlertIcon size={16} /> Unverified
+                </span>
               )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Player Profile (if role is player) */}
+      {/* Player Profile */}
       {user.role === 'player' && user.playerProfile && (
         <div className="profile-info-section">
           <h2 className="section-title">
-            <span className="title-icon">🎮</span>
+            <GamepadIcon size={20} />
             Player Profile
           </h2>
 
@@ -178,7 +224,7 @@ const MobileProfile = () => {
             {user.playerProfile.preferredRole && (
               <div className="info-item">
                 <div className="info-label">
-                  <span className="info-icon">🎯</span>
+                  <TargetIcon size={16} />
                   Preferred Role
                 </div>
                 <div className="info-value">{user.playerProfile.preferredRole}</div>
@@ -188,7 +234,7 @@ const MobileProfile = () => {
             {user.playerProfile.skillLevel && (
               <div className="info-item">
                 <div className="info-label">
-                  <span className="info-icon">⭐</span>
+                  <StarIcon size={16} />
                   Skill Level
                 </div>
                 <div className="info-value">{user.playerProfile.skillLevel}</div>
@@ -198,7 +244,7 @@ const MobileProfile = () => {
             {user.playerProfile.experienceYears > 0 && (
               <div className="info-item">
                 <div className="info-label">
-                  <span className="info-icon">📊</span>
+                  <ActivityIcon size={16} />
                   Experience
                 </div>
                 <div className="info-value">
@@ -209,11 +255,19 @@ const MobileProfile = () => {
 
             <div className="info-item">
               <div className="info-label">
-                <span className="info-icon">🔄</span>
+                <CheckCircleIcon size={16} />
                 Available as Substitute
               </div>
               <div className="info-value">
-                {user.playerProfile.availableAsSubstitute ? '✅ Yes' : '❌ No'}
+                {user.playerProfile.availableAsSubstitute ? (
+                  <span className="status-yes">
+                    <CheckCircleIcon size={16} /> Yes
+                  </span>
+                ) : (
+                  <span className="status-no">
+                    <XCircleIcon size={16} /> No
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -223,12 +277,12 @@ const MobileProfile = () => {
       {/* Action Buttons */}
       <div className="profile-actions">
         <button className="action-btn edit-btn" onClick={() => navigate('/mobile/edit-profile')}>
-          <span className="btn-icon">✏️</span>
+          <EditIcon size={18} />
           Edit Profile
         </button>
 
         <button className="action-btn settings-btn" onClick={() => navigate('/mobile/settings')}>
-          <span className="btn-icon">⚙️</span>
+          <SettingsIcon size={18} />
           Settings
         </button>
 
@@ -236,7 +290,7 @@ const MobileProfile = () => {
           className="action-btn logout-btn"
           onClick={() => setShowLogoutConfirm(true)}
         >
-          <span className="btn-icon">🚪</span>
+          <LogOutIcon size={18} />
           Logout
         </button>
       </div>
@@ -245,7 +299,9 @@ const MobileProfile = () => {
       {showLogoutConfirm && (
         <div className="logout-modal-overlay" onClick={() => setShowLogoutConfirm(false)}>
           <div className="logout-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-icon">⚠️</div>
+            <div className="modal-icon">
+              <AlertIcon size={48} />
+            </div>
             <h3 className="modal-title">Confirm Logout</h3>
             <p className="modal-message">Are you sure you want to logout?</p>
             <div className="modal-actions">

@@ -23,30 +23,24 @@ import PublicViewer from './components/Public/PublicViewer';
 import TournamentDetail from './components/Public/TournamentDetail';
 import TournamentsList from './components/Public/TournamentsList';
 
-// Mobile Components
+// PublicMobile Components (Public Viewer)
 import {
-  MobileLayout,
-  MobileHome,
-  MobileLeaderboard,
-  MobileTournaments,
-  MobileProfile,
-} from './components/Mobile';
+  PublicMobileLayout,
+  PublicMobileHome,
+  PublicMobileTournaments,
+  PublicMobileLeaderboard,
+  PublicMobileProfile,
+} from './components/PublicMobile';
 
 import './App.css';
-import './styles/mobileResponsive.css';
-import './styles/indianTheme.css';
 
 // Responsive Home Component - Auto-detects mobile/desktop
 const ResponsiveHome = () => {
   const isMobile = useIsMobile();
 
-  // Render mobile view with layout (header + bottom nav)
+  // Redirect mobile users to PublicMobile viewer
   if (isMobile) {
-    return (
-      <MobileLayout key="mobile-home">
-        <MobileHome />
-      </MobileLayout>
-    );
+    return <Navigate to="/watch" replace />;
   }
 
   return (
@@ -61,13 +55,9 @@ const ResponsiveHome = () => {
 const ResponsiveTournaments = () => {
   const isMobile = useIsMobile();
 
-  // Pure responsive rendering (no redirect)
+  // Redirect mobile users to PublicMobile tournaments
   if (isMobile) {
-    return (
-      <MobileLayout key="mobile-tournaments">
-        <MobileTournaments />
-      </MobileLayout>
-    );
+    return <Navigate to="/watch/tournaments" replace />;
   }
 
   return (
@@ -82,12 +72,9 @@ const ResponsiveTournaments = () => {
 const ResponsiveLeaderboard = () => {
   const isMobile = useIsMobile();
 
+  // Redirect mobile users to PublicMobile leaderboard
   if (isMobile) {
-    return (
-      <MobileLayout key="mobile-leaderboard">
-        <MobileLeaderboard />
-      </MobileLayout>
-    );
+    return <Navigate to="/watch/leaderboard" replace />;
   }
 
   // Desktop leaderboard (can be added later, for now redirect to home)
@@ -107,13 +94,19 @@ function App() {
             <Route path="/leaderboard" element={<ResponsiveLeaderboard />} />
             <Route path="/tournament/:id" element={<><Navbar /><TournamentDetail /></>} />
 
-            {/* Mobile Routes (for testing/force mobile view) */}
-            <Route path="/mobile" element={<MobileLayout />}>
-              <Route index element={<MobileHome />} />
-              <Route path="tournaments" element={<MobileTournaments />} />
-              <Route path="leaderboard" element={<MobileLeaderboard />} />
-              <Route path="profile" element={<MobileProfile />} />
+            {/* Public Mobile Routes (Public Viewer for Mobile) */}
+            <Route path="/watch" element={<PublicMobileLayout />}>
+              <Route index element={<PublicMobileHome />} />
+              <Route path="tournaments" element={<PublicMobileTournaments />} />
+              <Route path="leaderboard" element={<PublicMobileLeaderboard />} />
+              <Route path="profile" element={<PublicMobileProfile />} />
             </Route>
+
+            {/* Mobile Routes - Redirect to PublicMobile (watch) */}
+            <Route path="/mobile" element={<Navigate to="/watch" replace />} />
+            <Route path="/mobile/tournaments" element={<Navigate to="/watch/tournaments" replace />} />
+            <Route path="/mobile/leaderboard" element={<Navigate to="/watch/leaderboard" replace />} />
+            <Route path="/mobile/profile" element={<Navigate to="/watch/profile" replace />} />
 
             {/* Public User Auth Routes */}
             <Route path="/reports" element={<PublicReportsViewer />} />
