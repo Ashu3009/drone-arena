@@ -8,6 +8,7 @@ import {
   getTournamentById
 } from '../../services/api';
 import defaultBanner from '../../assets/logo.png';
+import TournamentAwardsManager from './TournamentAwardsManager';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || '${BACKEND_URL}';
 
@@ -217,6 +218,12 @@ const TournamentManagement = ({ tournament: initialTournament, teams, onClose, o
             style={activeSection === 'teams' ? styles.tabActive : styles.tab}
           >
             Teams ({tournamentTeams.length})
+          </button>
+          <button
+            onClick={() => setActiveSection('awards')}
+            style={activeSection === 'awards' ? styles.tabActive : styles.tab}
+          >
+            🏆 Awards & Points
           </button>
         </div>
 
@@ -524,6 +531,13 @@ const TournamentManagement = ({ tournament: initialTournament, teams, onClose, o
               )}
             </div>
           )}
+
+          {/* AWARDS & POINTS SECTION */}
+          {activeSection === 'awards' && (
+            <div>
+              <TournamentAwardsManager tournamentId={tournament._id} />
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -537,25 +551,29 @@ const styles = {
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 1000,
-    padding: '20px'
+    zIndex: 99999,
+    padding: '50px',
+    overflow: 'auto'
   },
   modal: {
     backgroundColor: '#1a1a1a',
     borderRadius: '12px',
     width: '90%',
-    maxWidth: '900px',
+    maxWidth: '1000px',
     maxHeight: '90vh',
     display: 'flex',
     flexDirection: 'column',
-    border: '1px solid #333'
+    border: '1px solid #333',
+    boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
+    margin: 'auto',
+    position: 'relative'
   },
   modalHeader: {
-    padding: '24px',
+    padding: '28px 32px',
     borderBottom: '1px solid #333',
     display: 'flex',
     justifyContent: 'space-between',
@@ -579,7 +597,7 @@ const styles = {
   tabs: {
     display: 'flex',
     gap: '8px',
-    padding: '0 24px',
+    padding: '16px 32px 0 32px',
     borderBottom: '2px solid #333',
     overflowX: 'auto'
   },
@@ -606,7 +624,7 @@ const styles = {
     whiteSpace: 'nowrap'
   },
   content: {
-    padding: '24px',
+    padding: '30px 32px',
     overflowY: 'auto',
     flex: 1
   },

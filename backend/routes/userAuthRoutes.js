@@ -10,7 +10,8 @@ const {
   getMe,
   logout,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  getPlayerProfile
 } = require('../controllers/userAuthController');
 const { protectUser } = require('../middleware/userAuth');
 
@@ -49,6 +50,10 @@ router.post('/reset-password/:token', resetPassword);
 // @route   GET /api/users/auth/me
 // @desc    Get current user profile
 router.get('/me', protectUser, getMe);
+
+// @route   GET /api/users/auth/player-profile
+// @desc    Get aggregated player profile (stats, matches, tournaments, awards)
+router.get('/player-profile', protectUser, getPlayerProfile);
 
 // @route   POST /api/users/auth/resend-verification
 // @desc    Resend verification email

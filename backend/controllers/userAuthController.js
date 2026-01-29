@@ -1,5 +1,8 @@
 // backend/controllers/userAuthController.js - Public User Authentication
 const User = require('../models/User');
+const Team = require('../models/Team');
+const Match = require('../models/Match');
+const Tournament = require('../models/Tournament');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const {
@@ -566,6 +569,235 @@ const resetPassword = async (req, res) => {
   }
 };
 
+// ============================================
+// @route   GET /api/users/auth/player-profile
+// @desc    Get aggregated player profile with stats, matches, tournaments, awards
+// @access  Private
+// ============================================
+const getPlayerProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id)
+      .populate('teamId', 'name color members captain wins losses points');
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // --- Find user's team ---
+    let team = null;
+    let userRole = 'Player';
+
+    if (user.teamId) {
+      // User is a captain with direct team reference
+      team = user.teamId;
+      userRole = 'Captain';
+    } else {
+      // Search for team where user is a member (by name match)
+      team = await Team.findOne({
+        'members.name': { $regex: new RegExp(`^${user.name}$`, 'i') }
+      }).select('name color members captain wins losses points');
+
+      if (team) {
+        const member = team.members.find(
+          m => m.name.toLowerCase() === user.name.toLowerCase()
+        );
+        userRole = member ? member.role : 'Player';
+      }
+    }
+
+    // --- If no team found, return basic profile ---
+    if (!team) {
+      return res.status(200).json({
+        success: true,
+        data: {
+          profile: {
+            name: user.name,
+            email: user.email,
+            photo: user.photo,
+            role: userRole,
+            team: null,
+            memberSince: user.createdAt
+          },
+          stats: { matchesPlayed: 0, wins: 0, losses: 0, draws: 0, avgScore: 0, highestScore: 0 },
+          seasons: [],
+          tournaments: [],
+          recentMatches: [],
+          awards: { motm: 0, mott: 0, bestRole: 0 }
+        }
+      });
+    }
+
+    const teamId = team._id;
+
+    // --- Find all matches for this team ---
+    const matches = await Match.find({
+      $or: [{ teamA: teamId }, { teamB: teamId }],
+      status: 'completed'
+    })
+      .populate('teamA', 'name color')
+      .populate('teamB', 'name color')
+      .populate('tournament', 'name startDate')
+      .sort({ createdAt: -1 });
+
+    // --- Calculate stats ---
+    let wins = 0, losses = 0, draws = 0, totalScore = 0, highestScore = 0;
+
+    matches.forEach(match => {
+      const isTeamA = match.teamA._id.toString() === teamId.toString();
+      const myScore = isTeamA ? match.finalScoreA : match.finalScoreB;
+
+      totalScore += myScore;
+      if (myScore > highestScore) highestScore = myScore;
+
+      if (match.winner) {
+        if (match.winner.toString() === teamId.toString()) {
+          wins++;
+        } else {
+          losses++;
+        }
+      } else {
+        draws++;
+      }
+    });
+
+    const matchesPlayed = matches.length;
+    const avgScore = matchesPlayed > 0 ? Math.round((totalScore / matchesPlayed) * 10) / 10 : 0;
+
+    // --- Recent matches (last 10) ---
+    const recentMatches = matches.slice(0, 10).map(match => {
+      const isTeamA = match.teamA._id.toString() === teamId.toString();
+      const opponent = isTeamA ? match.teamB : match.teamA;
+      const myScore = isTeamA ? match.finalScoreA : match.finalScoreB;
+      const oppScore = isTeamA ? match.finalScoreB : match.finalScoreA;
+      let result = 'D';
+      if (match.winner) {
+        result = match.winner.toString() === teamId.toString() ? 'W' : 'L';
+      }
+      return {
+        id: match._id,
+        opponent: { name: opponent.name, color: opponent.color },
+        myScore,
+        oppScore,
+        result,
+        tournament: match.tournament ? match.tournament.name : 'Unknown',
+        date: match.createdAt
+      };
+    });
+
+    // --- Tournaments ---
+    const tournaments = await Tournament.find({
+      registeredTeams: teamId
+    }).select('name startDate endDate status winners settings').sort({ startDate: -1 });
+
+    const tournamentData = tournaments.map(t => {
+      let placement = 'Participated';
+      if (t.winners) {
+        if (t.winners.champion && t.winners.champion.toString() === teamId.toString()) placement = 'Champion';
+        else if (t.winners.runnerUp && t.winners.runnerUp.toString() === teamId.toString()) placement = 'Runner Up';
+        else if (t.winners.thirdPlace && t.winners.thirdPlace.toString() === teamId.toString()) placement = '3rd Place';
+      }
+      return {
+        id: t._id,
+        name: t.name,
+        startDate: t.startDate,
+        status: t.status,
+        format: t.settings ? t.settings.teamFormat : '4v4',
+        placement
+      };
+    });
+
+    // --- Season-wise stats (group by year) ---
+    const seasonMap = {};
+    matches.forEach(match => {
+      const year = new Date(match.createdAt).getFullYear();
+      if (!seasonMap[year]) {
+        seasonMap[year] = { year, matches: 0, wins: 0, losses: 0, draws: 0, totalScore: 0 };
+      }
+      seasonMap[year].matches++;
+
+      const isTeamA = match.teamA._id.toString() === teamId.toString();
+      const myScore = isTeamA ? match.finalScoreA : match.finalScoreB;
+      seasonMap[year].totalScore += myScore;
+
+      if (match.winner) {
+        if (match.winner.toString() === teamId.toString()) seasonMap[year].wins++;
+        else seasonMap[year].losses++;
+      } else {
+        seasonMap[year].draws++;
+      }
+    });
+
+    const seasons = Object.values(seasonMap)
+      .sort((a, b) => b.year - a.year)
+      .map(s => ({
+        ...s,
+        avgScore: s.matches > 0 ? Math.round((s.totalScore / s.matches) * 10) / 10 : 0
+      }));
+
+    // --- Awards ---
+    // Man of the Match count
+    const motmCount = await Match.countDocuments({
+      'manOfTheMatch.playerName': { $regex: new RegExp(`^${user.name}$`, 'i') },
+      status: 'completed'
+    });
+
+    // Man of the Tournament count
+    const mottCount = await Tournament.countDocuments({
+      'manOfTheTournament.playerName': { $regex: new RegExp(`^${user.name}$`, 'i') }
+    });
+
+    // Best Role awards count
+    const bestRoleCount = await Tournament.countDocuments({
+      $or: [
+        { 'awards.bestForward.playerName': { $regex: new RegExp(`^${user.name}$`, 'i') } },
+        { 'awards.bestStriker.playerName': { $regex: new RegExp(`^${user.name}$`, 'i') } },
+        { 'awards.bestDefender.playerName': { $regex: new RegExp(`^${user.name}$`, 'i') } },
+        { 'awards.bestKeeper.playerName': { $regex: new RegExp(`^${user.name}$`, 'i') } }
+      ]
+    });
+
+    // --- Response ---
+    res.status(200).json({
+      success: true,
+      data: {
+        profile: {
+          name: user.name,
+          email: user.email,
+          photo: user.photo,
+          role: userRole,
+          team: { id: team._id, name: team.name, color: team.color },
+          preferredRole: user.playerProfile ? user.playerProfile.preferredRole : userRole,
+          memberSince: user.createdAt
+        },
+        stats: {
+          matchesPlayed,
+          wins,
+          losses,
+          draws,
+          avgScore,
+          highestScore
+        },
+        seasons,
+        tournaments: tournamentData,
+        recentMatches,
+        awards: {
+          motm: motmCount,
+          mott: mottCount,
+          bestRole: bestRoleCount
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('Player profile error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching player profile',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   signup,
   login,
@@ -575,5 +807,6 @@ module.exports = {
   getMe,
   logout,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  getPlayerProfile
 };

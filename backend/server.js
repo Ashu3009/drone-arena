@@ -27,6 +27,7 @@ app.use(cors({
     'https://drone-arena-frontend.vercel.app',
     'https://drone-arena-frontend-ashus-projects-831330bf.vercel.app',
     'http://localhost:3000',
+    'http://localhost:3001',       // Added for alternate port
     'https://localhost',           // Capacitor ke liye
     'capacitor://localhost',       // Capacitor ke liye
     'http://localhost',
@@ -60,11 +61,13 @@ const schoolRoutes = require('./routes/schoolRoutes');
 const siteStatsRoutes = require('./routes/siteStatsRoutes');
 const espRoutes = require('./routes/espRoutes');
 const analysisRoutes = require('./routes/analysisRoutes');
+const playerPointsRoutes = require('./routes/playerPointsRoutes'); // NEW: Player Points Routes
 
 // Mount Routes
 app.use('/api/auth', authRoutes); // Admin authentication
 app.use('/api/users/auth', userAuthRoutes); // Public user authentication
 app.use('/api/tournaments', tournamentRoutes);
+app.use('/api/tournaments/:tournamentId/player-points', playerPointsRoutes); // NEW: Player Points nested routes
 app.use('/api/teams', teamRoutes);
 app.use('/api/matches', matchRoutes);
 app.use('/api/telemetry', telemetryRoutes);
