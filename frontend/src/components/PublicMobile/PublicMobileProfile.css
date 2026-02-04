@@ -1,587 +1,634 @@
 /* ============================================ */
-/* PUBLIC MOBILE PROFILE */
+/* PLAYER PROFILE - CLEAN UI */
 /* ============================================ */
-.pub-profile-container {
+.profile-container {
+  padding: 16px;
   min-height: calc(100vh - 140px);
-  background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
-  padding: 16px;
-  padding-bottom: 100px;
 }
 
-/* ============================================ */
-/* HERO SECTION */
-/* ============================================ */
-.pub-profile-hero {
+.profile-loading {
   text-align: center;
-  padding: 32px 20px;
-  background: linear-gradient(135deg, #FF9933 0%, #FFFFFF 33%, #FFFFFF 66%, #138808 100%);
-  border-radius: 16px;
-  margin-bottom: 24px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  position: relative;
-  overflow: hidden;
+  padding: 60px 20px;
+  color: #6B7280;
 }
 
-/* ============================================ */
-/* LOGGED IN USER PROFILE STYLES */
-/* ============================================ */
-.pub-profile-user-avatar {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 16px;
-}
-
-.pub-avatar-img {
-  width: 80px;
-  height: 80px;
+.profile-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #F97316;
   border-radius: 50%;
-  border: 4px solid #FF9933;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.pub-avatar-placeholder {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #FF9933 0%, #FF6B00 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 36px;
-  font-weight: 800;
-  color: white;
-  border: 4px solid white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.pub-verified-badge {
-  display: inline-block;
-  padding: 6px 12px;
-  background: rgba(19, 136, 8, 0.15);
-  color: #138808;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  margin-top: 8px;
-  border: 1px solid rgba(19, 136, 8, 0.3);
-}
-
-.pub-unverified-badge {
-  display: inline-block;
-  padding: 6px 12px;
-  background: rgba(255, 153, 51, 0.15);
-  color: #FF6B00 !important;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  margin-top: 8px;
-  border: 1px solid rgba(255, 153, 51, 0.3);
-}
-
-.pub-profile-info-section {
-  margin-bottom: 24px;
-}
-
-.pub-profile-info-card {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e2e8f0;
-}
-
-.pub-profile-info-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid #f1f5f9;
-}
-
-.pub-profile-info-row:last-child {
-  border-bottom: none;
-}
-
-.pub-info-label {
-  font-size: 14px;
-  color: #64748b !important;
-  font-weight: 500;
-}
-
-.pub-info-value {
-  font-size: 14px;
-  color: #1e293b !important;
-  font-weight: 600;
-}
-
-.pub-status-active {
-  color: #138808;
-}
-
-.pub-profile-actions-section {
-  margin-bottom: 24px;
-}
-
-.pub-profile-action-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.pub-action-card {
-  background: #ffffff;
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.pub-action-card:active {
-  transform: scale(0.95);
-  background: #f8fafc;
-  border-color: #FF9933;
-}
-
-.pub-action-card span {
-  font-size: 13px;
-  font-weight: 600;
-  color: #1e293b  !important;
-}
-
-.pub-profile-logout-section {
-  margin-bottom: 24px;
-}
-
-.pub-profile-btn-logout {
-  width: 100%;
-  background: rgba(239, 68, 68, 0.1);
-  color: #dc2626;
-  padding: 14px 24px;
-  border-radius: 12px;
-  border: 2px solid rgba(239, 68, 68, 0.3);
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.pub-profile-btn-logout:active {
-  background: rgba(239, 68, 68, 0.2);
-  border-color: rgba(239, 68, 68, 0.5);
-  transform: scale(0.98);
-}
-
-.spinner-large {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #f3f4f6;
-  border-top-color: #FF9933;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto;
+  margin: 0 auto 12px;
+  animation: spin 0.8s linear infinite;
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 
-.pub-profile-hero::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  z-index: 0;
-}
-
-.pub-profile-hero > * {
-  position: relative;
-  z-index: 1;
-}
-
-.pub-profile-icon-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.profile-error-banner {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  border-radius: 8px;
+  padding: 12px 16px;
   margin-bottom: 16px;
-  animation: pub-profile-float 3s ease-in-out infinite;
-}
-
-@keyframes pub-profile-float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-.pub-profile-title {
-  font-size: 28px;
-  font-weight: 800;
-  color: #0f172a;
-  margin: 0 0 12px 0;
-  font-family: Georgia, serif;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.pub-profile-subtitle {
-  font-size: 15px;
-  color: #475569 !important;
-  line-height: 1.6;
-  margin: 0;
-  max-width: 320px;
-  margin: 0 auto;
-}
-
-/* ============================================ */
-/* FEATURES SECTION */
-/* ============================================ */
-.pub-profile-features {
-  margin-bottom: 24px;
-}
-
-.pub-profile-section-title {
-  font-size: 20px;
-  font-weight: 700;
-  color: #1e293b;
-  margin: 0 0 16px 0;
-  text-align: center;
-}
-
-.pub-profile-feature-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.pub-profile-feature-card {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e2e8f0;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-}
-
-.pub-profile-feature-card:active {
-  transform: scale(0.98);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-}
-
-.pub-profile-feature-icon {
-  flex-shrink: 0;
-  width: 48px;
-  height: 48px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, rgba(255, 153, 51, 0.1) 0%, rgba(19, 136, 8, 0.1) 100%);
-  border-radius: 12px;
-  border: 2px solid var(--icon-color, #F97316);
+  justify-content: space-between;
 }
-
-.pub-profile-feature-card:nth-child(even) .pub-profile-feature-icon {
-  background: linear-gradient(135deg, rgba(19, 136, 8, 0.1) 0%, rgba(255, 153, 51, 0.1) 100%);
-}
-
-.pub-profile-feature-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: #1e293b;
-  margin: 0 0 6px 0;
-}
-
-.pub-profile-feature-desc {
+.profile-error-banner p {
+  color: #DC2626;
   font-size: 13px;
-  color: #64748b !important;
-  line-height: 1.5;
   margin: 0;
 }
-
-/* ============================================ */
-/* CTA SECTION */
-/* ============================================ */
-.pub-profile-cta-section {
-  margin-bottom: 24px;
-}
-
-.pub-profile-cta-card {
-  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-  border-radius: 16px;
-  padding: 28px 20px;
-  text-align: center;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  position: relative;
-  overflow: hidden;
-}
-
-.pub-profile-cta-card::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255, 153, 51, 0.1) 0%, transparent 70%);
-  animation: pub-profile-glow 8s ease-in-out infinite;
-}
-
-@keyframes pub-profile-glow {
-  0%, 100% {
-    transform: translate(0, 0);
-    opacity: 0.5;
-  }
-  50% {
-    transform: translate(-30%, -30%);
-    opacity: 0.8;
-  }
-}
-
-.pub-profile-cta-card > * {
-  position: relative;
-  z-index: 1;
-}
-
-.pub-profile-cta-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255, 153, 51, 0.2);
-  padding: 6px 14px;
-  border-radius: 20px;
-  margin-bottom: 16px;
+.profile-error-banner button {
+  background: #DC2626;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
   font-size: 12px;
   font-weight: 600;
-  color: #FFA500;
-  border: 1px solid rgba(255, 153, 51, 0.3);
+  cursor: pointer;
 }
 
-.pub-profile-badge-dot {
-  width: 8px;
-  height: 8px;
-  background: #FFA500;
+/* ========== PROFILE HEADER (LinkedIn Style) ========== */
+.profile-cover-wrapper {
+  position: relative;
+  margin: -16px -16px 16px -16px;
+  background: #ffffff;
+}
+  
+.profile-cover-bg {
+  height: 120px;
+  background: linear-gradient(135deg, #0a1628 0%, #1a3a5c 50%, #0f3460 100%);
+}
+
+.profile-cover-avatar {
+  position: absolute;
+  top: 80px;
+  left: 20px;
+}
+
+.profile-avatar-img {
+  width: 88px;
+  height: 88px;
   border-radius: 50%;
-  animation: pub-profile-pulse 2s ease-in-out infinite;
+  object-fit: cover;
+  border: 4px solid #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-@keyframes pub-profile-pulse {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.6;
-    transform: scale(1.2);
-  }
-}
-
-.pub-profile-cta-title {
-  font-size: 24px;
-  font-weight: 800;
-  color: #ffffff;
-  margin: 0 0 12px 0;
-  font-family: Georgia, serif;
-}
-
-.pub-profile-cta-desc {
-  font-size: 14px;
-  color: #cbd5e1;
-  line-height: 1.6;
-  margin: 0 0 24px 0;
-}
-
-.pub-profile-cta-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.pub-profile-btn-primary {
-  background: linear-gradient(135deg, #FF9933 0%, #FF6B00 100%);
-  color: #ffffff;
-  padding: 14px 24px;
-  border-radius: 12px;
-  border: none;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(255, 107, 0, 0.3);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.pub-profile-btn-primary:active {
-  transform: translateY(2px);
-  box-shadow: 0 2px 8px rgba(255, 107, 0, 0.4);
-}
-
-.pub-profile-btn-secondary {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-  padding: 14px 24px;
-  border-radius: 12px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-}
-
-.pub-profile-btn-secondary:active {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.5);
-  transform: translateY(2px);
-}
-
-.pub-profile-cta-note {
-  font-size: 13px;
-  color: #94a3b8;
-  margin: 0;
+.profile-avatar-placeholder {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FED7AA, #FDBA74);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  font-size: 32px;
+  font-weight: 800;
+  color: #9A3412;
+  border: 4px solid #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.pub-profile-india-flag {
-  font-size: 18px;
+.profile-cover-info {
+  padding: 56px 20px 20px 20px;
+  border-bottom: 1px solid #E5E7EB;
 }
 
-/* ============================================ */
-/* STATS BANNER */
-/* ============================================ */
-.pub-profile-stats-banner {
+.profile-name {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 4px 0;
+}
+
+.profile-team-role {
+  font-size: 14px;
+  color: #4B5563 !important;
+  margin: 0;
+}
+
+.profile-dot {
+  color: #D1D5DB;
+  margin: 0 4px;
+}
+
+/* ========== STATS GRID ========== */
+.profile-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.profile-stat-card {
   display: flex;
-  justify-content: space-around;
+  flex-direction: column;
   align-items: center;
+  gap: 6px;
+  padding: 14px 8px;
   background: #ffffff;
   border-radius: 12px;
-  padding: 20px 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  margin-bottom: 24px;
-  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
-.pub-profile-stat-item {
-  text-align: center;
-  flex: 1;
-}
-
-.pub-profile-stat-value {
-  font-size: 22px;
+.profile-stat-value {
+  font-size: 18px;
   font-weight: 800;
-  color: #FF6B00;
-  margin-bottom: 4px;
-  font-family: Georgia, serif;
+  color: #111827 !important;
 }
 
-.pub-profile-stat-label {
-  font-size: 11px;
-  color: #64748b;
+.profile-stat-label {
+  font-size: 10px;
   font-weight: 600;
+  color: #6B7280 !important;
   text-transform: uppercase;
   letter-spacing: 0.3px;
 }
 
-.pub-profile-stat-divider {
-  width: 1px;
-  height: 40px;
-  background: linear-gradient(180deg, transparent 0%, #e2e8f0 50%, transparent 100%);
+/* ========== SECTIONS ========== */
+.profile-section {
+  margin-bottom: 16px;
 }
 
-/* ============================================ */
-/* FOOTER */
-/* ============================================ */
-.pub-profile-footer {
+.profile-section-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1F2937;
+  margin: 0 0 10px 4px;
+}
+
+.profile-row-muted {
+  opacity: 0.45;
+}
+
+.profile-match-none {
+  background: #F3F4F6 !important;
+  color: #9CA3AF !important;
+}
+
+/* ========== SEASON TABLE ========== */
+.profile-season-table {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.profile-season-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  padding: 10px 16px;
+  background: #F9FAFB;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.profile-season-header span {
+  font-size: 11px;
+  font-weight: 700;
+  color: #6B7280;
+  text-transform: uppercase;
   text-align: center;
-  padding: 16px;
+}
+
+.profile-season-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  padding: 12px 16px;
+  border-bottom: 1px solid #F3F4F6;
+}
+
+.profile-season-row:last-child {
+  border-bottom: none;
+}
+
+.profile-season-row span {
+  font-size: 14px;
+  color: #1F2937 !important;
+  text-align: center;
+}
+
+.profile-season-year {
+  font-weight: 700;
+  color: #111827 !important;
+}
+
+.profile-season-avg {
+  font-weight: 700;
+  color: #F97316 !important;
+}
+
+/* ========== TOURNAMENTS ========== */
+.profile-tournament-list {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.profile-tournament-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #F3F4F6;
+}
+
+.profile-tournament-item:last-child {
+  border-bottom: none;
+}
+
+.profile-tournament-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.profile-tournament-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827 !important;
+}
+
+.profile-tournament-result {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.profile-result-gold {
+  color: #D97706 !important;
+}
+
+.profile-result-silver {
+  color: #6B7280 !important;
+}
+
+.profile-result-bronze {
+  color: #92400E !important;
+}
+
+.profile-result-default {
+  color: #6B7280 !important;
+}
+
+/* ========== RECENT MATCHES ========== */
+.profile-matches-list {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.profile-match-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #F3F4F6;
+}
+
+.profile-match-item:last-child {
+  border-bottom: none;
+}
+
+.profile-match-opponent {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827 !important;
+}
+
+.profile-match-score {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+  margin-right: 12px;
+}
+
+.profile-match-result {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.profile-match-W {
+  background: #D1FAE5;
+  color: #065F46 !important;
+}
+
+.profile-match-L {
+  background: #FEE2E2;
+  color: #991B1B !important;
+}
+
+.profile-match-D {
+  background: #E5E7EB;
+  color: #1F2937 !important;
+}
+
+/* ========== AWARDS ========== */
+.profile-awards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.profile-award-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 12px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.profile-award-count {
+  font-size: 22px;
+  font-weight: 800;
+  color: #F97316 !important;
+}
+
+.profile-award-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #4B5563 !important;
+  text-align: center;
+}
+
+/* ========== LOGOUT ========== */
+.profile-logout-section {
+  margin-top: 24px;
   margin-bottom: 20px;
 }
 
-.pub-profile-footer p {
-  font-size: 12px;
-  color: #94a3b8 !important;
+.profile-logout-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px;
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.profile-logout-btn span {
+  font-size: 15px;
+  font-weight: 600;
+  color: #EF4444 !important;
+}
+
+.profile-logout-btn:active {
+  background: #FEE2E2;
+}
+
+/* ========== GUEST VIEW ========== */
+.profile-guest-hero {
+  text-align: center;
+  padding: 32px 20px 24px;
+}
+
+.profile-guest-icon {
+  margin-bottom: 12px;
+}
+
+.profile-guest-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 4px 0;
+}
+
+.profile-guest-subtitle {
+  font-size: 14px;
+  color: #6B7280;
   margin: 0;
+}
+
+/* Guest Features */
+.profile-guest-features {
+  margin-bottom: 20px;
+}
+
+.profile-guest-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.profile-guest-feature-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px 12px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.profile-guest-feature-icon {
+  margin-bottom: 8px;
+}
+
+.profile-guest-feature-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 2px 0;
+}
+
+.profile-guest-feature-desc {
+  font-size: 11px;
+  color: #9CA3AF !important;
+  margin: 0;
+}
+
+/* ========== CTA CARD (Main Focus) ========== */
+.profile-cta-card {
+  background: linear-gradient(145deg, #0f172a, #1e293b);
+  border-radius: 16px;
+  padding: 28px 20px;
+  text-align: center;
+  margin-bottom: 16px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-cta-badge {
+  display: inline-block;
+  background: rgba(249, 115, 22, 0.15);
+  color: #FB923C;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  border: 1px solid rgba(249, 115, 22, 0.25);
+}
+
+
+.profile-cta-heading {
+  font-size: 20px;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 10px 0;
+  line-height: 1.3;
+}
+
+.profile-cta-subtext {
+  font-size: 13px;
+  color: #94A3B8;
+  margin: 0 0 20px 0;
   line-height: 1.5;
 }
 
-/* ============================================ */
-/* RESPONSIVE ADJUSTMENTS */
-/* ============================================ */
-@media (max-width: 360px) {
-  .pub-profile-hero {
-    padding: 24px 16px;
-  }
-
-  .pub-profile-title {
-    font-size: 24px;
-  }
-
-  .pub-profile-subtitle {
-    font-size: 14px;
-  }
-
-  .pub-profile-feature-card {
-    padding: 14px;
-  }
-
-  .pub-profile-cta-title {
-    font-size: 20px;
-  }
-
-  .pub-profile-btn-primary,
-  .pub-profile-btn-secondary {
-    padding: 12px 20px;
-    font-size: 14px;
-  }
+.profile-cta-benefits {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+  padding: 0 12px;
 }
 
-/* ============================================ */
-/* SMOOTH ANIMATIONS */
-/* ============================================ */
-@keyframes pub-profile-fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.profile-cta-benefit {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.pub-profile-container > * {
-  animation: pub-profile-fadeIn 0.6s ease-out backwards;
+.profile-cta-benefit span {
+  font-size: 13px;
+  color: #E2E8F0;
+  font-weight: 500;
 }
 
-.pub-profile-hero {
-  animation-delay: 0.1s;
+.profile-cta-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.pub-profile-features {
-  animation-delay: 0.2s;
+.profile-cta-btn-signin {
+  padding: 14px;
+  background: linear-gradient(135deg, #F97316, #EA580C);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
 }
 
-.pub-profile-cta-section {
-  animation-delay: 0.3s;
+.profile-cta-btn-signin:active {
+  opacity: 0.9;
 }
 
-.pub-profile-stats-banner {
-  animation-delay: 0.4s;
+.profile-cta-btn-create {
+  padding: 14px;
+  background: transparent;
+  color: #E2E8F0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.profile-cta-btn-create:active {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.profile-cta-footer-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 18px;
+  font-size: 12px;
+  color: #64748B;
+  font-weight: 500;
+}
+
+
+/* Guest Stats Banner */
+.profile-guest-stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.profile-guest-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.profile-guest-stat-value {
+  font-size: 20px;
+  font-weight: 800;
+  color: #111827 !important;
+}
+
+.profile-guest-stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #9CA3AF !important;
+  text-transform: uppercase;
+}
+
+.profile-guest-stat-divider {
+  width: 1px;
+  height: 32px;
+  background: #E5E7EB;
+}
+
+/* Made in India Note */
+.profile-guest-cta-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 16px;
+  font-size: 12px;
+  color: #9CA3AF;
+  font-weight: 500;
+}
+
+/* Footer */
+.profile-guest-footer {
+  text-align: center;
+  padding: 20px 16px;
+  margin-top: 16px;
+}
+
+.profile-guest-footer p {
+  font-size: 12px;
+  color: #9CA3AF !important;
+  margin: 0;
+  font-weight: 500;
 }

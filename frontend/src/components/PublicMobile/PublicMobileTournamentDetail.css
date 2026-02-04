@@ -1,0 +1,1111 @@
+/* ============================================ */
+/* TOURNAMENT DETAIL - ESPN + APPLE CLEAN UI */
+/* ============================================ */
+
+.tour-detail-container {
+  min-height: 100vh;
+  background: #F9FAFB;
+  padding-bottom: 20px;
+}
+
+.tour-detail-loading,
+.tour-detail-error {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6B7280;
+}
+
+.tour-detail-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #E5E7EB;
+  border-top-color: #F97316;
+  border-radius: 50%;
+  margin: 0 auto 12px;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ========== HEADER ========== */
+.tour-detail-header {
+  padding: 12px 16px;
+  background: #FFFFFF;
+  border-bottom: 1px solid #E5E7EB;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.tour-detail-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  color: #F97316;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.tour-detail-back-btn:active {
+  opacity: 0.7;
+}
+
+/* ========== COVER - TOURNAMENT SHOWCASE STYLE ========== */
+.tour-detail-cover-wrapper {
+  position: relative;
+  margin: 0;
+  background: #FFFFFF;
+  overflow: hidden;
+}
+
+.tour-detail-cover-bg {
+  height: 140px;
+  background: linear-gradient(135deg, #0a1628 0%, #1a3a5c 50%, #0f3460 100%);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  text-align: center;
+}
+
+/* Animated gradient overlay */
+.tour-detail-cover-bg::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle at 20% 50%,
+    rgba(249, 115, 22, 0.15) 0%,
+    transparent 50%
+  ),
+  radial-gradient(
+    circle at 80% 50%,
+    rgba(59, 130, 246, 0.1) 0%,
+    transparent 50%
+  );
+  animation: floatGradient 15s ease-in-out infinite;
+}
+
+/* Dot pattern overlay */
+.tour-detail-cover-bg::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+  opacity: 0.3;
+}
+
+@keyframes floatGradient {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  33% {
+    transform: translate(5%, 5%) rotate(120deg);
+  }
+  66% {
+    transform: translate(-5%, 5%) rotate(240deg);
+  }
+}
+
+/* Tournament Name on Banner */
+.tour-detail-banner-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin: 0 0 8px 0;
+  line-height: 1.2;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 2;
+  position: relative;
+  animation: fadeIn 0.6s ease-out;
+}
+
+.tour-detail-banner-meta {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  z-index: 2;
+  position: relative;
+  animation: fadeIn 0.8s ease-out 0.2s both;
+}
+
+.tour-detail-banner-dot {
+  margin: 0 6px;
+  opacity: 0.6;
+}
+
+/* Photo/Logo Centered Below Banner */
+.tour-detail-cover-logo {
+  position: absolute;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tour-detail-logo-img {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #FFFFFF ;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2),
+              0 0 0 0 rgba(249, 115, 22, 0.4);
+  transition: all 0.3s ease;
+  animation: breathe 3s ease-in-out infinite;
+}
+
+.tour-detail-logo-img:active {
+  transform: scale(0.95);
+}
+
+.tour-detail-logo-placeholder {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FED7AA, #FDBA74, #F97316);
+  background-size: 200% 200%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: 800;
+  color: #FFFFFF;
+  border: 4px solid #FFFFFF;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2),
+              0 0 20px rgba(249, 115, 22, 0.4),
+              inset 0 0 20px rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  animation: breathe 3s ease-in-out infinite, gradientShift 4s ease infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+.tour-detail-logo-placeholder::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 70%
+  );
+  animation: shimmer 3s infinite;
+}
+
+.tour-detail-logo-placeholder:active {
+  transform: scale(0.95);
+}
+
+@keyframes breathe {
+  0%, 100% {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2),
+                0 0 20px rgba(249, 115, 22, 0.4),
+                inset 0 0 20px rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3),
+                0 0 30px rgba(249, 115, 22, 0.6),
+                inset 0 0 20px rgba(255, 255, 255, 0.2);
+  }
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(0deg);
+  }
+  100% {
+    transform: translateX(100%) translateY(100%) rotate(0deg);
+  }
+}
+
+.tour-detail-cover-info {
+  padding: 56px 20px 20px 20px;
+  background: #FFFFFF;
+  border-bottom: 1px solid #E5E7EB;
+  animation: fadeIn 0.8s ease-out 0.2s both;
+  text-align: center;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* MOT Label and Name Below Photo */
+.tour-detail-mot-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #F97316 !important;
+  margin: 0 0 6px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tour-detail-mot-name {
+  font-size: 20px;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 4px 0;
+  line-height: 1.2;
+}
+
+.tour-detail-mot-team {
+  font-size: 14px;
+  font-weight: 500;
+  color: #6B7280;
+  margin: 0 0 12px 0;
+}
+
+.tour-detail-subtitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: #6B7280;
+  margin: 0 0 12px 0;
+}
+
+.tour-detail-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.tour-detail-status-badge.live {
+  background: #D1FAE5;
+  color: #065F46;
+  animation: pulseBadge 2s ease-in-out infinite;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+}
+
+@keyframes pulseBadge {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+  }
+}
+
+.tour-detail-status-badge.upcoming {
+  background: #DBEAFE;
+  color: #1E40AF;
+}
+
+.tour-detail-status-badge.completed {
+  background: #E5E7EB;
+  color: #374151;
+}
+
+.tour-detail-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10B981;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.tour-detail-description {
+  font-size: 14px;
+  color: #6B7280 !important;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ========== TABS ========== */
+.tour-detail-tabs {
+  background: #FFFFFF;
+  border-bottom: 1px solid #E5E7EB;
+  position: sticky;
+  top: 57px;
+  z-index: 99;
+}
+
+.tour-detail-tabs-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+}
+
+.tour-detail-tabs-scroll {
+  flex: 1;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.tour-detail-tabs-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.tour-detail-more-btn {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  color: #6B7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tour-detail-more-btn:active {
+  background: #F3F4F6;
+  border-color: #D1D5DB;
+}
+
+/* Dropdown Menu */
+.tour-detail-tabs-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 16px;
+  margin-top: 6px;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  min-width: 140px;
+  z-index: 100;
+  overflow: hidden;
+  animation: dropdownFadeIn 0.15s ease-out;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tour-detail-dropdown-item {
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.12s;
+  border-bottom: 0.5px solid #F3F4F6;
+}
+
+.tour-detail-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.tour-detail-dropdown-item:active {
+  background: #F3F4F6;
+}
+
+.tour-detail-dropdown-item.active {
+  background: #FFF7ED;
+  color: #F97316;
+  font-weight: 600;
+}
+
+.tour-detail-tab {
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #6B7280;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.tour-detail-tab:active {
+  transform: scale(0.96);
+}
+
+.tour-detail-tab.active {
+  background: #F97316;
+  color: #FFFFFF;
+}
+
+/* ========== CONTENT ========== */
+.tour-detail-content {
+  padding: 16px;
+}
+
+.tour-section-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1F2937;
+  margin: 0 0 12px 0;
+}
+
+/* ========== QUICK STATS ========== */
+.tour-quick-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.tour-stat-card {
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 14px 8px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.tour-stat-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.tour-stat-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #6B7280;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* ========== WINNERS ========== */
+.tour-winners-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.tour-winner-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.tour-winner-medal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.tour-winner-medal svg {
+  width: 28px;
+  height: 28px;
+}
+
+.tour-winner-medal.gold {
+  background: linear-gradient(135deg, #FEF3C7, #FDE047);
+}
+
+.tour-winner-medal.gold svg {
+  stroke: #CA8A04;
+  fill: none;
+}
+
+.tour-winner-medal.silver {
+  background: linear-gradient(135deg, #F1F5F9, #CBD5E1);
+}
+
+.tour-winner-medal.silver svg {
+  stroke: #64748B;
+  fill: none;
+}
+
+.tour-winner-medal.bronze {
+  background: linear-gradient(135deg, #FED7AA, #FDBA74);
+}
+
+.tour-winner-medal.bronze svg {
+  stroke: #C2410C;
+  fill: none;
+}
+
+.tour-winner-info {
+  flex: 1;
+}
+
+.tour-winner-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6B7280;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.tour-winner-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* ========== MAN OF THE TOURNAMENT ========== */
+.tour-mot-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  margin-bottom: 24px;
+}
+
+.tour-mot-photo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #F97316;
+}
+
+.tour-mot-photo-placeholder {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FED7AA, #FDBA74);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: 800;
+  color: #9A3412;
+  border: 3px solid #F97316;
+}
+
+.tour-mot-info {
+  flex: 1;
+}
+
+.tour-mot-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.tour-mot-team {
+  font-size: 13px;
+  color: #6B7280;
+  margin-bottom: 8px;
+}
+
+.tour-mot-stats {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #F97316;
+}
+
+/* ========== INFO CARD ========== */
+.tour-info-card {
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  margin-bottom: 24px;
+}
+
+.tour-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #F3F4F6;
+}
+
+.tour-info-row:last-child {
+  border-bottom: none;
+}
+
+.tour-info-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #6B7280 !important;
+}
+
+.tour-info-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827 !important;
+}
+
+/* ========== MATCHES ========== */
+.tour-filter-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.tour-date-filter {
+  padding: 8px 12px;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #374151;
+  background: #FFFFFF;
+}
+
+.tour-matches-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tour-match-card {
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.tour-match-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.tour-match-date {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6B7280 !important;
+}
+
+.tour-match-status {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.tour-match-status.completed {
+  background: #D1FAE5 !important;
+  color: #065F46 !important;
+}
+
+.tour-match-status.in_progress {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+.tour-match-status.scheduled {
+  background: #DBEAFE;
+  color: #1E40AF;
+}
+
+.tour-match-teams {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.tour-match-team {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.tour-match-team-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827 !important;
+}
+
+.tour-match-score {
+  font-size: 20px;
+  font-weight: 800;
+  color: #F97316 !important;
+}
+
+.tour-match-vs {
+  font-size: 11px;
+  font-weight: 700;
+  color: #9CA3AF !important;
+  padding: 0 12px;
+}
+
+.tour-match-winner {
+  font-size: 12px;
+  font-weight: 600;
+  color: #059669;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+/* ========== MAN OF THE MATCH ========== */
+.tour-mom-section {
+  border-top: 1px solid #E5E7EB;
+  padding-top: 12px;
+}
+
+.tour-mom-header {
+  font-size: 11px;
+  font-weight: 700;
+  color: #6B7280;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.tour-mom-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tour-mom-photo {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #F97316;
+}
+
+.tour-mom-photo-placeholder {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FED7AA, #FDBA74);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 800;
+  color: #9A3412;
+  border: 2px solid #F97316;
+}
+
+.tour-mom-info {
+  flex: 1;
+}
+
+.tour-mom-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 2px;
+}
+
+.tour-mom-team {
+  font-size: 12px;
+  color: #6B7280;
+  margin-bottom: 6px;
+}
+
+.tour-mom-stats {
+  font-size: 11px;
+  font-weight: 600;
+  color: #F97316;
+}
+
+/* ========== TEAMS ========== */
+.tour-teams-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tour-team-card {
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.tour-team-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 6px;
+}
+
+.tour-team-location {
+  font-size: 13px;
+  color: #6B7280;
+  margin-bottom: 4px;
+}
+
+.tour-team-type {
+  font-size: 12px;
+  color: #9CA3AF;
+}
+
+/* ========== AWARDS ========== */
+.tour-awards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.tour-award-card {
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.tour-award-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: #FFF7ED;
+  border-radius: 50%;
+  margin: 0 auto 10px;
+}
+
+.tour-award-icon svg {
+  color: #F97316;
+  stroke: #F97316;
+}
+
+.tour-award-photo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin: 0 auto 10px;
+  display: block;
+  border: 3px solid #F97316;
+}
+
+.tour-award-photo-placeholder {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FED7AA, #FDBA74);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: 800;
+  color: #9A3412;
+  margin: 0 auto 10px;
+  border: 3px solid #F97316;
+}
+
+.tour-award-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #6B7280;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.tour-award-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.tour-award-team {
+  font-size: 12px;
+  color: #6B7280;
+  margin-bottom: 6px;
+}
+
+.tour-award-stat {
+  font-size: 13px;
+  font-weight: 700;
+  color: #F97316;
+}
+
+/* ========== PRIZE POOL ========== */
+.tour-prize-section {
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  margin-bottom: 24px;
+}
+
+.tour-total-prize {
+  font-size: 20px;
+  font-weight: 800;
+  color: #F97316;
+  text-align: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #FED7AA;
+}
+
+.tour-prizes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tour-prize-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #F3F4F6;
+}
+
+.tour-prize-row:last-child {
+  border-bottom: none;
+}
+
+.tour-prize-position {
+  font-size: 14px;
+  font-weight: 700;
+  color: #374151;
+}
+
+.tour-prize-amount {
+  font-size: 15px;
+  font-weight: 700;
+  color: #059669;
+}
+
+/* ========== ORGANIZER ========== */
+.tour-organizer-card {
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  margin-bottom: 24px;
+}
+
+.tour-organizer-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 8px;
+}
+
+.tour-organizer-contact {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #6B7280;
+  margin-bottom: 4px;
+}
+
+.tour-organizer-contact svg {
+  color: #F97316;
+  stroke: #F97316;
+  flex-shrink: 0;
+}
+
+/* ========== GALLERY ========== */
+.tour-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.tour-gallery-item {
+  border-radius: 12px;
+  overflow: hidden;
+  background: #FFFFFF;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.tour-gallery-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+
+/* ========== EMPTY STATE ========== */
+.tour-empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  background: #FFFFFF;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.tour-empty-state p {
+  font-size: 14px;
+  color: #9CA3AF;
+  margin: 0;
+}

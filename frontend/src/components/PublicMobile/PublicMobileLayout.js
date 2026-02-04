@@ -1,29 +1,17 @@
 import React, { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import './PublicMobileLayout.css';
-
-// DroneNova Propeller Logo SVG
-const DroneNovaLogo = () => (
-  <svg width="40" height="40" viewBox="0 0 100 100" fill="none">
-    {/* Center hub */}
-    <circle cx="50" cy="50" r="12" fill="#1a3a5c"/>
-    <circle cx="50" cy="50" r="8" fill="#FF9933"/>
-    {/* Propeller blades - 4 directions */}
-    <ellipse cx="50" cy="25" rx="8" ry="20" fill="#138808" opacity="0.9"/>
-    <ellipse cx="75" cy="50" rx="20" ry="8" fill="#FF9933" opacity="0.9"/>
-    <ellipse cx="50" cy="75" rx="8" ry="20" fill="#138808" opacity="0.9"/>
-    <ellipse cx="25" cy="50" rx="20" ry="8" fill="#FF9933" opacity="0.9"/>
-    {/* Blade connectors */}
-    <circle cx="50" cy="25" r="4" fill="#1a3a5c"/>
-    <circle cx="75" cy="50" r="4" fill="#1a3a5c"/>
-    <circle cx="50" cy="75" r="4" fill="#1a3a5c"/>
-    <circle cx="25" cy="50" r="4" fill="#1a3a5c"/>
-  </svg>
-);
+import logoImg from '../../assets/DroneNova India 2026.png';
 
 const MenuIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="#1a3a5c">
     <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+  </svg>
+);
+
+const CloseIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="#1a3a5c">
+    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
   </svg>
 );
 
@@ -51,12 +39,34 @@ const ProfileIcon = ({ active }) => (
   </svg>
 );
 
+const MatchesIcon = ({ active }) => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill={active ? "#F97316" : "#9CA3AF"}>
+    <circle cx="12" cy="12" r="9" stroke={active ? "#F97316" : "#9CA3AF"} strokeWidth="2" fill="none"/>
+    <polygon points="12,4 14,10 20,10 15,14 17,20 12,16 7,20 9,14 4,10 10,10" fill={active ? "#F97316" : "#9CA3AF"}/>
+  </svg>
+);
+
+const StatsIcon = ({ active }) => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill={active ? "#F97316" : "#9CA3AF"}>
+    <path d="M3 3v18h18" stroke={active ? "#F97316" : "#9CA3AF"} strokeWidth="2" fill="none" strokeLinecap="round"/>
+    <rect x="7" y="13" width="3" height="7" rx="1" fill={active ? "#F97316" : "#9CA3AF"}/>
+    <rect x="12" y="9" width="3" height="11" rx="1" fill={active ? "#F97316" : "#9CA3AF"} opacity="0.7"/>
+    <rect x="17" y="5" width="3" height="15" rx="1" fill={active ? "#F97316" : "#9CA3AF"} opacity="0.5"/>
+  </svg>
+);
+
+const AwardsIcon = ({ active }) => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill={active ? "#F97316" : "#9CA3AF"}>
+    <circle cx="12" cy="9" r="6" stroke={active ? "#F97316" : "#9CA3AF"} strokeWidth="2" fill="none"/>
+    <path d="M12 6v6l3 2" stroke={active ? "#F97316" : "#9CA3AF"} strokeWidth="2" fill="none" strokeLinecap="round"/>
+    <path d="M8 15l-2 7h12l-2-7" fill={active ? "#F97316" : "#9CA3AF"} opacity="0.4"/>
+  </svg>
+);
+
 const PublicMobileLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
-
-  const isHome = location.pathname === '/watch';
 
   return (
     <div className="pub-mobile-container">
@@ -67,41 +77,61 @@ const PublicMobileLayout = () => {
         </button>
 
         <div className="pub-logo-container-new">
-          <DroneNovaLogo />
-          <div className="pub-logo-text-wrapper">
-            <span className="pub-logo-main">DroneNova</span>
-            <span className="pub-logo-india">— INDIA —</span>
-          </div>
+          <img src={logoImg} alt="DroneNova India" className="pub-header-logo-img" />
         </div>
 
-        <button className="pub-menu-btn-new" onClick={() => setMenuOpen(!menuOpen)}>
-          <MenuIcon />
-        </button>
+        <div style={{ width: 40 }} />
       </header>
 
-      {/* Menu Dropdown */}
-      {menuOpen && (
-        <div className="pub-menu-dropdown-new">
-          <button
-            className="pub-menu-item-new"
-            onClick={() => {
-              navigate('/login');
-              setMenuOpen(false);
-            }}
-          >
-            Login
-          </button>
-          <button
-            className="pub-menu-item-new"
-            onClick={() => {
-              navigate('/signup');
-              setMenuOpen(false);
-            }}
-          >
-            Sign Up
+      {/* Sidebar Overlay */}
+      {menuOpen && <div className="pub-sidebar-overlay" onClick={() => setMenuOpen(false)} />}
+
+      {/* Sidebar */}
+      <aside className={`pub-sidebar ${menuOpen ? 'pub-sidebar-open' : ''}`}>
+        <div className="pub-sidebar-header">
+          <div className="pub-sidebar-brand">
+            <img src={logoImg} alt="DroneNova India" className="pub-sidebar-logo-img" />
+          </div>
+          <button className="pub-sidebar-close" onClick={() => setMenuOpen(false)}>
+            <CloseIcon />
           </button>
         </div>
-      )}
+
+        <nav className="pub-sidebar-nav">
+          {[
+            { id: 'home', icon: HomeIcon, label: 'Home', route: '/watch' },
+            { id: 'profile', icon: ProfileIcon, label: 'Profile', route: '/watch/profile' },
+            { id: 'tournaments', icon: TournamentIcon, label: 'Tournaments', route: '/watch/tournaments' },
+            { id: 'matches', icon: MatchesIcon, label: 'Matches', route: '/watch/matches' },
+            { id: 'stats', icon: StatsIcon, label: 'Stats', route: '/watch/stats' },
+            { id: 'awards', icon: AwardsIcon, label: 'Awards', route: '/watch/awards' },
+          ].map(({ id, icon: Icon, label, route }) => (
+            <button
+              key={id}
+              className={`pub-sidebar-item ${location.pathname === route ? 'pub-sidebar-item-active' : ''}`}
+              onClick={() => {
+                navigate(route);
+                setMenuOpen(false);
+              }}
+            >
+              <Icon active={location.pathname === route} />
+              <span className="pub-sidebar-item-label">{label}</span>
+            </button>
+          ))}
+        </nav>
+
+        <div className="pub-sidebar-footer">
+          <button
+            className="pub-sidebar-login-btn"
+            onClick={() => {
+              navigate('/admin/login');
+              setMenuOpen(false);
+            }}
+          >
+            Admin Login
+          </button>
+        </div>
+      </aside>
 
       {/* Main Content */}
       <main className="pub-main-content-new">

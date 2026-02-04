@@ -83,6 +83,12 @@ export const getCurrentUser = async () => {
   return response.data;
 };
 
+// Get player profile with aggregated stats
+export const getPlayerProfile = async () => {
+  const response = await axios.get(`${API_BASE_URL}/users/auth/player-profile`);
+  return response.data;
+};
+
 // User logout
 export const userLogout = async () => {
   const response = await axios.post(`${API_BASE_URL}/users/auth/logout`);

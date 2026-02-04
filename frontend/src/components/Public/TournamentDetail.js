@@ -5,7 +5,6 @@ import {
   getMatches
 } from '../../services/api';
 import './TournamentDetail.css';
-import defaultBanner from '../../assets/logo.png';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
@@ -184,34 +183,62 @@ const TournamentDetail = () => {
 
   return (
     <div className="tournament-detail-container">
-      {/* Header */}
-      <div className="tournament-detail-header">
-        {tournament.media?.bannerImage ? (
-          <img
-            src={getImageUrl(tournament.media.bannerImage)}
-            alt={tournament.name}
-            className="tournament-detail-banner"
-          />
-        ) : (
-          <img
-            src={defaultBanner}
-            alt="Default Tournament Banner"
-            className="tournament-detail-banner"
-          />
-        )}
-        <div className="tournament-detail-header-content">
-          <h1 className="tournament-detail-title">{tournament.name}</h1>
-          <div className="tournament-detail-header-info">
-            <span className="tournament-detail-location">
-              📍 {tournament.location?.city}, {tournament.location?.state}
-            </span>
-            <span className="tournament-detail-dates">
-              📅 {new Date(tournament.startDate).toLocaleDateString()} - {new Date(tournament.endDate).toLocaleDateString()}
-            </span>
-            <span className="tournament-detail-status" style={{backgroundColor: tournament.status === 'completed' ? '#4CAF50' : '#FF9800'}}>
-              {tournament.status || 'Upcoming'}
-            </span>
+      {/* Cover - Tournament Showcase Style (Mobile Design for Desktop) */}
+      <div className="tournament-detail-cover-wrapper">
+        {/* Gradient Banner with Tournament Name */}
+        <div className="tournament-detail-cover-bg">
+          <h1 className="tournament-detail-banner-title">{tournament.name}</h1>
+          <div className="tournament-detail-banner-meta">
+            <span>{tournament.location?.city}, {tournament.location?.state}</span>
+            <span className="tournament-detail-banner-dot">•</span>
+            <span>{new Date(tournament.startDate).toLocaleDateString()} - {new Date(tournament.endDate).toLocaleDateString()}</span>
           </div>
+        </div>
+
+        {/* MOT Photo / Tournament Logo Overlapping Banner */}
+        <div className="tournament-detail-cover-logo">
+          {tournament.manOfTheTournament?.photo ? (
+            <img
+              src={getImageUrl(tournament.manOfTheTournament.photo)}
+              alt={tournament.manOfTheTournament.playerName}
+              className="tournament-detail-logo-img"
+            />
+          ) : tournament.media?.logoImage ? (
+            <img
+              src={getImageUrl(tournament.media.logoImage)}
+              alt={tournament.name}
+              className="tournament-detail-logo-img"
+            />
+          ) : (
+            <div className="tournament-detail-logo-placeholder">
+              {tournament.name.charAt(0).toUpperCase()}
+            </div>
+          )}
+        </div>
+
+        {/* Info Below Photo */}
+        <div className="tournament-detail-cover-info">
+          {tournament.manOfTheTournament?.playerName ? (
+            <>
+              <p className="tournament-detail-mot-label">Man of the Tournament</p>
+              <h2 className="tournament-detail-mot-name">{tournament.manOfTheTournament.playerName}</h2>
+              {tournament.manOfTheTournament.team?.name && (
+                <p className="tournament-detail-mot-team">{tournament.manOfTheTournament.team.name}</p>
+              )}
+            </>
+          ) : (
+            <p className="tournament-detail-subtitle">Tournament Showcase</p>
+          )}
+
+          <div className={`tournament-detail-status-badge ${
+            tournament.status === 'ongoing' ? 'live' :
+            tournament.status === 'completed' ? 'completed' : 'upcoming'
+          }`}>
+            {tournament.status === 'ongoing' && <span className="tournament-detail-live-dot" />}
+            {tournament.status === 'ongoing' ? 'Live' :
+             tournament.status === 'completed' ? 'Completed' : 'Upcoming'}
+          </div>
+
           {tournament.description && (
             <p className="tournament-detail-description">{tournament.description}</p>
           )}

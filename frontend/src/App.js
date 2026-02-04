@@ -31,6 +31,7 @@ import {
   PublicMobileLeaderboard,
   PublicMobileProfile,
 } from './components/PublicMobile';
+import PublicMobileTournamentDetail from './components/PublicMobile/PublicMobileTournamentDetail';
 
 import './App.css';
 
@@ -81,6 +82,24 @@ const ResponsiveLeaderboard = () => {
   return <Navigate to="/" replace />;
 };
 
+// Responsive Tournament Detail - Dynamically switches mobile/desktop
+const ResponsiveTournamentDetail = () => {
+  const isMobile = useIsMobile();
+
+  // Mobile users get clean PublicMobile tournament detail
+  if (isMobile) {
+    return <PublicMobileTournamentDetail />;
+  }
+
+  // Desktop users get the old design with Navbar
+  return (
+    <div key="desktop-tournament-detail" style={{ width: '100%', height: '100%' }}>
+      <Navbar />
+      <TournamentDetail />
+    </div>
+  );
+};
+
 function App() {
   return (
     <AuthProvider>
@@ -92,7 +111,7 @@ function App() {
             <Route path="/" element={<ResponsiveHome />} />
             <Route path="/tournaments" element={<ResponsiveTournaments />} />
             <Route path="/leaderboard" element={<ResponsiveLeaderboard />} />
-            <Route path="/tournament/:id" element={<><Navbar /><TournamentDetail /></>} />
+            <Route path="/tournament/:id" element={<ResponsiveTournamentDetail />} />
 
             {/* Public Mobile Routes (Public Viewer for Mobile) */}
             <Route path="/watch" element={<PublicMobileLayout />}>

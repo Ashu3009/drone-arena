@@ -303,24 +303,16 @@ const PublicMobileHome = () => {
 
   return (
     <div>
-      {/* ========== HERO SECTION ========== */}
-      <div className="hero-section">
-        {/* Background Video */}
-        {/* <video
-          className="hero-video"
-          autoPlay
-          loop
-          muted
-          playsInline
-        >
-          <source src="/PublicMobile/assets/videos/Hero_video_8.mp4" type="video/mp4" />
-        </video> */}
-
-        {/* Overlay Content */}
-        {/* <div className="hero-overlay">
-          <h1 className="hero-main-title">DroneSoccer</h1>
-          <p className="hero-subtitle">LEAGUE</p>
-        </div> */}
+      {/* ========== HERO TITLE ========== */}
+      <div className="hero-title-bar">
+        <div className="hero-title-marquee">
+          <span className="hero-title-text">
+            <strong>DRONENOVA INDIA</strong> &nbsp;—&nbsp; LAUNCHING INDIA'S FIRST DRONE SOCCER LEAGUE &nbsp;&nbsp; &nbsp;&nbsp;
+          </span>
+          <span className="hero-title-text">
+            <strong>DRONENOVA INDIA</strong> &nbsp;—&nbsp; LAUNCHING INDIA'S FIRST DRONE SOCCER LEAGUE &nbsp;&nbsp; &nbsp;&nbsp;
+          </span>
+        </div>
       </div>
 
       {/* ========== MAIN CONTENT ========== */}
