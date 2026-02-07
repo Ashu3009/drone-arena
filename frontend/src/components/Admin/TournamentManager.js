@@ -759,10 +759,6 @@ const TournamentManager = () => {
                 </span>
               </div>
 
-              {tournament.description && (
-                <p style={styles.cardDescription}>{tournament.description}</p>
-              )}
-
               <div style={styles.cardInfo}>
                 <div style={styles.infoItem}>
                   <span style={styles.infoLabel}>Location:</span>
@@ -972,7 +968,7 @@ const styles = {
   },
   tournamentList: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
     gap: '20px'
   },
   loadingText: {
@@ -998,13 +994,18 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'start',
-    marginBottom: '12px'
+    marginBottom: '12px',
+    gap: '12px'
   },
   cardTitle: {
     margin: 0,
     fontSize: '18px',
     flex: 1,
-    color: '#e2e8f0'
+    color: '#e2e8f0',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    wordBreak: 'break-word',
+    minWidth: 0
   },
   cardStatus: {
     background: 'linear-gradient(135deg, rgba(0, 79, 249, 0.3), rgba(0, 123, 255, 0.2))',
@@ -1013,7 +1014,9 @@ const styles = {
     borderRadius: '12px',
     fontSize: '12px',
     fontWeight: 'bold',
-    border: '1px solid rgba(0, 123, 255, 0.4)'
+    border: '1px solid rgba(0, 123, 255, 0.4)',
+    flexShrink: 0,
+    whiteSpace: 'nowrap'
   },
   cardDescription: {
     color: '#94a3b8',
@@ -1045,7 +1048,8 @@ const styles = {
   },
   cardActions: {
     display: 'flex',
-    gap: '8px'
+    gap: '8px',
+    flexWrap: 'wrap'
   },
   manageButton: {
     background: 'linear-gradient(135deg, rgba(255, 152, 0, 0.3), rgba(255, 152, 0, 0.2))',

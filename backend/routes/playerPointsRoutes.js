@@ -8,7 +8,8 @@ const {
   getTournamentPlayerPoints,
   calculateTournamentAwards,
   getPlayerStats,
-  deleteMatchPlayerPoints
+  deleteMatchPlayerPoints,
+  autoGenerateRoundPoints
 } = require('../controllers/playerPointsController');
 const { protect } = require('../middleware/auth'); // Admin authentication
 
@@ -20,6 +21,7 @@ router.get('/player-stats/:playerName', getPlayerStats);
 
 // Protected routes (Admin only)
 router.post('/', protect, savePlayerPoints);
+router.post('/auto-generate', protect, autoGenerateRoundPoints);
 router.delete('/match/:matchId', protect, deleteMatchPlayerPoints);
 
 module.exports = router;

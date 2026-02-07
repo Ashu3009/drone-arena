@@ -30,7 +30,7 @@ body:has(.tournament-detail-container)::-webkit-scrollbar-thumb:hover {
 }
 
 .tournament-detail-container {
-  max-width: 1200px;
+  max-width: 1600px;
   margin: 0 auto;
   padding: 20px;
   min-height: 100vh;

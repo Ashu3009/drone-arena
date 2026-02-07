@@ -114,6 +114,7 @@ const getAllMatches = async (req, res) => {
       .populate('teamA', 'name color members teamSize')
       .populate('teamB', 'name color members teamSize')
       .populate('winner', 'name')
+      .populate('manOfTheMatch.team', 'name color')
       .sort({ createdAt: -1 });
     
     res.json({
@@ -139,7 +140,8 @@ const getMatchById = async (req, res) => {
       .populate('tournament', 'name')
       .populate('teamA', 'name color members teamSize')
       .populate('teamB', 'name color members teamSize')
-      .populate('winner', 'name');
+      .populate('winner', 'name')
+      .populate('manOfTheMatch.team', 'name color');
     
     if (!match) {
       return res.status(404).json({
@@ -1355,7 +1357,7 @@ const endRound = async (req, res) => {
     res.status(200).json({
       success: true,
       message: `Round ${roundNumber} ended successfully`,
-      data: {
+      data: {  
         roundNumber: activeRound.roundNumber,
         status: activeRound.status,
         startTime: activeRound.startTime,

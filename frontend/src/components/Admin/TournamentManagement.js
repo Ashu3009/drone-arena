@@ -7,7 +7,6 @@ import {
   setTournamentWinners,
   getTournamentById
 } from '../../services/api';
-import defaultBanner from '../../assets/logo.png';
 import TournamentAwardsManager from './TournamentAwardsManager';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || '${BACKEND_URL}';
@@ -48,7 +47,6 @@ const TournamentManagement = ({ tournament: initialTournament, teams, onClose, o
     photo: null,
     stats: tournament.manOfTheTournament?.stats || {
       goals: 0,
-      assists: 0,
       matchesPlayed: 0
     }
   });
@@ -234,21 +232,12 @@ const TournamentManagement = ({ tournament: initialTournament, teams, onClose, o
             <div>
               <h3 style={styles.sectionTitle}>Tournament Banner</h3>
 
-              {tournament.media?.bannerImage ? (
+              {tournament.media?.bannerImage && (
                 <div style={styles.currentBanner}>
                   <p style={styles.label}>Current Banner:</p>
                   <img
                     src={getImageUrl(tournament.media.bannerImage)}
                     alt="Current Banner"
-                    style={styles.bannerPreview}
-                  />
-                </div>
-              ) : (
-                <div style={styles.currentBanner}>
-                  <p style={styles.label}>Default Banner:</p>
-                  <img
-                    src={defaultBanner}
-                    alt="Default Banner"
                     style={styles.bannerPreview}
                   />
                 </div>
@@ -469,20 +458,6 @@ const TournamentManagement = ({ tournament: initialTournament, teams, onClose, o
                 </div>
 
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>Assists</label>
-                  <input
-                    type="number"
-                    value={motData.stats.assists}
-                    onChange={(e) => setMotData({
-                      ...motData,
-                      stats: { ...motData.stats, assists: parseInt(e.target.value) || 0 }
-                    })}
-                    style={styles.input}
-                    min="0"
-                  />
-                </div>
-
-                <div style={styles.formGroup}>
                   <label style={styles.label}>Matches Played</label>
                   <input
                     type="number"
@@ -544,36 +519,40 @@ const TournamentManagement = ({ tournament: initialTournament, teams, onClose, o
   );
 };
 
+// Detect mobile
+const isMobile = window.innerWidth <= 768;
+
 const styles = {
   overlay: {
     position: 'fixed',
     top: 0,
-    left: 0,
+    left: isMobile ? 0 : '240px',
     right: 0,
     bottom: 0,
     backgroundColor: 'rgba(0, 0, 0, 0.85)',
     display: 'flex',
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: isMobile ? 'flex-start' : 'center',
     zIndex: 99999,
-    padding: '50px',
+    padding: isMobile ? '0' : '20px',
     overflow: 'auto'
   },
   modal: {
     backgroundColor: '#1a1a1a',
-    borderRadius: '12px',
-    width: '90%',
-    maxWidth: '1000px',
-    maxHeight: '90vh',
+    borderRadius: isMobile ? '0' : '12px',
+    width: isMobile ? '100%' : '95%',
+    maxWidth: isMobile ? '100%' : '1000px',
+    maxHeight: isMobile ? '100vh' : '90vh',
+    minHeight: isMobile ? '100vh' : 'auto',
     display: 'flex',
     flexDirection: 'column',
-    border: '1px solid #333',
+    border: isMobile ? 'none' : '1px solid #333',
     boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
-    margin: 'auto',
+    margin: isMobile ? '0' : 'auto',
     position: 'relative'
   },
   modalHeader: {
-    padding: '28px 32px',
+    padding: isMobile ? '16px' : '28px 32px',
     borderBottom: '1px solid #333',
     display: 'flex',
     justifyContent: 'space-between',
@@ -581,66 +560,85 @@ const styles = {
   },
   modalTitle: {
     margin: 0,
-    fontSize: '24px',
-    color: '#fff'
+    fontSize: isMobile ? '18px' : '24px',
+    color: '#fff',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    flex: 1,
+    marginRight: '12px'
   },
   closeButton: {
-    backgroundColor: 'transparent',
-    border: 'none',
+    backgroundColor: '#2a2a2a',
+    border: '1px solid #444',
     color: '#888',
-    fontSize: '24px',
+    fontSize: '18px',
     cursor: 'pointer',
     padding: '0',
     width: '32px',
-    height: '32px'
+    height: '32px',
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0
   },
   tabs: {
     display: 'flex',
-    gap: '8px',
-    padding: '16px 32px 0 32px',
+    gap: isMobile ? '4px' : '8px',
+    padding: isMobile ? '12px 12px 0' : '16px 32px 0 32px',
     borderBottom: '2px solid #333',
-    overflowX: 'auto'
+    overflowX: 'auto',
+    WebkitOverflowScrolling: 'touch',
+    scrollbarWidth: 'none',
+    position: 'sticky',
+    top: 0,
+    backgroundColor: '#1a1a1a',
+    zIndex: 10
   },
   tab: {
     backgroundColor: 'transparent',
     border: 'none',
     borderBottom: '3px solid transparent',
-    padding: '12px 20px',
-    fontSize: '14px',
+    padding: isMobile ? '8px 12px' : '12px 20px',
+    fontSize: isMobile ? '12px' : '14px',
     fontWeight: 'bold',
     color: '#888',
     cursor: 'pointer',
-    whiteSpace: 'nowrap'
+    whiteSpace: 'nowrap',
+    flexShrink: 0
   },
   tabActive: {
     backgroundColor: 'transparent',
     border: 'none',
     borderBottom: '3px solid #00d4ff',
-    padding: '12px 20px',
-    fontSize: '14px',
+    padding: isMobile ? '8px 12px' : '12px 20px',
+    fontSize: isMobile ? '12px' : '14px',
     fontWeight: 'bold',
     color: '#00d4ff',
     cursor: 'pointer',
-    whiteSpace: 'nowrap'
+    whiteSpace: 'nowrap',
+    flexShrink: 0
   },
   content: {
-    padding: '30px 32px',
+    padding: isMobile ? '16px' : '30px 32px',
+    paddingTop: isMobile ? '20px' : '36px',
     overflowY: 'auto',
     flex: 1
   },
   sectionTitle: {
-    fontSize: '20px',
-    marginBottom: '20px',
+    fontSize: isMobile ? '16px' : '20px',
+    marginBottom: '16px',
     color: '#fff',
     borderBottom: '2px solid #333',
     paddingBottom: '10px'
   },
   currentBanner: {
-    marginBottom: '24px'
+    marginBottom: '20px'
   },
   bannerPreview: {
     width: '100%',
-    maxHeight: '300px',
+    maxHeight: isMobile ? '180px' : '300px',
     objectFit: 'cover',
     borderRadius: '8px',
     marginTop: '8px'
@@ -648,24 +646,26 @@ const styles = {
   uploadSection: {
     backgroundColor: '#1e1e1e',
     borderRadius: '8px',
-    padding: '20px',
-    border: '1px solid #333'
+    padding: isMobile ? '14px' : '20px',
+    border: '1px solid #333',
+    marginTop: '20px'
   },
   label: {
     display: 'block',
-    fontSize: '14px',
+    fontSize: isMobile ? '13px' : '14px',
     color: '#aaa',
     marginBottom: '8px'
   },
   fileInput: {
     width: '100%',
-    padding: '10px',
+    padding: isMobile ? '8px' : '10px',
     backgroundColor: '#2a2a2a',
     border: '1px solid #444',
     borderRadius: '6px',
     color: '#fff',
-    fontSize: '14px',
-    marginBottom: '12px'
+    fontSize: isMobile ? '13px' : '14px',
+    marginBottom: '12px',
+    boxSizing: 'border-box'
   },
   fileName: {
     fontSize: '13px',
@@ -681,15 +681,16 @@ const styles = {
     color: '#fff',
     fontSize: '14px',
     fontWeight: 'bold',
-    cursor: 'pointer'
+    cursor: 'pointer',
+    marginTop: '16px'
   },
   gallerySection: {
-    marginBottom: '24px'
+    marginBottom: '20px'
   },
   galleryGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
-    gap: '12px',
+    gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(150px, 1fr))',
+    gap: isMobile ? '8px' : '12px',
     marginTop: '12px'
   },
   galleryItem: {
@@ -697,20 +698,20 @@ const styles = {
   },
   galleryImage: {
     width: '100%',
-    height: '150px',
+    height: isMobile ? '120px' : '150px',
     objectFit: 'cover',
     borderRadius: '8px'
   },
   deleteImageButton: {
     position: 'absolute',
-    bottom: '8px',
-    right: '8px',
+    bottom: '6px',
+    right: '6px',
     backgroundColor: '#ff4444',
     border: 'none',
     borderRadius: '4px',
-    padding: '6px 12px',
+    padding: isMobile ? '4px 8px' : '6px 12px',
     color: '#fff',
-    fontSize: '12px',
+    fontSize: isMobile ? '10px' : '12px',
     fontWeight: 'bold',
     cursor: 'pointer'
   },
@@ -737,87 +738,94 @@ const styles = {
     fontSize: '16px',
     fontWeight: 'bold',
     cursor: 'pointer',
-    marginTop: '12px'
+    marginTop: '24px'
   },
   currentMotSection: {
-    marginBottom: '24px',
+    marginBottom: '20px',
     backgroundColor: '#1e1e1e',
     borderRadius: '8px',
-    padding: '16px',
+    padding: isMobile ? '12px' : '16px',
     border: '1px solid #333'
   },
   motPreview: {
     display: 'flex',
-    gap: '16px',
+    gap: isMobile ? '12px' : '16px',
     alignItems: 'center',
     marginTop: '12px'
   },
   motPhotoPreview: {
-    width: '80px',
-    height: '80px',
+    width: isMobile ? '60px' : '80px',
+    height: isMobile ? '60px' : '80px',
     borderRadius: '50%',
     objectFit: 'cover',
-    border: '3px solid #00d4ff'
+    border: '3px solid #00d4ff',
+    flexShrink: 0
   },
   motNamePreview: {
-    fontSize: '18px',
+    fontSize: isMobile ? '15px' : '18px',
     color: '#fff',
     fontWeight: 'bold',
     margin: '0 0 4px 0'
   },
   motTeamPreview: {
-    fontSize: '14px',
+    fontSize: isMobile ? '13px' : '14px',
     color: '#888',
     margin: 0
   },
   statsRow: {
     display: 'flex',
-    gap: '16px'
+    gap: isMobile ? '8px' : '16px',
+    flexWrap: 'wrap'
   },
   teamsList: {
     display: 'grid',
-    gap: '12px'
+    gap: isMobile ? '8px' : '12px'
   },
   teamItem: {
     backgroundColor: '#1e1e1e',
     borderRadius: '8px',
-    padding: '16px',
+    padding: isMobile ? '12px' : '16px',
     border: '1px solid #333',
     display: 'flex',
     alignItems: 'center',
-    gap: '16px'
+    gap: isMobile ? '10px' : '16px'
   },
   teamNumber: {
-    fontSize: '20px',
+    fontSize: isMobile ? '16px' : '20px',
     fontWeight: 'bold',
     color: '#00d4ff',
-    minWidth: '30px'
+    minWidth: isMobile ? '24px' : '30px'
   },
   teamInfo: {
-    flex: 1
+    flex: 1,
+    minWidth: 0
   },
   teamName: {
-    fontSize: '16px',
+    fontSize: isMobile ? '14px' : '16px',
     color: '#fff',
     fontWeight: 'bold',
-    margin: '0 0 4px 0'
+    margin: '0 0 4px 0',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap'
   },
   teamLocation: {
-    fontSize: '14px',
+    fontSize: isMobile ? '12px' : '14px',
     color: '#888',
     margin: 0
   },
   teamType: {
-    fontSize: '13px',
+    fontSize: isMobile ? '11px' : '13px',
     color: '#aaa',
-    padding: '4px 12px',
+    padding: isMobile ? '3px 8px' : '4px 12px',
     backgroundColor: '#2a2a2a',
-    borderRadius: '12px'
+    borderRadius: '12px',
+    flexShrink: 0
   },
   emptyText: {
     textAlign: 'center',
-    padding: '40px',
-    fontSize: '16px',
+    padding: isMobile ? '30px 16px' : '40px',
+    fontSize: isMobile ? '14px' : '16px',
     color: '#888'
   }
 };

@@ -1,5 +1,6 @@
 // frontend/src/components/Admin/TournamentAwardsManager.js
 // NEW COMPONENT - Tournament Awards & Points Management (Admin Only)
+// Updated for Round-wise Points Entry with Auto-Generate
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './TournamentAwardsManager.css';
@@ -10,24 +11,86 @@ const TournamentAwardsManager = ({ tournamentId }) => {
   const [activeTab, setActiveTab] = useState('points-entry');
   const [matches, setMatches] = useState([]);
   const [selectedMatch, setSelectedMatch] = useState(null);
-  const [teams, setTeams] = useState([]);
+  const [selectedRound, setSelectedRound] = useState(1); // Round 1, 2, or 3
   const [playerPoints, setPlayerPoints] = useState([]);
+  const [roundPoints, setRoundPoints] = useState({}); // Store points per round
   const [awards, setAwards] = useState(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [generating, setGenerating] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
+
+  // Create Match state
+  const [teams, setTeams] = useState([]);
+  const [newMatch, setNewMatch] = useState({
+    teamA: '',
+    teamB: '',
+    matchNumber: matches.length + 1
+  });
 
   useEffect(() => {
     if (tournamentId) {
       fetchMatches();
       fetchAwards();
+      fetchTournamentTeams();
     }
   }, [tournamentId]);
+
+  const fetchTournamentTeams = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/tournaments/${tournamentId}`);
+      if (response.data.success) {
+        setTeams(response.data.data.registeredTeams || []);
+      }
+    } catch (error) {
+      console.error('Error fetching teams:', error);
+    }
+  };
+
+  const createMatch = async () => {
+    if (!newMatch.teamA || !newMatch.teamB) {
+      showMessage('error', 'Please select both teams');
+      return;
+    }
+
+    if (newMatch.teamA === newMatch.teamB) {
+      showMessage('error', 'Team A and Team B must be different');
+      return;
+    }
+
+    try {
+      setSaving(true);
+      const response = await axios.post(
+        `${API_BASE_URL}/matches`,
+        {
+          tournamentId: tournamentId,
+          teamAId: newMatch.teamA,
+          teamBId: newMatch.teamB
+        }
+      );
+
+      if (response.data.success) {
+        showMessage('success', 'Match created successfully!');
+        setNewMatch({
+          teamA: '',
+          teamB: '',
+          matchNumber: matches.length + 2
+        });
+        fetchMatches(); // Refresh matches list
+        setActiveTab('points-entry'); // Switch to points entry tab
+      }
+    } catch (error) {
+      console.error('Error creating match:', error);
+      showMessage('error', error.response?.data?.message || 'Failed to create match');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const fetchMatches = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_BASE_URL}/matches?tournament=${tournamentId}`);
+      const response = await axios.get(`${API_BASE_URL}/matches?tournamentId=${tournamentId}`);
       setMatches(response.data.data || []);
     } catch (error) {
       console.error('Error fetching matches:', error);
@@ -44,6 +107,7 @@ const TournamentAwardsManager = ({ tournamentId }) => {
       const match = matchResponse.data.data;
 
       setSelectedMatch(match);
+      setSelectedRound(1); // Reset to round 1
 
       // Get all unique players from both teams
       const players = [];
@@ -56,7 +120,7 @@ const TournamentAwardsManager = ({ tournamentId }) => {
             team: match.teamA._id,
             teamName: match.teamA.name,
             teamColor: match.teamA.color,
-            role: member.role
+            role: member.role || 'Forward' // Default role
           });
         });
       }
@@ -69,34 +133,43 @@ const TournamentAwardsManager = ({ tournamentId }) => {
             team: match.teamB._id,
             teamName: match.teamB.name,
             teamColor: match.teamB.color,
-            role: member.role
+            role: member.role || 'Forward'
           });
         });
       }
 
-      // Fetch existing points for this match
+      // Fetch existing points for this match (all rounds)
       const pointsResponse = await axios.get(
         `${API_BASE_URL}/tournaments/${tournamentId}/player-points/match/${matchId}`
       );
 
       const existingPoints = pointsResponse.data.data || [];
+      const roundWise = pointsResponse.data.roundWise || {};
 
-      // Initialize player points with existing data or zeros
+      // Store round-wise points
+      setRoundPoints(roundWise);
+
+      // Initialize player points for round 1 with existing data or zeros
       const initializedPoints = players.map(player => {
-        const existing = existingPoints.find(p => p.playerName === player.name);
+        // Find existing points for round 1
+        const existingRound1 = existingPoints.find(
+          p => p.playerName === player.name && p.round === 1
+        );
         return {
           playerName: player.name,
           team: player.team,
           teamName: player.teamName,
           teamColor: player.teamColor,
-          role: player.role,
-          categoryPoints: existing?.categoryPoints || {
+          playerRole: existingRound1?.playerRole || player.role || 'Forward',
+          goalsScored: existingRound1?.goalsScored || 0,
+          categoryPoints: existingRound1?.categoryPoints || {
             strikerPoints: 0,
             forwardPoints: 0,
             defenderPoints: 0,
             goalkeeperPoints: 0
           },
-          notes: existing?.notes || ''
+          totalPoints: existingRound1?.totalPoints || 0,
+          isGenerated: !!existingRound1
         };
       });
 
@@ -109,20 +182,126 @@ const TournamentAwardsManager = ({ tournamentId }) => {
     }
   };
 
-  const handlePointsChange = (playerIndex, category, value) => {
+  // Switch round and load existing data
+  const switchRound = async (round) => {
+    if (!selectedMatch) return;
+    setSelectedRound(round);
+
+    try {
+      // Fetch points for this specific round
+      const pointsResponse = await axios.get(
+        `${API_BASE_URL}/tournaments/${tournamentId}/player-points/match/${selectedMatch._id}?round=${round}`
+      );
+
+      const existingPoints = pointsResponse.data.data || [];
+
+      // Update playerPoints with round-specific data
+      const updatedPoints = playerPoints.map(player => {
+        const existingRoundData = existingPoints.find(
+          p => p.playerName === player.playerName
+        );
+        return {
+          ...player,
+          playerRole: existingRoundData?.playerRole || player.playerRole,
+          goalsScored: existingRoundData?.goalsScored || 0,
+          categoryPoints: existingRoundData?.categoryPoints || {
+            strikerPoints: 0,
+            forwardPoints: 0,
+            defenderPoints: 0,
+            goalkeeperPoints: 0
+          },
+          totalPoints: existingRoundData?.totalPoints || 0,
+          isGenerated: !!existingRoundData
+        };
+      });
+
+      setPlayerPoints(updatedPoints);
+    } catch (error) {
+      console.error('Error fetching round data:', error);
+    }
+  };
+
+  const handleGoalsChange = (playerIndex, value) => {
     const newPoints = [...playerPoints];
-    const numValue = Math.max(0, Math.min(100, parseInt(value) || 0));
-    newPoints[playerIndex].categoryPoints[category] = numValue;
+    const numValue = Math.max(0, parseInt(value) || 0);
+    newPoints[playerIndex].goalsScored = numValue;
+    newPoints[playerIndex].isGenerated = false; // Mark as not generated after manual change
     setPlayerPoints(newPoints);
   };
 
-  const handleNotesChange = (playerIndex, value) => {
+  const handleRoleChange = (playerIndex, role) => {
     const newPoints = [...playerPoints];
-    newPoints[playerIndex].notes = value;
+    newPoints[playerIndex].playerRole = role;
+    newPoints[playerIndex].isGenerated = false;
     setPlayerPoints(newPoints);
   };
 
-  const savePlayerPoints = async () => {
+  // Auto-generate role-based points for current round
+  const autoGeneratePoints = async () => {
+    if (!selectedMatch) {
+      showMessage('error', 'Please select a match first');
+      return;
+    }
+
+    try {
+      setGenerating(true);
+
+      // Prepare player goals data
+      const playerGoals = playerPoints.map(player => ({
+        playerName: player.playerName,
+        team: player.team,
+        playerRole: player.playerRole,
+        goalsScored: player.goalsScored
+      }));
+
+      const response = await axios.post(
+        `${API_BASE_URL}/tournaments/${tournamentId}/player-points/auto-generate`,
+        {
+          matchId: selectedMatch._id,
+          round: selectedRound,
+          playerGoals: playerGoals
+        }
+      );
+
+      // Update local state with generated points
+      const generatedData = response.data.data || [];
+      const updatedPoints = playerPoints.map(player => {
+        const generated = generatedData.find(g => g.playerName === player.playerName);
+        if (generated) {
+          return {
+            ...player,
+            categoryPoints: generated.categoryPoints,
+            totalPoints: generated.totalPoints,
+            isGenerated: true
+          };
+        }
+        return player;
+      });
+
+      setPlayerPoints(updatedPoints);
+      showMessage('success', `Round ${selectedRound} points auto-generated!`);
+
+      // Update MOM display
+      if (response.data.manOfMatch) {
+        setSelectedMatch(prev => ({
+          ...prev,
+          manOfTheMatch: response.data.manOfMatch
+        }));
+      }
+
+      // Refresh matches list to show updated MOM badge
+      fetchMatches();
+      fetchAwards(); // Refresh awards
+    } catch (error) {
+      console.error('Error auto-generating points:', error);
+      showMessage('error', error.response?.data?.message || 'Failed to auto-generate points');
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  // Save manually entered points for current round
+  const saveRoundPoints = async () => {
     if (!selectedMatch) {
       showMessage('error', 'Please select a match first');
       return;
@@ -131,20 +310,24 @@ const TournamentAwardsManager = ({ tournamentId }) => {
     try {
       setSaving(true);
 
+      const pointsData = playerPoints.map(player => ({
+        playerName: player.playerName,
+        team: player.team,
+        playerRole: player.playerRole,
+        goalsScored: player.goalsScored,
+        categoryPoints: player.categoryPoints
+      }));
+
       await axios.post(
         `${API_BASE_URL}/tournaments/${tournamentId}/player-points`,
         {
           matchId: selectedMatch._id,
-          playerPoints: playerPoints
-        },
-        {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
+          round: selectedRound,
+          playerPoints: pointsData
         }
       );
 
-      showMessage('success', 'Player points saved successfully!');
+      showMessage('success', `Round ${selectedRound} points saved successfully!`);
       fetchAwards(); // Refresh awards after saving
     } catch (error) {
       console.error('Error saving player points:', error);
@@ -191,6 +374,12 @@ const TournamentAwardsManager = ({ tournamentId }) => {
 
       <div className="awards-tabs">
         <button
+          className={`tab-btn ${activeTab === 'create-match' ? 'active' : ''}`}
+          onClick={() => setActiveTab('create-match')}
+        >
+          ➕ Create Match
+        </button>
+        <button
           className={`tab-btn ${activeTab === 'points-entry' ? 'active' : ''}`}
           onClick={() => setActiveTab('points-entry')}
         >
@@ -206,6 +395,66 @@ const TournamentAwardsManager = ({ tournamentId }) => {
           🏅 View Awards
         </button>
       </div>
+
+      {activeTab === 'create-match' && (
+        <div className="create-match-section">
+          <div className="match-form">
+            <h3>Create New Match</h3>
+
+            <div className="form-group">
+              <label>Match Number</label>
+              <input
+                type="number"
+                value={newMatch.matchNumber}
+                onChange={(e) => setNewMatch({ ...newMatch, matchNumber: parseInt(e.target.value) || 1 })}
+                min="1"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Team A</label>
+              <select
+                value={newMatch.teamA}
+                onChange={(e) => setNewMatch({ ...newMatch, teamA: e.target.value })}
+              >
+                <option value="">Select Team A</option>
+                {teams.map(team => (
+                  <option key={team._id} value={team._id}>
+                    {team.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Team B</label>
+              <select
+                value={newMatch.teamB}
+                onChange={(e) => setNewMatch({ ...newMatch, teamB: e.target.value })}
+              >
+                <option value="">Select Team B</option>
+                {teams.map(team => (
+                  <option key={team._id} value={team._id}>
+                    {team.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <button
+              className="create-match-btn"
+              onClick={createMatch}
+              disabled={!newMatch.teamA || !newMatch.teamB || saving}
+            >
+              {saving ? 'Creating...' : 'Create Match'}
+            </button>
+
+            <div className="info-box">
+              <p>ℹ️ After creating a match, you can assign player points for each round in the <strong>Points Entry</strong> tab.</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {activeTab === 'points-entry' && (
         <div className="points-entry-section">
@@ -230,6 +479,11 @@ const TournamentAwardsManager = ({ tournamentId }) => {
                       <span style={{ color: match.teamB?.color }}>{match.teamB?.name}</span>
                     </div>
                     <div className="match-status">{match.status}</div>
+                    {match.manOfTheMatch?.playerName && (
+                      <div className="mom-badge">
+                        🏅 MOM: {match.manOfTheMatch.playerName}
+                      </div>
+                    )}
                   </button>
                 ))
               )}
@@ -239,22 +493,54 @@ const TournamentAwardsManager = ({ tournamentId }) => {
           {selectedMatch && (
             <div className="points-form">
               <div className="form-header">
-                <h3>Enter Player Points - Match #{selectedMatch.matchNumber}</h3>
-                <button className="save-btn" onClick={savePlayerPoints} disabled={saving}>
-                  {saving ? '💾 Saving...' : '💾 Save All Points'}
-                </button>
+                <h3>Match #{selectedMatch.matchNumber} - Round Points Entry</h3>
+                {selectedMatch.manOfTheMatch?.playerName && (
+                  <div className="mom-display">
+                    🏅 MOM: <strong>{selectedMatch.manOfTheMatch.playerName}</strong>
+                  </div>
+                )}
               </div>
 
-              <div className="category-legend">
-                <span className="legend-item">⚡ Striker (0-100)</span>
-                <span className="legend-item">🎯 Forward (0-100)</span>
-                <span className="legend-item">🛡️ Defender (0-100)</span>
-                <span className="legend-item">🥅 Goalkeeper (0-100)</span>
+              {/* Round Selection Tabs */}
+              <div className="round-tabs">
+                {[1, 2, 3].map(round => (
+                  <button
+                    key={round}
+                    className={`round-tab ${selectedRound === round ? 'active' : ''}`}
+                    onClick={() => switchRound(round)}
+                  >
+                    Round {round}
+                    {roundPoints[round]?.length > 0 && (
+                      <span className="round-saved-badge">✓</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+
+              <div className="round-info">
+                <p>📝 Enter goals for each player, set their role, then click <strong>Auto-Generate</strong> to calculate points based on role.</p>
+              </div>
+
+              <div className="action-buttons">
+                <button
+                  className="generate-btn"
+                  onClick={autoGeneratePoints}
+                  disabled={generating}
+                >
+                  {generating ? '⏳ Generating...' : '🎲 Auto-Generate Round Points'}
+                </button>
+                <button
+                  className="save-btn"
+                  onClick={saveRoundPoints}
+                  disabled={saving}
+                >
+                  {saving ? '💾 Saving...' : '💾 Save Round Points'}
+                </button>
               </div>
 
               <div className="players-list">
                 {playerPoints.map((player, index) => (
-                  <div key={index} className="player-points-card">
+                  <div key={index} className={`player-points-card ${player.isGenerated ? 'generated' : ''}`}>
                     <div className="player-info">
                       <div
                         className="team-indicator"
@@ -263,78 +549,52 @@ const TournamentAwardsManager = ({ tournamentId }) => {
                       <div className="player-details">
                         <h4>{player.playerName}</h4>
                         <p className="player-meta">
-                          {player.teamName} • {player.role}
+                          {player.teamName}
                         </p>
                       </div>
                     </div>
 
-                    <div className="points-inputs">
-                      <div className="point-input-group">
-                        <label>⚡ Striker</label>
+                    <div className="player-inputs-row">
+                      {/* Role Selection */}
+                      <div className="input-group role-select">
+                        <label>Role</label>
+                        <select
+                          value={player.playerRole}
+                          onChange={(e) => handleRoleChange(index, e.target.value)}
+                        >
+                          <option value="Striker">Striker</option>
+                          <option value="Forward">Forward</option>
+                          <option value="Defender">Defender</option>
+                          <option value="Keeper">Keeper</option>
+                        </select>
+                      </div>
+
+                      {/* Goals Input */}
+                      <div className="input-group goals-input">
+                        <label>⚽ Goals</label>
                         <input
                           type="number"
                           min="0"
-                          max="100"
-                          value={player.categoryPoints.strikerPoints}
-                          onChange={(e) =>
-                            handlePointsChange(index, 'strikerPoints', e.target.value)
-                          }
+                          value={player.goalsScored}
+                          onChange={(e) => handleGoalsChange(index, e.target.value)}
                         />
-                      </div>
-
-                      <div className="point-input-group">
-                        <label>🎯 Forward</label>
-                        <input
-                          type="number"
-                          min="0"
-                          max="100"
-                          value={player.categoryPoints.forwardPoints}
-                          onChange={(e) =>
-                            handlePointsChange(index, 'forwardPoints', e.target.value)
-                          }
-                        />
-                      </div>
-
-                      <div className="point-input-group">
-                        <label>🛡️ Defender</label>
-                        <input
-                          type="number"
-                          min="0"
-                          max="100"
-                          value={player.categoryPoints.defenderPoints}
-                          onChange={(e) =>
-                            handlePointsChange(index, 'defenderPoints', e.target.value)
-                          }
-                        />
-                      </div>
-
-                      <div className="point-input-group">
-                        <label>🥅 Goalkeeper</label>
-                        <input
-                          type="number"
-                          min="0"
-                          max="100"
-                          value={player.categoryPoints.goalkeeperPoints}
-                          onChange={(e) =>
-                            handlePointsChange(index, 'goalkeeperPoints', e.target.value)
-                          }
-                        />
-                      </div>
-
-                      <div className="point-total">
-                        <strong>Total: {calculateTotal(player.categoryPoints)}</strong>
                       </div>
                     </div>
 
-                    <div className="notes-section">
-                      <input
-                        type="text"
-                        placeholder="Notes (optional)"
-                        value={player.notes}
-                        onChange={(e) => handleNotesChange(index, e.target.value)}
-                        className="notes-input"
-                      />
-                    </div>
+                    {/* Generated Points Display (Read-only) */}
+                    {player.isGenerated && (
+                      <div className="generated-points">
+                        <div className="points-display">
+                          <span className="point-badge striker">⚡ {player.categoryPoints.strikerPoints}</span>
+                          <span className="point-badge forward">🎯 {player.categoryPoints.forwardPoints}</span>
+                          <span className="point-badge defender">🛡️ {player.categoryPoints.defenderPoints}</span>
+                          <span className="point-badge keeper">🥅 {player.categoryPoints.goalkeeperPoints}</span>
+                        </div>
+                        <div className="total-points">
+                          Total: <strong>{calculateTotal(player.categoryPoints)}</strong>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -370,6 +630,7 @@ const TournamentAwardsManager = ({ tournamentId }) => {
                   </p>
                   <div className="award-stats">
                     <span>Total Points: <strong>{awards.manOfTournament?.totalPoints}</strong></span>
+                    <span>Goals: <strong>{awards.manOfTournament?.totalGoals || 0}</strong></span>
                     <span>Matches: <strong>{awards.manOfTournament?.matchesPlayed}</strong></span>
                   </div>
                 </div>
@@ -385,7 +646,10 @@ const TournamentAwardsManager = ({ tournamentId }) => {
                     <h3>{awards.bestStriker?.playerName}</h3>
                     <p>{awards.bestStriker?.teamDetails?.name}</p>
                     <div className="stat-badge">
-                      Avg: {awards.bestStriker?.avgPoints?.toFixed(2)}
+                      ⚽ {awards.bestStriker?.totalGoals || 0} Goals
+                    </div>
+                    <div className="stat-badge">
+                      Score: {awards.bestStriker?.weightedScore?.toFixed(2)}
                     </div>
                   </div>
                 </div>
@@ -398,7 +662,10 @@ const TournamentAwardsManager = ({ tournamentId }) => {
                     <h3>{awards.bestForward?.playerName}</h3>
                     <p>{awards.bestForward?.teamDetails?.name}</p>
                     <div className="stat-badge">
-                      Avg: {awards.bestForward?.avgPoints?.toFixed(2)}
+                      ⚽ {awards.bestForward?.totalGoals || 0} Goals
+                    </div>
+                    <div className="stat-badge">
+                      Score: {awards.bestForward?.weightedScore?.toFixed(2)}
                     </div>
                   </div>
                 </div>
